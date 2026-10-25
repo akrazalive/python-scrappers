@@ -30,11 +30,14 @@ parameters; it is not needed (the Kroger endpoint with `store_id` is proven) and
 | 3 | `deploy.sh … job` – job, trigger **Manual**, default command `budget-status`; `run_test.sh … status` proves it runs | developer | 0 | step 2 |
 | 4 | **Test 1** `run_test.sh <sub> <rg> test1` | developer | **≤ 19** | agreed CT window, Test 1 approved |
 | 5 | **Test 2** `run_test.sh <sub> <rg> test2` | developer | **≤ 300** | Test 1 result reviewed, window |
-| 6 | Test 3 – fresh full-CSV run, killed once and resumed | developer | cap set from Test 2 measurement, approved by client | client approval of the cap |
+| 6 | Test 3 `run_test.sh <sub> <rg> full <cap>` – fresh full-CSV run; `run_test.sh … stop` once mid-run (forced kill), then the same `full <cap>` resumes from the checkpoint | developer | cap set from Test 2 measurement, approved by client | client approval of the cap |
 | 7 | failed-publication proof; second execution | developer | ≈ 50; second run approved separately | client approval |
 
-The tests run inside Azure so the key stays in Key Vault. No schedule exists at any step; `SCHEDULE=on` is used only
-after the client approves days/time.
+The tests run inside Azure so the key stays in Key Vault, and every run continues in the cloud with no developer
+machine involved: `run_test.sh` starts an execution and returns; one execution may run up to 24 h
+(`replicaTimeoutSeconds`), and a stopped replica is retried from its checkpoint (`replicaRetryLimit` 2).
+`run_test.sh … status` and `… collect` fetch progress and evidence at any time. No schedule exists at any step;
+`SCHEDULE=on` is used only after the client approves days/time.
 
 ## 3. Executable commands and enforced limits
 
@@ -58,10 +61,11 @@ and a total cannot be raised under the same name. Every counted request is logge
 in `state/_budgets/<test>.jsonl`. Offline tests: `tests/test_v112_bounded_tests.py` (worst case – every request
 fails and retries – stays ≤ 19 even when the test is started twice).
 
-In Azure, `deploy/azure/run_test.sh <sub> <rg> test1|test2|status` refuses to start unless the job trigger is
-Manual, sets the execution's command, starts ONE execution, waits, resets the job to `budget-status`, and writes
-`evidence/azure-<test>-<ts>/` (execution record, console log, budget ledger, verification / probe / run evidence,
-SHA256SUMS).
+In Azure, `deploy/azure/run_test.sh <sub> <rg> test1|test2|full <cap>` refuses to start unless the job trigger is
+Manual, sets the execution's command and starts ONE execution, then returns. `stop` interrupts the running
+execution (kill/resume test); `status` lists executions and budget usage; `collect [exec]` writes
+`evidence/azure-<exec>-<ts>/` (execution record, console log, budget ledger, verification / probe / run evidence,
+SHA256SUMS) and sets the job back to `budget-status`.
 
 ## 4. Stores
 

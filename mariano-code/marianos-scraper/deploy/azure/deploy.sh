@@ -16,6 +16,7 @@ set -euo pipefail
 SUB=${1:?subscription id}; RG=${2:?existing resource group}; PHASE=${3:?infra|job}
 HERE="$(cd "$(dirname "$0")" && pwd)"; ROOT="$HERE/../.."
 ASSIGN_ROLES=${ASSIGN_ROLES:-false}; CRON=${CRON:-0 7 * * 2,5}
+export MSYS_NO_PATHCONV=1   # Git Bash on Windows: keep /subscriptions/... resource ids unchanged
 SCHEDULE=${SCHEDULE:-off}; SCHED_ENABLED=false; if [ "$SCHEDULE" = "on" ]; then SCHED_ENABLED=true; fi
 TAGS=${TAGS:-}; PROVIDER=${PROVIDER:-oxylabs_kroger}
 if [ -z "$TAGS" ]; then TAGS='{}'; fi

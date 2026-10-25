@@ -40,6 +40,7 @@ All 5 versions used in the run (1.1.1 to 1.1.5) were recomputed from their zips 
   c) Quota and a test window.
 
 6. Completion plan (US Central, CDT, details in section 6)
+This replaces my earlier conditional two-day estimate. Azure access is now ready. Still pending: your approvals, the role assignments, the Oxylabs credential and a test window.
 - Package B (raw evidence and variant check): 4 hours after you approve the 1,220 requests, e.g. Mon 26 Oct 15:00 CDT if approved by 11:00.
 - v1.1.6 code (the exception you agree, the UPC queue fix, the manual-only Azure template): Tue 27 Oct 20:00 CDT, or Wed 28 Oct 14:00 if variants must also be collected.
 - Azure deploy and tests on the final hash, including the hard stop: Wed 28 Oct 16:00 CDT.

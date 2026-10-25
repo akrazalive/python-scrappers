@@ -40,6 +40,15 @@ param fetchProvider string = 'oxylabs_kroger'
 @description('What a manual job execution runs (mscraper CLI arguments). Default budget-status = zero provider requests, so an accidental start costs nothing. Bounded tests set it per execution (deploy/azure/run_test.sh).')
 param defaultArgs string = 'budget-status'
 
+@description('Longest one execution may run, in seconds (default 24 h). A full run continues in the cloud with the developer PC off; if the replica stops early it is retried from its checkpoint (replicaRetryLimit).')
+param replicaTimeoutSeconds int = 86400
+
+@description('Automatic retries of a failed / stopped replica within one execution; each retry resumes from the checkpoint on Azure Files.')
+param replicaRetryLimit int = 2
+
+@description('Parallel provider requests (MSCRAPER_CONCURRENCY); set from the Test 2 measurement and the Oxylabs plan.')
+param concurrency int = 4
+
 @description('Optional: Oxylabs key to store in Key Vault. Leave empty when the client stores the secret itself.')
 @secure()
 param oxylabsWebApiKey string = ''
@@ -184,8 +193,8 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
       triggerType: scheduleEnabled ? 'Schedule' : 'Manual'
       scheduleTriggerConfig: scheduleEnabled ? { cronExpression: cronExpression, parallelism: 1, replicaCompletionCount: 1 } : null
       manualTriggerConfig: scheduleEnabled ? null : { parallelism: 1, replicaCompletionCount: 1 }
-      replicaTimeout: 28800          // 8 h hard stop; an unfinished run resumes from its checkpoint next time
-      replicaRetryLimit: 1
+      replicaTimeout: replicaTimeoutSeconds   // one execution covers a full run; unfinished work resumes from the checkpoint
+      replicaRetryLimit: replicaRetryLimit
       secrets: [for n in providerSecrets: { name: n, keyVaultUrl: '${kv.properties.vaultUri}secrets/${n}', identity: identity.id }]
     }
     template: {
@@ -199,6 +208,7 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
           volumeMounts: [ { volumeName: 'state', mountPath: '/state' } ]
           env: concat(providerEnv, [
             { name: 'MSCRAPER_FETCH_PROVIDER', value: fetchProvider }
+            { name: 'MSCRAPER_CONCURRENCY', value: string(concurrency) }
             { name: 'MSCRAPER_ARGS', value: scheduleEnabled ? 'run-all' : defaultArgs }
             { name: 'MSCRAPER_OUTPUT_BACKEND', value: 'azure_blob' }
             { name: 'MSCRAPER_STATE_DIR', value: '/state' }

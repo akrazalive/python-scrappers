@@ -3,6 +3,7 @@
 #   ./deploy/azure/preflight.sh <subscription-id> <resource-group>
 # Writes evidence/azure-preflight-<ts>/preflight.json and prints PASS / ACTION NEEDED lines.
 set -uo pipefail
+export MSYS_NO_PATHCONV=1   # Git Bash on Windows: keep /subscriptions/... resource ids unchanged
 SUB=${1:?subscription id}; RG=${2:?resource group}
 OUT="evidence/azure-preflight-$(date -u +%Y%m%dT%H%M%SZ)"; mkdir -p "$OUT"
 az account set --subscription "$SUB" || { echo "ACTION NEEDED: subscription $SUB not visible to this account"; exit 1; }
@@ -13,10 +14,10 @@ SCOPE=$(echo "$RG_JSON" | python -c "import json,sys;print(json.load(sys.stdin)[
 ROLES=$(az role assignment list --assignee "$ME" --scope "$SCOPE" --include-inherited --query "[].roleDefinitionName" -o json 2>/dev/null || echo "[]")
 
 python - "$OUT" "$SUB" "$RG" "$RG_JSON" "$ROLES" <<'PY'
-import json, subprocess, sys
+import json, shutil, subprocess, sys
 out, sub, rg, rg_json, roles = sys.argv[1], sys.argv[2], sys.argv[3], json.loads(sys.argv[4]), json.loads(sys.argv[5] or "[]")
 def az(*a):
-    r = subprocess.run(["az", *a, "-o", "json"], capture_output=True, text=True, shell=False)
+    r = subprocess.run([shutil.which("az") or "az", *a, "-o", "json"], capture_output=True, text=True, shell=False)  # az.cmd on Windows
     return json.loads(r.stdout) if r.returncode == 0 and r.stdout.strip() else None
 providers = {}
 for ns in ("Microsoft.App", "Microsoft.OperationalInsights", "Microsoft.Storage", "Microsoft.KeyVault", "Microsoft.ManagedIdentity"):

@@ -1,1 +1,244 @@
-error:error.code} was unexpected at this time.
+{
+  "changes": [
+    {
+      "after": {
+        "apiVersion": "2024-03-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.App/managedEnvironments/mscraper-env",
+        "location": "westus2",
+        "name": "mscraper-env",
+        "properties": {
+          "appLogsConfiguration": {
+            "destination": "log-analytics",
+            "logAnalyticsConfiguration": {
+              "customerId": "[reference('/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.OperationalInsights/workspaces/mscraper-logs', '2023-09-01').customerId]",
+              "sharedKey": "*******"
+            }
+          }
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.App/managedEnvironments"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.App/managedEnvironments/mscraper-env",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2024-03-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.App/managedEnvironments/mscraper-env/storages/state",
+        "name": "state",
+        "properties": {
+          "azureFile": {
+            "accessMode": "ReadWrite",
+            "accountKey": "*******",
+            "accountName": "*******",
+            "shareName": "scraper-state"
+          }
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.App/managedEnvironments/storages"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.App/managedEnvironments/mscraper-env/storages/state",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-07-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/mscraper-kv-zwkzlg5qbam5",
+        "location": "westus2",
+        "name": "mscraper-kv-zwkzlg5qbam5",
+        "properties": {
+          "enableRbacAuthorization": true,
+          "enableSoftDelete": true,
+          "sku": {
+            "family": "A",
+            "name": "standard"
+          },
+          "tenantId": "b6d4bd45-c947-4f69-9949-7e688a70561e"
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.KeyVault/vaults"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/mscraper-kv-zwkzlg5qbam5",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-01-31",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mscraper-id",
+        "location": "westus2",
+        "name": "mscraper-id",
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.ManagedIdentity/userAssignedIdentities"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mscraper-id",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-09-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.OperationalInsights/workspaces/mscraper-logs",
+        "location": "westus2",
+        "name": "mscraper-logs",
+        "properties": {
+          "retentionInDays": 30,
+          "sku": {
+            "name": "PerGB2018"
+          }
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.OperationalInsights/workspaces"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.OperationalInsights/workspaces/mscraper-logs",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-05-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a",
+        "kind": "StorageV2",
+        "location": "westus2",
+        "name": "mscraperzwkzlg5qbam5a",
+        "properties": {
+          "allowBlobPublicAccess": false,
+          "minimumTlsVersion": "TLS1_2",
+          "supportsHttpsTrafficOnly": true
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "type": "Microsoft.Storage/storageAccounts"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-05-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default",
+        "name": "default",
+        "properties": {
+          "deleteRetentionPolicy": {
+            "days": 14,
+            "enabled": true
+          },
+          "isVersioningEnabled": true
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.Storage/storageAccounts/blobServices"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-05-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default/containers/marianos-scraper",
+        "name": "marianos-scraper",
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.Storage/storageAccounts/blobServices/containers"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default/containers/marianos-scraper",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-05-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/fileServices/default",
+        "name": "default",
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.Storage/storageAccounts/fileServices"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/fileServices/default",
+      "symbolicName": null,
+      "unsupportedReason": null
+    },
+    {
+      "after": {
+        "apiVersion": "2023-05-01",
+        "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/fileServices/default/shares/scraper-state",
+        "name": "scraper-state",
+        "properties": {
+          "shareQuota": 5
+        },
+        "resourceGroup": "scraper-contest-asif-test",
+        "type": "Microsoft.Storage/storageAccounts/fileServices/shares"
+      },
+      "before": null,
+      "changeType": "Create",
+      "delta": null,
+      "deploymentId": null,
+      "extension": null,
+      "identifiers": null,
+      "resourceId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/fileServices/default/shares/scraper-state",
+      "symbolicName": null,
+      "unsupportedReason": null
+    }
+  ],
+  "diagnostics": null,
+  "error": null,
+  "potentialChanges": null,
+  "status": "Succeeded"
+}

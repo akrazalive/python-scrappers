@@ -74,7 +74,17 @@ Why the code changed between collection and delivery of entry #69:
   Vault – RG Contributor cannot read them.
 * `tools/store_evidence.py`: store / fulfillment evidence from saved raw responses (selected store, modality, request
   pin, per-product price source and IN_STORE availability, verbatim price excerpts, file SHA-256).
-* Tests: 42 offline (38 + 4 for the total budget and the bounded tests).
+* **Crawl throughput**: the wave loop is replaced by a continuous work queue (`Runner.crawl_pending`). Up to 1.1.1 a
+  wave waited for its slowest request (retries and back-off included) before the next wave started, leaving most of
+  the 4 parallel slots idle – the main cause of ~8-9 requests/minute on 21 Oct. Now every queued request starts as
+  soon as a slot is free; each request is started at most once per session. `crawl.max_expansion_waves` removed.
+  Parallel requests: `fetch.concurrency` or env `MSCRAPER_CONCURRENCY` (Bicep `concurrency`), to be set from Test 2.
+* Azure: one execution may run up to `replicaTimeoutSeconds` (default 24 h, was a fixed 8 h) with
+  `replicaRetryLimit` 2 (a stopped replica resumes from the checkpoint), so a full run completes in the cloud with no
+  developer machine involved. `run_test.sh` starts and returns at once; actions `test1`, `test2`, `full <cap>` (Test 3;
+  the same command resumes), `stop` (forced interruption for the kill/resume test), `status`, `collect [exec]`.
+  Scripts set `MSYS_NO_PATHCONV=1` and `preflight.sh` resolves `az.cmd`, so they also run from Git Bash on Windows.
+* Tests: 44 offline (38 + 6: total budget, bounded tests, crawl queue).
 
 ## 1.1.1 (2026-10-24) – client reply to v1.1.0
 * Coverage: zero UNEXPLAINED gaps. Every seed request's gap is split into explained items (request/slice not completed,

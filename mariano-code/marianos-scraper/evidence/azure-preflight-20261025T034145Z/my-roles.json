@@ -1,0 +1,19 @@
+[
+  {
+    "createdBy": "8278510f-34e3-49a8-8669-e36b37ccc0fa",
+    "createdOn": "2026-10-24T23:13:14.631214+00:00",
+    "description": "Dedicated scraper contest test resource group. Manual test execution; coordinate request budgets and schedules with the owner.",
+    "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Authorization/roleAssignments/45a136dc-afc8-40da-9fb8-e51479ac0a4f",
+    "name": "45a136dc-afc8-40da-9fb8-e51479ac0a4f",
+    "principalId": "b29818e6-9309-48c3-8922-64d2d7d8e32c",
+    "principalName": "debugging.specialist_gmail.com#EXT#@darrenandresasbcglobal.onmicrosoft.com",
+    "principalType": "User",
+    "resourceGroup": "scraper-contest-asif-test",
+    "roleDefinitionId": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
+    "roleDefinitionName": "Contributor",
+    "scope": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test",
+    "type": "Microsoft.Authorization/roleAssignments",
+    "updatedBy": "8278510f-34e3-49a8-8669-e36b37ccc0fa",
+    "updatedOn": "2026-10-24T23:13:14.631214+00:00"
+  }
+]

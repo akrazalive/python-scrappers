@@ -2,13 +2,18 @@ MARIANO'S #69 → v1.1.2: completion plan, bounded tests with enforced totals, O
 
 Hello,
 
-Thank you for applying the Azure access and for the encouragement. I can now see scraper-contest-asif-test with my invited account. v1.1.2 is attached (marianos-v1.1.2.zip, code_sha256 c6a0f502d12f1c1ba8f8f13cae3f196ff40a49a71eb2b03f4202f0bd2feccb38). It replaces v1.1.1. Nothing new was collected live: the only live Mariano's evidence is still from 21 Oct.
+Thank you for applying the Azure access and for the encouragement. I can now see scraper-contest-asif-test with my invited account. A read-only check (folder C-AZURE-PREFLIGHT-2026-10-25) shows:
+- my role on the group is Contributor, and the group is empty
+- Microsoft.App, Microsoft.OperationalInsights, Microsoft.Storage, Microsoft.KeyVault and Microsoft.ManagedIdentity are all Registered
+- there are no policy assignments on the group
+- a what-if preview of the infrastructure step succeeded
+Nothing was created. v1.1.2 is attached (marianos-v1.1.2.zip, code_sha256 40c404a02eaae755cd7daea89b818d2213cb29c24fd005f5c339b4e2b6678129). It replaces v1.1.1. Nothing new was collected live: the only live Mariano's evidence is still from 21 Oct.
 
 PACKAGE STATUS (00-INDEX.md)
 - There is one Mariano's entry, #69. Your review heading called it "#69 (earlier #60)"; there is no separate #60 package.
 - Entry #69 = live data of 21 Oct (demonstration subset, never published).
 - v1.1.0 and v1.1.1 are superseded. v1.1.2 is current (code + offline tests).
-- Live and offline material are in separate folders: A-LIVE-EVIDENCE-2026-10-21 and B-OFFLINE-ONLY (42 offline tests).
+- Live and offline material are in separate folders: A-LIVE-EVIDENCE-2026-10-21 and B-OFFLINE-ONLY (44 offline tests).
 
 OXYLABS: EXACT FEATURE NEEDED (03 §1)
 - Oxylabs Web API, Kroger dedicated scraper: POST https://webapi.oxylabs.io/v1/scrape/kroger, with the store_id on every request.
@@ -48,25 +53,25 @@ SEQUENCE (manual only, 03 §2)
 No schedule is created at any step.
 
 COMPLETION PLAN (02, US Central; assumes D1-D5 below are met on the dates shown)
-- Mon 26 Oct 12:00 CDT: preflight result (roles, providers, policy)
 - Wed 28 Oct 09:30-10:00 CDT: Test 1
 - Thu 29 Oct 09:00-10:00 CDT: Test 2
 - Thu 29 Oct 17:00 CDT: next reviewable package v1.1.3 (Test 1 + 2 live evidence, measured requests per CSV row, proposed Test 3 cap)
-- Fri 30 Oct 09:00 CDT – Sun 1 Nov: Test 3, a fresh run of all 28 CSV rows at Crystal Lake, with one forced kill and resume. At the 21-Oct throughput (about 8-9 requests per minute) a full run takes about 28-56 hours. Test 2 will give the real figure.
+- Fri 30 Oct 09:00 CDT – Sun 1 Nov at the latest: Test 3, a fresh run of all 28 CSV rows at Crystal Lake, with one forced kill and resume. The 21-Oct throughput (about 8-9 requests per minute) would mean 28-56 hours. v1.1.2 removes the main cause: the crawl no longer waits in waves for its slowest request, and the parallel-request count is a setting. Test 2 measures the real rate, and v1.1.3 will state the measured duration.
+- All runs execute entirely in Azure as manual job executions (up to 24 h each, resuming from the checkpoint if a replica stops). They do not depend on my machine being on.
 - Mon 2 – Tue 3 Nov: coverage review, failed-publication proof, scoped second execution
 - Wed 4 Nov 17:00 CST: final evidence package v1.2.0
 - Coupon linkage depends on D6 and is not included in the 4 Nov date.
 My working time is about 4 days. It is spread over 10 calendar days because of the approvals, test windows and the measured runtime. This replaces the earlier two-day estimate.
 
 WHAT I NEED FROM YOU
-- D1, by Tue 27 Oct 12:00 CDT: approval of the deployment/cost plan; confirmation that Microsoft.App, Microsoft.OperationalInsights, Microsoft.Storage, Microsoft.KeyVault and Microsoft.ManagedIdentity are registered; any policy limits (regions, SKUs, tags, network rules).
+- D1, by Tue 27 Oct 12:00 CDT: approval of the deployment/cost plan. Providers and group policy are already confirmed; please tell me only if a subscription-level rule applies that the group does not show.
 - D2, after the infrastructure step: your administrator runs the two role-assignment commands and stores the Oxylabs Web API key in Key Vault.
 - D3: approval of Test 1 (19 requests or fewer) and Test 2 (300 requests or fewer). The per-request rate is in your Oxylabs dashboard.
 - D4: confirmation of the Test 1 and Test 2 windows above, or other times.
 - D5, after v1.1.3: approval of the Test 3 request cap.
 - D6, any time: decision on the coupon browser probe.
 
-Nothing will be deployed, run or spent until you confirm each step. The 42 tests remain labelled offline.
+Nothing will be deployed, run or spent until you confirm each step. The 44 tests remain labelled offline.
 
 Regards,
 Asif Khan

@@ -1,0 +1,11 @@
+{
+  "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test",
+  "location": "westus2",
+  "managedBy": null,
+  "name": "scraper-contest-asif-test",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": {},
+  "type": "Microsoft.Resources/resourceGroups"
+}

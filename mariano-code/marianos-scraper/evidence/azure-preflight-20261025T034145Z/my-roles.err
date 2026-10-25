@@ -1,0 +1,2 @@
+WARNING: Failed to query b29818e6-9309-48c3-8922-64d2d7d8e32c by invoking Graph API. If you don't have permission to query Graph API, please specify --assignee-object-id and --assignee-principal-type.
+WARNING: Assuming b29818e6-9309-48c3-8922-64d2d7d8e32c as an object ID.
