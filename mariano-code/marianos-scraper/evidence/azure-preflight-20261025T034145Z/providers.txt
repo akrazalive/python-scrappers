@@ -1,0 +1,5 @@
+Microsoft.App Registered
+Microsoft.OperationalInsights Registered
+Microsoft.Storage Registered
+Microsoft.KeyVault Registered
+Microsoft.ManagedIdentity Registered
