@@ -1,0 +1,2290 @@
+[
+  {
+    "item_id": "2904416150",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Saucy-Spoon-Applewood-Smoked-Bacon-Baked-Beans-Canned-Beans-28-oz-Can/2904416150"
+  },
+  {
+    "item_id": "13374461260",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/3-pack-A-Dozen-Cousins-Cuban-Black-Beans-Vegan-Gluten-Free-Microwaveable-Seasoned-Beans-with-Avocado-Oil-10-oz-Pouch/13374461260"
+  },
+  {
+    "item_id": "38600117",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/La-Coste-a-Canned-Charro-Beans-with-Bacon-and-Chorizo-19-75-oz/38600117"
+  },
+  {
+    "item_id": "10534045",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Dark-Red-Kidney-Beans-15-5-oz/10534045"
+  },
+  {
+    "item_id": "10534038",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Black-Beans-15-oz-Can/10534038"
+  },
+  {
+    "item_id": "19461221572",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/6-pack-Great-Value-Pinto-Beans-15-5-oz/19461221572"
+  },
+  {
+    "item_id": "10534043",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Pinto-Beans-15-5-oz-Can/10534043"
+  },
+  {
+    "item_id": "10534039",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Light-Red-Kidney-Beans-15-5-oz/10534039"
+  },
+  {
+    "item_id": "10534044",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Chili-Beans-15-5-oz-Can/10534044"
+  },
+  {
+    "item_id": "10322247",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/La-Costena-Whole-Pinto-Beans-19-75-oz-Can/10322247"
+  },
+  {
+    "item_id": "10309321",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/La-Costena-Refried-Pinto-Beans-20-5-OZ/10309321"
+  },
+  {
+    "item_id": "45207653",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Brown-Sugar-Hickory-Baked-Beans-Canned-Beans-28-oz-Can/45207653"
+  },
+  {
+    "item_id": "949679892",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Mixed-Chili-Beans-15-oz-Can/949679892"
+  },
+  {
+    "item_id": "10534042",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Great-Northern-Beans-15-5-oz-Can/10534042"
+  },
+  {
+    "item_id": "10451547",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Canned-Black-Eyed-Peas-15-5-oz-Can/10451547"
+  },
+  {
+    "item_id": "10306771",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Original-Baked-Beans-Canned-Beans-28-oz-Can/10306771"
+  },
+  {
+    "item_id": "16478651794",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/La-Sierra-Refried-Black-Bean-Family-Pack-17-44oz/16478651794"
+  },
+  {
+    "item_id": "417764146",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Brown-Sugar-Hickory-Baked-Beans-28-oz-Can/417764146"
+  },
+  {
+    "item_id": "10306802",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Traditional-Refried-Beans-Canned-Mashed-Pinto-Beans-16-oz-Can/10306802"
+  },
+  {
+    "item_id": "10292168",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Rosarita-Traditional-Refried-Beans-16-oz/10292168"
+  },
+  {
+    "item_id": "10534041",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Garbanzos-Chick-Peas-15-5-oz/10534041"
+  },
+  {
+    "item_id": "14784811306",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/6-pack-Great-Value-Traditional-Refried-Beans-16-oz/14784811306"
+  },
+  {
+    "item_id": "39778877",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Seasoned-Black-Beans-15-oz-Can/39778877"
+  },
+  {
+    "item_id": "22002645",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Cannellini-Beans-15-5-oz/22002645"
+  },
+  {
+    "item_id": "15673600",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Original-Baked-Beans-Canned-Beans-8-3-oz-Can/15673600"
+  },
+  {
+    "item_id": "10306800",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Black-Beans-Canned-Beans-15-oz/10306800"
+  },
+  {
+    "item_id": "10306775",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Large-Butter-Beans-Beans-Canned-Butter-Beans-16-oz-Can/10306775"
+  },
+  {
+    "item_id": "3006977474",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Pinto-Beans-Canned-Beans-with-Pop-Top-Lid-15-5-oz-Can/3006977474"
+  },
+  {
+    "item_id": "10306812",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Maple-and-Cured-Bacon-Baked-Beans-Canned-Beans-28-oz/10306812"
+  },
+  {
+    "item_id": "10306814",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Country-Style-Baked-Beans-Canned-Beans-28-oz-Can/10306814"
+  },
+  {
+    "item_id": "596137010",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Sidekicks-Taco-Fiesta-Black-Beans-Canned-Black-Beans-15-1-oz-Can/596137010"
+  },
+  {
+    "item_id": "32250873",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-No-Salt-Added-Light-Red-Kidney-Beans-15-5-oz/32250873"
+  },
+  {
+    "item_id": "22002644",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Navy-Bean-15-5-oz-Can/22002644"
+  },
+  {
+    "item_id": "10306807",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Bush-s-Best-Steakhouse-Recipe-Grillin-39-Beans-22-oz/10306807"
+  },
+  {
+    "item_id": "10291833",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Ranch-Style-Canned-Pinto-Beans-Real-Western-Flavor-15-oz/10291833"
+  },
+  {
+    "item_id": "10307917",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Van-Camp-s-Pork-And-Beans-In-Tomato-Sauce-Canned-Beans-15-oz/10307917"
+  },
+  {
+    "item_id": "32250874",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:55:52+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Pinto-Beans-No-Salt-Added-15-5-oz/32250874"
+  },
+  {
+    "item_id": "1888369115",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Beyond-Meat-Beyond-Steak-Plant-Based-Seared-Tips-10-oz/1888369115"
+  },
+  {
+    "item_id": "43923746",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/SugarBee-Apple-Bulk/43923746"
+  },
+  {
+    "item_id": "10801150",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/LightLife-Smart-Dogs-Plant-Based-Hot-Dogs-12-oz-Plastic-Wrapper-8-Count/10801150"
+  },
+  {
+    "item_id": "978115165",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Envy-Apples-3-lb-Bag/978115165"
+  },
+  {
+    "item_id": "44390949",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Hass-Avocados-Each/44390949"
+  },
+  {
+    "item_id": "44390954",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Cucumber-Each/44390954"
+  },
+  {
+    "item_id": "10451315",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Produce-Baby-Peeled-Carrots-1lb-Bag/10451315"
+  },
+  {
+    "item_id": "44390943",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Green-Seedless-Grapes-From-California-Bag-2-25-lbs-Bag-Est/44390943"
+  },
+  {
+    "item_id": "47770140",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Red-Seedless-Grapes-From-California-Bag-2-25-lbs-Bag-Est/47770140"
+  },
+  {
+    "item_id": "160597260",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Whole-Green-Cilantro-Bunch-1-Bunch-Fresh-Produce/160597260"
+  },
+  {
+    "item_id": "3293638540",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Strawberries-in-Cookies-N-Creme-8-oz-Frozen/3293638540"
+  },
+  {
+    "item_id": "189584443",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Field-Roast-Refrigerated-Chao-Creamy-Dairy-Free-Original-Slices-7-oz-Plastic/189584443"
+  },
+  {
+    "item_id": "51259215",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Whole-Red-Onion-Each/51259215"
+  },
+  {
+    "item_id": "1918496773",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/NatureSweet-Cherubs-Grape-Tomatoes-9-oz-Fresh/1918496773"
+  },
+  {
+    "item_id": "44390945",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Green-Bell-Pepper-Each/44390945"
+  },
+  {
+    "item_id": "41752773",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Bulk-Yellow-Lemons/41752773"
+  },
+  {
+    "item_id": "51259361",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Whole-Green-Onion-1-Bunch-Fresh-Produce/51259361"
+  },
+  {
+    "item_id": "44391042",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Green-Cabbage-Each/44391042"
+  },
+  {
+    "item_id": "44390952",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Green-Whole-Asparagus-Bunch-Fresh-Produce/44390952"
+  },
+  {
+    "item_id": "10532755",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Romaine-Lettuce-Hearts-3-Count-Each/10532755"
+  },
+  {
+    "item_id": "5315271440",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Crunch-Pak-Sweet-Savory-Snacker-with-Fresh-Tart-Sliced-Apples-Turkey-Bites-Pretzels-Caramel-4-15oz-Tray/5315271440"
+  },
+  {
+    "item_id": "5027746601",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Milk-Chocolate-Covered-Strawberry-8oz-Frozen/5027746601"
+  },
+  {
+    "item_id": "1732560925",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Blueberries-1-Pint-Container/1732560925"
+  },
+  {
+    "item_id": "51259212",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Whole-Yellow-Onion-Each/51259212"
+  },
+  {
+    "item_id": "810359707",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Crunch-Pak-Snack-Dipperz-with-Fresh-Tart-Sliced-Apples-and-Caramel-in-a-5pk/810359707"
+  },
+  {
+    "item_id": "189317357",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:27+00:00",
+    "url": "https://www.walmart.com/ip/Field-Roast-Refrigerated-Smoked-Apple-Sage-Plant-Based-Sausages-13-oz/189317357"
+  },
+  {
+    "item_id": "16280202816",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Solely-Organic-Mango-Raspberry-Fruit-Jerky-5-0-8-oz-Packs/16280202816"
+  },
+  {
+    "item_id": "19612962657",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chomps-Antibiotic-Free-Original-Chicken-Sticks-8-Count/19612962657"
+  },
+  {
+    "item_id": "19197460296",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chomps-Grass-Fed-and-Finished-Chili-Lime-Beef-Meat-Snack-Stick-8ct/19197460296"
+  },
+  {
+    "item_id": "15910513806",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Solely-Organic-Mango-Fruit-Jerky-5-0-8-oz-Packs/15910513806"
+  },
+  {
+    "item_id": "10312601",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Quaker-Gluten-Free-Caramel-Rice-Cakes-6-5-oz/10312601"
+  },
+  {
+    "item_id": "553906197",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chomps-Original-Beef-Chomplings/553906197"
+  },
+  {
+    "item_id": "44391101",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Seedless-Watermelon-Each/44391101"
+  },
+  {
+    "item_id": "2631435153",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Oats-Overnight-Strawberries-Cream-Shake-2-1-oz/2631435153"
+  },
+  {
+    "item_id": "216218066",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Fresh-Yellow-Peach-Each/216218066"
+  },
+  {
+    "item_id": "248314113",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chobani-20g-Protein-Lowfat-Greek-Yogurt-Drink-Strawberries-Cream-10-fl-oz/248314113"
+  },
+  {
+    "item_id": "19957854749",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chobani-Flip-20G-Protein-Low-Fat-Greek-Yogurt-Strawberry-Banana-6oz/19957854749"
+  },
+  {
+    "item_id": "670985229",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Quaker-Instant-Oatmeal-Strawberries-Cream-1-51-oz-Cup/670985229"
+  },
+  {
+    "item_id": "680902689",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Quaker-Maple-Brown-Sugar-Flavored-Instant-Oatmeal-1-69-oz-Cup-1-Count/680902689"
+  },
+  {
+    "item_id": "5216999195",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/4-pack-Kodiak-Protein-Packed-Chocolate-Fudge-Brownie-Power-Cup-2-36-oz/5216999195"
+  },
+  {
+    "item_id": "16586667895",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Tyson-Grilled-Boneless-Chicken-Bites-Cup-5-2-oz-Frozen-Fully-Cooked/16586667895"
+  },
+  {
+    "item_id": "33056711",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Quaker-Instant-Oatmeal-Apple-Cinnamon-Quick-Cook-Oatmeal-1-5oz-Cup/33056711"
+  },
+  {
+    "item_id": "6921254024",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/OLIPOP-6g-Fiber-Prebiotic-Soda-Classic-Grape-12-fl-oz-4-Pack-Shelf-Stable/6921254024"
+  },
+  {
+    "item_id": "19929262370",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chobani-Flip-20G-Protein-Low-Fat-Greek-Yogurt-Coconut-Almond-6oz/19929262370"
+  },
+  {
+    "item_id": "14053328",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Marketside-Fresh-Green-Beans-12-oz/14053328"
+  },
+  {
+    "item_id": "15779650088",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/OLIPOP-6g-Fiber-Prebiotic-Soda-Crisp-Apple-12-fl-oz-4-Pack-Shelf-Stable/15779650088"
+  },
+  {
+    "item_id": "12829451575",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Oats-Overnight-Cookies-Cream-Protein-Overnight-Oatmeal-Shake-2-2-oz-1-Count/12829451575"
+  },
+  {
+    "item_id": "752425180",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Quaker-Instant-Oatmeal-Maple-Brown-Sugar-12-1-oz-8-Packets/752425180"
+  },
+  {
+    "item_id": "350018260",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Marketside-Fresh-Halved-Brussels-Sprouts-12-oz/350018260"
+  },
+  {
+    "item_id": "5537686460",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Alani-Nu-Protein-Shake-Cookies-Cream-12-fl-oz-4-Pack-Bottles-30g-Protein-Gluten-Free/5537686460"
+  },
+  {
+    "item_id": "7261103789",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Chomplings-Sea-Salt-Beef-Mini-Jerky-Meat-Sticks-4g-of-Protein-6-Count/7261103789"
+  },
+  {
+    "item_id": "215031623",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Marketside-Santa-Fe-Style-Salad-with-Chicken-6-35-oz-Bowl-Fresh/215031623"
+  },
+  {
+    "item_id": "51236581",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:29+00:00",
+    "url": "https://www.walmart.com/ip/Core-Power-High-Protein-Shake-Chocolate-42g-Bottle-14-fl-oz/51236581"
+  },
+  {
+    "item_id": "133178677",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Gatorade-Zero-Sugar-Thirst-Quencher-Variety-Pack-Berry-Glacier-Cherry-Glacier-Freeze-Sports-Drinks-12-fl-oz-18-Count-Bottles/133178677"
+  },
+  {
+    "item_id": "10449240",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Gatorade-Thirst-Quencher-Fruit-Punch-Sports-Drinks-12-fl-oz-12-Count-Bottles/10449240"
+  },
+  {
+    "item_id": "5695684412",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Chobani-20G-Protein-Low-Fat-Greek-Yogurt-Drink-Strawberries-and-Cream-10-fl-oz-Bottle-4-Pack/5695684412"
+  },
+  {
+    "item_id": "16224470",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Gatorade-Thirst-Quencher-Electrolyte-Sports-Drink-Lemon-Lime-Orange-and-Fruit-Punch-Variety-Pack-12-fl-oz-18-Count-Bottles/16224470"
+  },
+  {
+    "item_id": "10450904",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Maruchan-Ramen-Noodle-Chicken-Flavor-Soup-3-oz-12-Count-Shelf-Stable-Package/10450904"
+  },
+  {
+    "item_id": "415812597",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Pop-Tarts-Toaster-Pastries-Breakfast-Foods-Kids-Snacks-Value-Pack-Frosted-Strawberry-16-Pop-Tarts/415812597"
+  },
+  {
+    "item_id": "15728862",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/White-Castle-Classic-Cheese-Sliders-11-oz-6-Count-Frozen/15728862"
+  },
+  {
+    "item_id": "5080177344",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Frito-Lay-Flavor-Mix-Chips-Variety-Pack-1-oz-18-Count/5080177344"
+  },
+  {
+    "item_id": "110946086",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Capri-Sun-Flavored-Natural-Flavor-Juice-Drink-Blend-30-Pouches-School-Lunches-On-the-Go-Hydration-Fruit-Punch-Strawberry-Kiwi-Pacific-Cooler-Natural/110946086"
+  },
+  {
+    "item_id": "719983894",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Jose-Ole-Beef-Cheese-Mini-Tacos-Frozen-Mexican-Food-16-2-oz-25-Count/719983894"
+  },
+  {
+    "item_id": "46330173",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Kraft-Mac-and-Cheese-8-Cups-for-Easy-Dinner-or-Dinner-Sides-Original-Flavor-No-Artificial-Flavors-Preservatives-or-Dyes-2-05-oz/46330173"
+  },
+  {
+    "item_id": "1830120353",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/OREO-Chocolate-Sandwich-Cookies-Family-Size-18-12-oz/1830120353"
+  },
+  {
+    "item_id": "21804014",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Milo-s-Famous-Sweet-Tea-Refrigerated-Iced-Tea-128-fl-oz-Gallon-100-Natural-No-Preservatives-Brewed-Fresh-Daily/21804014"
+  },
+  {
+    "item_id": "17490960627",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/2-pack-Kraft-Mac-and-Cheese-5-Boxes-for-Easy-Dinner-or-Dinner-Sides-Original-Flavor-No-Artificial-Flavors-Preservatives-or-Dyes-7-25-oz/17490960627"
+  },
+  {
+    "item_id": "10413990",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Hidden-Valley-Original-Ranch-Salad-Dressing-and-Topping-36-Ounce-Bottle/10413990"
+  },
+  {
+    "item_id": "2235838826",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Welch-s-Fruit-Snacks-Berries-N-Cherries-0-8-oz-40-Count/2235838826"
+  },
+  {
+    "item_id": "33867594",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Chunk-Light-Tuna-in-Water-5-oz-4-Pack/33867594"
+  },
+  {
+    "item_id": "10311392",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Nature-Valley-Crunchy-Granola-Bars-Oats-n-Honey-12-Bars-8-94-OZ-6-Pouches/10311392"
+  },
+  {
+    "item_id": "10804752",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Lean-Cuisine-Cheese-Personal-Frozen-Pizza-Frozen-Meal-6-oz/10804752"
+  },
+  {
+    "item_id": "10447830",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Ragu-Chunky-Tomato-Pasta-Sauce-with-Garlic-and-Onion-66-oz/10447830"
+  },
+  {
+    "item_id": "13448854",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Purified-Drinking-Water-16-9-fl-oz-24-Count/13448854"
+  },
+  {
+    "item_id": "993059917",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Rice-Krispies-Treats-Variety-Pack-Chewy-Crispy-Marshmallow-Squares-Kids-Snacks-12-1-oz-16-Count/993059917"
+  },
+  {
+    "item_id": "730184952",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Toasted-Corn-Flakes-Breakfast-Cereal-18-oz/730184952"
+  },
+  {
+    "item_id": "10535216",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Coca-Cola-Classic-Soda-Pop-12-fl-oz-Cans-24-Pack/10535216"
+  },
+  {
+    "item_id": "14912505221",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Keebler-Sweet-Treat-Variety-Pack-10-Count-Box-Includes-Chips-Deluxe-Funables-Fudge-Stripes-and-Mother-s-Circus-Animal-Cookies-9-4-oz/14912505221"
+  },
+  {
+    "item_id": "5032284766",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/OREO-Thins-Golden-Sandwich-Cookies-Family-Size-11-78-oz/5032284766"
+  },
+  {
+    "item_id": "834187603",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/SLIM-JIM-Original-Pantry-Pack/834187603"
+  },
+  {
+    "item_id": "5045831433",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Takis-18-pc-1-oz-Variety-Pack-Assorted-Rolled-Tortilla-Chips/5045831433"
+  },
+  {
+    "item_id": "19605920541",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/ARIH-Modern-Noodles-Western-Korean-Fusion-Soup-Less-Noodles-Gochujang-Butter-4-Pack/19605920541"
+  },
+  {
+    "item_id": "15570903",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Maruchan-Ramen-Noodle-Soup-Beef-Flavor-Instant-Noodles-3-oz-Pack-of-12/15570903"
+  },
+  {
+    "item_id": "39127392",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/PAM-Original-Non-Stick-Cooking-Spray-Canola-Oil-Blend-Great-for-Air-Fryer-Baking-Grilling-10-oz-2-Count/39127392"
+  },
+  {
+    "item_id": "10309521",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Capri-Sun-Flavored-Natural-Flavor-Juice-Drink-Blend-10-Pouches-School-Lunches-On-the-Go-Hydration-Strawberry-Kiwi-Natural-Ingredients-6-fl-oz/10309521"
+  },
+  {
+    "item_id": "193141448",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Frito-Lay-Flamin-Hot-Mix-Variety-Pack-Snack-Chips-18-Count-Multipack/193141448"
+  },
+  {
+    "item_id": "850562562",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/BODYARMOR-Sports-Drink-Fruit-Punch-12-Fl-Oz-8-count/850562562"
+  },
+  {
+    "item_id": "489832534",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Gatorade-Thirst-Quencher-Electrolyte-Sports-Drink-Fruit-Punch-Glacier-Cherry-Cool-Blue-Variety-Pack-12-fl-oz-18-Count-Bottles/489832534"
+  },
+  {
+    "item_id": "20854244",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Dr-Pepper-Soda-Pop-12-fl-oz-24-Pack-Cans/20854244"
+  },
+  {
+    "item_id": "364798995",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:56:35+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Deluxe-Cashews-30-oz/364798995"
+  },
+  {
+    "item_id": "19668604553",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Jackson-s-Jalape-o-Avocado-Oil-Kettle-Potato-Chips-5-oz/19668604553"
+  },
+  {
+    "item_id": "5480933034",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Jackson-s-Classic-Potato-Kettle-Chips-with-Sea-Salt-Avocado-Oil-Free-of-Top-9-Allergens-5-oz/5480933034"
+  },
+  {
+    "item_id": "19986016523",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Graza-Hot-N-Sweet-Potato-Chips-5-5oz/19986016523"
+  },
+  {
+    "item_id": "910985070",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Ruffles-Original-Flavor-Potato-Snack-Chips-Party-Size-13-Ounce-Bag/910985070"
+  },
+  {
+    "item_id": "336304484",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Ruffles-Potato-Chips-Original-Snack-Chips-8-5-Ounce-Bag/336304484"
+  },
+  {
+    "item_id": "597964523",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Barbecue-Potato-Chips-Party-Size-12-5-oz-Bag/597964523"
+  },
+  {
+    "item_id": "735598557",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Ruffles-Potato-Chips-Sour-Cream-Onion-Flavor-Snack-Chips-8-0-Ounce-Bag/735598557"
+  },
+  {
+    "item_id": "33282306",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Sour-Cream-Onion-Flavor-Potato-Chips-7-75-oz-Bag/33282306"
+  },
+  {
+    "item_id": "411914231",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Ruffles-Cheddar-Sour-Cream-Potato-Snack-Chips-Party-Size-12-5-oz-Bag/411914231"
+  },
+  {
+    "item_id": "20031970900",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Graza-Zesty-Caesar-Potato-Chips-5-5oz/20031970900"
+  },
+  {
+    "item_id": "20239801942",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Pringles-Dippers-Bacon-Cheddar/20239801942"
+  },
+  {
+    "item_id": "677669806",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Classic-Potato-Snack-Chips-Party-Size-13-oz-Bag/677669806"
+  },
+  {
+    "item_id": "652141083",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Wavy-Original-Potato-Chips-Party-Size-13-oz-Bag/652141083"
+  },
+  {
+    "item_id": "33282303",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Classic-Potato-Chips-8-oz-Bag/33282303"
+  },
+  {
+    "item_id": "52796390",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Cape-Cod-Potato-Chips-Original-Kettle-Chips-14-oz-Party-Size/52796390"
+  },
+  {
+    "item_id": "13256356799",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lays-All-Dressed-Potato-Chips-7-75-oz-Bag/13256356799"
+  },
+  {
+    "item_id": "198082763",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Barbecue-Flavored-Potato-Chips-Party-Size-12-5-oz-Bag/198082763"
+  },
+  {
+    "item_id": "992619347",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Ruffles-Potato-Chips-Cheddar-Sour-Cream-Flavored-Snack-Chips-8-Ounce-Bag/992619347"
+  },
+  {
+    "item_id": "476979874",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Wavy-Potato-Chips-Original-Flavor-7-75-oz-Bag/476979874"
+  },
+  {
+    "item_id": "20294202064",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Pringles-Dippers-French-Onion/20294202064"
+  },
+  {
+    "item_id": "20071773946",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Graza-Classic-Sea-Salt-Potato-Chips-5-5oz/20071773946"
+  },
+  {
+    "item_id": "33282307",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Potato-Chips-Cheddar-Sour-Cream-7-75-oz-Bag/33282307"
+  },
+  {
+    "item_id": "453387822",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Pringles-Potato-Crisps-Chips-Lunch-Snacks-Snack-Cups-Variety-Pack-19-5oz-Box-27-Cups/453387822"
+  },
+  {
+    "item_id": "334454839",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Sour-Cream-Onion-Flavored-Potato-Chips-7-75-oz-Bag/334454839"
+  },
+  {
+    "item_id": "664636414",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Sour-Cream-Onion-Flavored-Potato-Chips-Party-Size-12-5-oz-Bag/664636414"
+  },
+  {
+    "item_id": "47217461",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Pringles-Original-Potato-Crisps-Chips-Lunch-Snacks-5-2-oz-Canister/47217461"
+  },
+  {
+    "item_id": "892102581",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Salt-Vinegar-Potato-Snack-Chips-Party-Size-12-5-oz-Bag/892102581"
+  },
+  {
+    "item_id": "33571859",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Dill-Pickle-Potato-Snack-Chips-7-75-oz-Bag/33571859"
+  },
+  {
+    "item_id": "673990441",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Wavy-Potato-Chips-Lightly-Salted-Snack-Chips-7-5-Ounce-Bag/673990441"
+  },
+  {
+    "item_id": "20264319094",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Pringles-Dippers-Original/20264319094"
+  },
+  {
+    "item_id": "48274450",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Queso-Potato-Chips-8-oz/48274450"
+  },
+  {
+    "item_id": "983618605",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Ruffles-Potato-Chips-Jalapeno-Ranch-Flavored-8-0-oz-Bag/983618605"
+  },
+  {
+    "item_id": "584286382",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/PopCorners-No-Artificial-Colors-or-Flavors-White-Cheddar-Popped-Corn-Chips-Bag-7-oz/584286382"
+  },
+  {
+    "item_id": "33469534",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Honey-BBQ-Flavored-Potato-Chips-7-5-oz-Bag/33469534"
+  },
+  {
+    "item_id": "52796389",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Cape-Cod-Potato-Chips-Less-Fat-Original-Kettle-Chips-Party-Size-14-oz-Party-Size/52796389"
+  },
+  {
+    "item_id": "44185596",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Lay-s-Original-Sea-Salt-Kettle-Cooked-Potato-Chips-Bag-8-oz/44185596"
+  },
+  {
+    "item_id": "31954394",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/SunChips-Garden-Salsa-Flavored-Multigrain-Snacks-7-oz/31954394"
+  },
+  {
+    "item_id": "101733881",
+    "status": "out_of_stock",
+    "source_value": "OUT_OF_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:02+00:00",
+    "url": "https://www.walmart.com/ip/Maui-Style-Onion-Potato-Chips-6-Ounce-Bag/101733881"
+  },
+  {
+    "item_id": "1620505309",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Feastables-Mr-Beast-Cookies-and-Creme-White-Chocolate-Bar-2-1-oz-60g-1-Bar/1620505309"
+  },
+  {
+    "item_id": "17761312346",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Tony-s-Chocolonely-Filled-Creamy-Milk-Ganache-Bar-4-5oz/17761312346"
+  },
+  {
+    "item_id": "16182105149",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Feastables-MrBeast-Caramel-Bar-2-1-oz-60g-1-Count/16182105149"
+  },
+  {
+    "item_id": "17769620176",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Tony-s-Chocolonely-Milk-Chocolate-Sea-Salt-Caramel-Filled-Bar-4-76-oz/17769620176"
+  },
+  {
+    "item_id": "38323298",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Reese-s-Chocolate-Peanut-Butter-Creme-XL-Candy-Bar-4-25-oz/38323298"
+  },
+  {
+    "item_id": "10452239",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Milk-Chocolate-Candy-Bars-1-55-oz-6-Count/10452239"
+  },
+  {
+    "item_id": "17578856808",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Milk-Chocolate-Candy-Bars-Miniatures-Snack-Size-45-oz-10-Count/17578856808"
+  },
+  {
+    "item_id": "38253459",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Kit-Kat-Milk-Chocolate-Wafer-King-Size-Candy-Bar-3-oz/38253459"
+  },
+  {
+    "item_id": "17970574902",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/CRUNCH-Fun-Size-Candy-Bars-Creamy-Milk-Chocolate-with-Crisped-Rice-Individually-Wrapped-Candy-10-oz-Bag/17970574902"
+  },
+  {
+    "item_id": "655577788",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Milk-Chocolate-Giant-Candy-Bar-7-56-oz-25-Pieces/655577788"
+  },
+  {
+    "item_id": "247191629",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Feastables-MrBeast-Milk-Chocolate-Bar-2-1-oz-60g-1-Count/247191629"
+  },
+  {
+    "item_id": "14119165321",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Kit-Kat-Milk-Chocolate-Wafer-Snack-Size-Candy-Bars-49-oz-4-Count/14119165321"
+  },
+  {
+    "item_id": "5209903435",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Twix-Fun-Size-Caramel-Chocolate-Bars-10-Ct/5209903435"
+  },
+  {
+    "item_id": "661434385",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/100-Grand-Crispy-Milk-Chocolate-with-Caramel-Fun-Size-Candy-Bars-10-oz-Bag/661434385"
+  },
+  {
+    "item_id": "3620561636",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Peanut-Caramel-Nougat-Bar-1-76-oz/3620561636"
+  },
+  {
+    "item_id": "3271668533",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Caramel-Nougat-Bar-1-84-oz/3271668533"
+  },
+  {
+    "item_id": "50861023",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Snickers-Chocolate-Candy-Bars-Fun-Size-10-59-oz-Bag/50861023"
+  },
+  {
+    "item_id": "17252562870",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/CHOCOLOVE-PISTACHIOS-SEA-SALT-MILK-CHOCOLATE-BAR-3-2OZ/17252562870"
+  },
+  {
+    "item_id": "3676063370",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Chocolove-Hawaiian-Sea-Salt-in-Strong-Dark-Chocolate-3oz-Bar/3676063370"
+  },
+  {
+    "item_id": "10449888",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Cadbury-Dairy-Milk-Milk-Chocolate-Candy-Bar-3-5-oz/10449888"
+  },
+  {
+    "item_id": "38253434",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Reese-s-Sticks-Milk-Chocolate-Peanut-Butter-Wafer-King-Size-Candy-Pack-3-oz/38253434"
+  },
+  {
+    "item_id": "793288688",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Symphony-Chocolate-Almond-Toffee-Giant-Candy-Bar-7-37-oz-25-Pieces/793288688"
+  },
+  {
+    "item_id": "2338136214",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Mars-Mixed-Snickers-Twix-Milky-Way-3-Musketeers-Minis-Chocolate-Bars-19-49-oz-Bulk-Bag/2338136214"
+  },
+  {
+    "item_id": "33282365",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Twix-Caramel-Chocolate-Cookie-Candy-Bar-Share-Size-3-02-oz/33282365"
+  },
+  {
+    "item_id": "189173654",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Reese-s-Fast-Break-Milk-Chocolate-Peanut-Butter-and-Nougat-King-Size-Candy-Bar-3-5-oz/189173654"
+  },
+  {
+    "item_id": "2002244182",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Fluffy-Nougat-Bar-1-92-oz/2002244182"
+  },
+  {
+    "item_id": "18515216975",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Larabar-Peanut-Butter-Chocolate-Protein-Bars-12g-Protein-Gluten-Free-5-Ct-7-95-oz/18515216975"
+  },
+  {
+    "item_id": "960295017",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Quantum-Energy-Squares-Peanut-Butter-Dark-Chocolate-Bar-1-69oz/960295017"
+  },
+  {
+    "item_id": "10447806",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Cadbury-Dairy-Milk-Roast-Almond-Milk-Chocolate-Candy-Bar-3-5-oz/10447806"
+  },
+  {
+    "item_id": "38323292",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Symphony-Milk-Chocolate-Almonds-and-Toffee-XL-Candy-Bar-4-25-oz-16-Pieces/38323292"
+  },
+  {
+    "item_id": "3640404060",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Milk-Chocolate-Crispy-Wafer-Bar-1-48-oz/3640404060"
+  },
+  {
+    "item_id": "38253456",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Kit-Kat-Milk-Chocolate-Wafer-Candy-Bar-1-5-oz/38253456"
+  },
+  {
+    "item_id": "38253413",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Milk-Chocolate-Candy-Bar-1-55-oz/38253413"
+  },
+  {
+    "item_id": "717663695",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Milky-Way-Fun-Size-Milk-Chocolate-Candy-Bars-18-47-oz-Bag/717663695"
+  },
+  {
+    "item_id": "165837510",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Milky-Way-Candy-Midnight-Dark-Chocolate-Bar-Share-Size-2-83-oz/165837510"
+  },
+  {
+    "item_id": "16935611",
+    "status": "out_of_stock",
+    "source_value": "OUT_OF_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Hershey-s-Milk-Chocolate-with-Almonds-XL-Candy-Bar-4-25-oz-16-Pieces/16935611"
+  },
+  {
+    "item_id": "5272464080",
+    "status": "out_of_stock",
+    "source_value": "OUT_OF_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/3-pack-Payday-Chocolatey-Peanut-Caramel-Snack-Size-Candy-Bag-9-12-oz/5272464080"
+  },
+  {
+    "item_id": "38253501",
+    "status": "out_of_stock",
+    "source_value": "OUT_OF_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:03+00:00",
+    "url": "https://www.walmart.com/ip/Twix-Caramel-Full-Size-Chocolate-Cookie-Candy-Bars-1-79-oz-Bar/38253501"
+  },
+  {
+    "item_id": "2587301454",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/Reese-s-Banana-Slices-in-Milk-Chocolate-and-Reese-s-Peanut-Butter-Chips-8-oz-Frozen/2587301454"
+  },
+  {
+    "item_id": "10849699",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/Pictsweet-Farms-Purple-Hull-Peas-Southern-Classics-Frozen-Vegetables-12-oz/10849699"
+  },
+  {
+    "item_id": "10976521067",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/HERSHEY-S-Milk-Chocolate-Caramel-Banana-8-oz-Frozen/10976521067"
+  },
+  {
+    "item_id": "13252699",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Blueberries-16-oz-Frozen/13252699"
+  },
+  {
+    "item_id": "980539185",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Frozen-Deluxe-Stir-Fry-Mixed-Vegetables-20-oz-Bag/980539185"
+  },
+  {
+    "item_id": "259683648",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Sweet-Corn-on-the-Cob-6-Count-Frozen/259683648"
+  },
+  {
+    "item_id": "10805110",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:41+00:00",
+    "url": "https://www.walmart.com/ip/Pictsweet-Farms-Turnip-Greens-with-Diced-Turnips-Southern-Classics-Frozen-Vegetables-14-oz/10805110"
+  },
+  {
+    "item_id": "15334421030",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Sweet-Craft-Dolceria-Italian-Style-Key-Lime-Pie-4-2-Ounce-Cup-Frozen/15334421030"
+  },
+  {
+    "item_id": "15355903002",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Sweet-Craft-Dolceria-Italian-Tiramisu-Pudding-Pie-Cup-4-2-Ounce-Cup-Frozen/15355903002"
+  },
+  {
+    "item_id": "20469699",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Neapolitan-Ice-Cream-Sandwiches-42-oz-12-Pack/20469699"
+  },
+  {
+    "item_id": "5144655101",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/FunPops-Freeze-Pops-Variety-Pack-Gluten-Free-2-oz-36-Count-Bag/5144655101"
+  },
+  {
+    "item_id": "50893890",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Bomb-Pop-Banana-Fudge-Freeze-Ice-Pop-Frozen-Freezer-Dessert-3-75-fl-oz-12-Pack/50893890"
+  },
+  {
+    "item_id": "15114703",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Mini-Vanilla-Flavored-Ice-Cream-Sandwiches-36-8-fl-oz-16-Pack/15114703"
+  },
+  {
+    "item_id": "14347706117",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Blue-Ribbon-Classics-Butterscotch-Dipped-Frozen-Treat-Bar/14347706117"
+  },
+  {
+    "item_id": "20925285",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Bomb-Pop-Original-Freeze-Ice-Pops-Frozen-Freezer-Dessert-21-fl-oz-12-Pack/20925285"
+  },
+  {
+    "item_id": "14929118162",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Haagen-Dazs-Summer-Blueberry-and-Lemon-Sorbet-14-fl-oz/14929118162"
+  },
+  {
+    "item_id": "11047554",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Budget-Saver-Twin-Pops-Assorted-Flavors-18-Count-Frozen-Popsicles-Cherry-Banana-and-More/11047554"
+  },
+  {
+    "item_id": "10316043",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:45+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Vanilla-Flavored-Low-Fat-Ice-Cream-Sandwiches-42-oz-12-Pack/10316043"
+  },
+  {
+    "item_id": "16935731",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-No-Added-Sweeteners-100-Apple-Juice-64-fl-oz/16935731"
+  },
+  {
+    "item_id": "10416519",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Garlic-Texas-Toast-8-Count-11-25-Ounce-Frozen/10416519"
+  },
+  {
+    "item_id": "992524020",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Purified-Drinking-Water-16-9-Fl-Oz-40-Count/992524020"
+  },
+  {
+    "item_id": "10315143",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Macaroni-Beef-15-oz/10315143"
+  },
+  {
+    "item_id": "13281897",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Cheese-Dip-Breadsticks-Snacks-1-oz-5-Count/13281897"
+  },
+  {
+    "item_id": "753404940",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Natural-Walnut-Halves-Pieces-7-25-Oz/753404940"
+  },
+  {
+    "item_id": "804851997",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Pine-Nuts-4-oz/804851997"
+  },
+  {
+    "item_id": "36717600",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Dry-Roasted-Seasoned-with-Sea-Salt-Peanuts-34-5-oz/36717600"
+  },
+  {
+    "item_id": "15386258264",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Hazelnut-Cocoa-No-Crust-Frozen-Sandwiches-8-oz-4-Count/15386258264"
+  },
+  {
+    "item_id": "592393200",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Prima-Della-Colby-Jack-Cheese-Sliced-Fresh-Plastic-Bag/592393200"
+  },
+  {
+    "item_id": "10316726",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Spaghetti-Rings-Pasta-with-Meatballs-in-Tomato-Sauce-15-oz/10316726"
+  },
+  {
+    "item_id": "10794699",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Twist-up-Lemon-Lime-Soda-Pop-12-fl-oz-12-Pack-Cans/10794699"
+  },
+  {
+    "item_id": "1621611927",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/4-pack-Great-Value-Honey-12-oz-Plastic-Bear/1621611927"
+  },
+  {
+    "item_id": "10315187",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Spaghetti-Rings-in-Tomato-Sauce-15-oz/10315187"
+  },
+  {
+    "item_id": "5396749022",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/2-pack-Great-Value-Chopped-Pecans-4-oz/5396749022"
+  },
+  {
+    "item_id": "810369388",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/GREAT-VALUE-12-4-OZ-WHITE-CHEDDAR-CHEESE-CRACKERS/810369388"
+  },
+  {
+    "item_id": "10533933",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Premium-Original-Shells-Cheese-12-oz-Box-Shelf-Stable/10533933"
+  },
+  {
+    "item_id": "854574241",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T06:59:47+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Roasted-Salted-Pecans-7-oz/854574241"
+  },
+  {
+    "item_id": "20323672860",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Counter-Creamy-Chicken-Parm-Pasta-Bowl-10-oz-Frozen/20323672860"
+  },
+  {
+    "item_id": "19261570836",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Pagoda-Frozen-Creamy-Chili-Chicken-Potsticker-Bowl-9-5-oz/19261570836"
+  },
+  {
+    "item_id": "19214116270",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Pagoda-Frozen-General-Tso-s-Chicken-Asian-Rice-Bowl-9-5-oz/19214116270"
+  },
+  {
+    "item_id": "898730091",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Scott-Jon-s-Frozen-Meals-Shrimp-Scampi-Noodles-Microwave-Meals-Frozen-Lunch-or-Dinner-for-One-9-6-oz/898730091"
+  },
+  {
+    "item_id": "13389269387",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Marie-Callender-s-Fried-Chicken-and-Mashed-Potato-Bowl-Single-Serve-Frozen-Meal-11-5-oz/13389269387"
+  },
+  {
+    "item_id": "22863022",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Amy-s-Frozen-Meals-Broccoli-Cheddar-Bowl-Microwave-Meals-9-5-oz/22863022"
+  },
+  {
+    "item_id": "970096078",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Marie-Callender-s-Aged-Cheddar-Cheesy-Chicken-and-Rice-Bowl-Frozen-Meal-12-oz-frozen/970096078"
+  },
+  {
+    "item_id": "10794571",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Banquet-Family-Size-Salisbury-Steaks-and-Brown-Gravy-Frozen-Meal-27-oz-Frozen/10794571"
+  },
+  {
+    "item_id": "47386167",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Banquet-Salisbury-Steak-11g-Protein-Frozen-Meal-11-88-oz/47386167"
+  },
+  {
+    "item_id": "838540817",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Scott-Jon-s-Frozen-Meals-Shrimp-Alfredo-Pasta-Microwave-Meals-Frozen-Lunch-or-Dinner-for-One-9-6-oz/838540817"
+  },
+  {
+    "item_id": "5373117001",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Scott-Jon-s-Frozen-Meals-Honey-Sesame-Salmon-Rice-Bowl-Microwave-Meals-Frozen-Dinner-for-One-9-6-oz/5373117001"
+  },
+  {
+    "item_id": "21838815",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Banquet-Sausage-and-Gravy-Deep-Dish-Pot-Pie-Frozen-Meal-7-oz-Frozen/21838815"
+  },
+  {
+    "item_id": "1807187317",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/By-Chef-Ramsay-Shepherd-s-Pie-10-oz-Bowl-Frozen/1807187317"
+  },
+  {
+    "item_id": "19370918914",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Counter-3-Cheese-Chicken-Alfredo-Bowl-10-oz-Frozen/19370918914"
+  },
+  {
+    "item_id": "5674655419",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Guy-Fieri-s-Flavortown-Philly-Super-Melty-Cheesesteak-Tots-Bowl-with-Shaved-Steak-and-Cheese-Sauce-9-5-oz-Frozen/5674655419"
+  },
+  {
+    "item_id": "406323625",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:12+00:00",
+    "url": "https://www.walmart.com/ip/Scott-Jon-s-Frozen-Meals-Garlic-Butter-Shrimp-Rice-Bowl-Microwave-Meals-Frozen-Dinner-for-One-9-6-oz/406323625"
+  },
+  {
+    "item_id": "10415519",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Tomato-Paste-6-oz/10415519"
+  },
+  {
+    "item_id": "13387420719",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/3-pack-Great-Value-Medium-Pitted-Black-Olives-6-oz/13387420719"
+  },
+  {
+    "item_id": "14255812360",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/3-pack-Great-Value-Sliced-Black-Olives-2-25-oz/14255812360"
+  },
+  {
+    "item_id": "40711364",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Tartar-Sauce-12-fl-oz/40711364"
+  },
+  {
+    "item_id": "383160830",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Whole-Sweet-Pickles-24-fl-oz/383160830"
+  },
+  {
+    "item_id": "43711099",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Yellow-Mustard-20-oz-Squeeze-Bottle/43711099"
+  },
+  {
+    "item_id": "17056888",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Mayonnaise-30-fl-oz/17056888"
+  },
+  {
+    "item_id": "250008472",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Ground-Mustard-1-5-oz/250008472"
+  },
+  {
+    "item_id": "10315545",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Dijon-Mustard-12-oz-Squeeze-Bottle/10315545"
+  },
+  {
+    "item_id": "1069799515",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/3-pack-Great-Value-Tomato-Ketchup-64-oz-Bottle/1069799515"
+  },
+  {
+    "item_id": "10315361",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Chicken-and-Stars-Condensed-Soup-10-5-oz/10315361"
+  },
+  {
+    "item_id": "10315055",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Spicy-Brown-Mustard-12-oz-Squeeze-Bottle/10315055"
+  },
+  {
+    "item_id": "10315444",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Large-Pitted-Black-Olives-6-oz/10315444"
+  },
+  {
+    "item_id": "17056887",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Light-Mayonnaise-30-fl-oz/17056887"
+  },
+  {
+    "item_id": "253942483",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Dill-Relish-12-fl-oz/253942483"
+  },
+  {
+    "item_id": "12157941",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Savory-Steak-Sauce-10-oz/12157941"
+  },
+  {
+    "item_id": "10315442",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Stuffed-Manzanilla-Olives-with-Minced-Pimento-21-oz-Jar/10315442"
+  },
+  {
+    "item_id": "678594193",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Stuffed-Garlic-Green-Olives-7oz-Jar/678594193"
+  },
+  {
+    "item_id": "25904063",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Yellow-Mustard-8-oz/25904063"
+  },
+  {
+    "item_id": "785305323",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Stuffed-Feta-Cheese-Green-Olives-7oz-Jar/785305323"
+  },
+  {
+    "item_id": "10315446",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Chopped-Black-Olives-4-25-oz-Major-Allergens-Not-Contained-Gluten-Free/10315446"
+  },
+  {
+    "item_id": "973793717",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Green-Olives-Stuffed-with-Pimiento-7-oz-Glass-Jar/973793717"
+  },
+  {
+    "item_id": "10416458",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Hot-Sliced-Jalape-o-Peppers-12-Oz/10416458"
+  },
+  {
+    "item_id": "400669492",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Seafood-Sauce-Zesty-12-oz/400669492"
+  },
+  {
+    "item_id": "792526580",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Sweet-Relish-24-fl-oz/792526580"
+  },
+  {
+    "item_id": "941996472",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Sliced-Kalamata-Greek-Olives-6-35oz-Jar/941996472"
+  },
+  {
+    "item_id": "17056890",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Whipped-Mayo-Dressing-30-fl-oz/17056890"
+  },
+  {
+    "item_id": "10315930",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Sauerkraut-14-5-oz-Can/10315930"
+  },
+  {
+    "item_id": "544531074",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Organic-Dijon-Mustard-12-oz/544531074"
+  },
+  {
+    "item_id": "926269095",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Original-Horseradish-Sauce-12-oz-Regular/926269095"
+  },
+  {
+    "item_id": "378941019",
+    "status": "available",
+    "source_value": "IN_STOCK",
+    "price_source": "fresh_store_offer",
+    "observed_at": "2026-10-24T07:01:14+00:00",
+    "url": "https://www.walmart.com/ip/Great-Value-Hamburger-Dill-Chip-Pickles-32-fl-oz/378941019"
+  }
+]

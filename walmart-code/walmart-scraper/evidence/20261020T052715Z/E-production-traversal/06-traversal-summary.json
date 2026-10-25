@@ -1,0 +1,10 @@
+{
+  "run_id": "20261020T094629Z-2ae3ee",
+  "listings": 0,
+  "listings_exhausted": 0,
+  "price_partitioned_listings": 0,
+  "records": 0,
+  "validation_ok": false,
+  "requests": 5,
+  "runtime_s": 76.4
+}

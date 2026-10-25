@@ -1,0 +1,12 @@
+category,listings,done,failed,walmart_reported,collected,kept_records,upc_fill,ppm_fill,weight_fill
+Food,1,1,0,162,108,89,1.0,1.0,1.0
+Household Essentials,1,1,0,645,110,87,1.0,1.0,0.989
+Personal Care,1,1,0,200,106,79,1.0,1.0,1.0
+Beauty,1,1,0,329,108,81,0.889,1.0,0.988
+Diapering,1,1,0,457,110,88,1.0,0.898,0.932
+Feeding,1,1,0,1146,110,85,0.965,0.624,0.871
+Health & Wellness,1,1,0,735,107,88,1.0,0.977,1.0
+Pets,1,1,0,155,108,76,1.0,1.0,1.0
+Balloons,1,1,0,185,101,83,0.795,0.422,0.855
+Art Supplies,1,1,0,744,108,82,0.939,0.5,0.854
+Office Supplies,1,1,0,505,103,79,0.899,0.367,0.861

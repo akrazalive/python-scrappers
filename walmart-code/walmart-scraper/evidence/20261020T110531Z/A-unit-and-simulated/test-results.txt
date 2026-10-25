@@ -1,0 +1,43 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m pytest -v -p no:cacheprovider
+# started 2026-10-20T11:05:32+00:00
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: D:\PROJECTS\Monthly-Test\walmart-scraper
+plugins: anyio-4.15.1
+collecting ... collected 31 items
+
+tests/test_detection.py::test_thin_listing_fails_validation PASSED       [  3%]
+tests/test_detection.py::test_yield_drop_against_previous_run_blocks_publication PASSED [  6%]
+tests/test_detection.py::test_category_minimum PASSED                    [  9%]
+tests/test_detection.py::test_lock_left_by_dead_process_is_taken_over PASSED [ 12%]
+tests/test_detection.py::test_hard_kill_then_resume PASSED               [ 16%]
+tests/test_detection.py::test_location_scope_runs_and_publishes PASSED   [ 19%]
+tests/test_detection.py::test_wrong_store_address_fails_before_collection PASSED [ 22%]
+tests/test_detection.py::test_raw_responses_archived_with_store_context PASSED [ 25%]
+tests/test_detection.py::test_cp_landing_root_and_landing_node_split PASSED [ 29%]
+tests/test_detection.py::test_variant_mismatch_is_never_attributed PASSED [ 32%]
+tests/test_detection.py::test_offer_census_reports_displayed_labels PASSED [ 35%]
+tests/test_detection.py::test_oversize_listing_without_subcategories_is_price_partitioned PASSED [ 38%]
+tests/test_detection.py::test_out_of_stock_product_is_retained PASSED    [ 41%]
+tests/test_detection.py::test_unavailable_product_carried_forward_with_original_crawl_date PASSED [ 45%]
+tests/test_detection.py::test_second_run_reuses_known_upcs_and_fetches_only_new_product_pages PASSED [ 48%]
+tests/test_pipeline.py::test_full_run_publishes_valid_data PASSED        [ 51%]
+tests/test_pipeline.py::test_store_mismatch_blocks_publication PASSED    [ 54%]
+tests/test_pipeline.py::test_failed_run_never_replaces_good_data PASSED  [ 58%]
+tests/test_pipeline.py::test_interruption_resumes_without_loss_or_duplicates PASSED [ 61%]
+tests/test_pipeline.py::test_demo_runs_are_never_published PASSED        [ 64%]
+tests/test_rules.py::test_field_order_and_empty_strings PASSED           [ 67%]
+tests/test_rules.py::test_pipeline_fields_forced_empty PASSED            [ 70%]
+tests/test_rules.py::test_price_format PASSED                            [ 74%]
+tests/test_rules.py::test_approx_weight PASSED                           [ 77%]
+tests/test_rules.py::test_weight_extraction PASSED                       [ 80%]
+tests/test_rules.py::test_private_label PASSED                           [ 83%]
+tests/test_rules.py::test_volume_deals_preserve_wording_and_displayed_price_only PASSED [ 87%]
+tests/test_rules.py::test_digital_deals PASSED                           [ 90%]
+tests/test_rules.py::test_rewards_not_treated_as_digital_reduction PASSED [ 93%]
+tests/test_rules.py::test_volume_and_digital_together PASSED             [ 96%]
+tests/test_rules.py::test_pack_labels_are_not_promotions PASSED          [100%]
+
+============================= 31 passed in 18.31s =============================
+
+# finished 2026-10-20T11:05:51+00:00 exit code 0

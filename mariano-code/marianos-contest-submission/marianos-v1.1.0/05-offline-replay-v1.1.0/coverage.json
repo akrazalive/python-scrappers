@@ -1,0 +1,240 @@
+{
+  "method": "per-query reconciliation: Mariano's reported totalCount vs distinct products read (query + brand slices)",
+  "summary": {
+    "queries": 7,
+    "queries_complete": 0,
+    "queries_with_capped_total": 7,
+    "products_in_gaps": 6832
+  },
+  "by_category": {
+    "Meat": {
+      "shelves": 4,
+      "shelves_all_queries_complete": 0,
+      "queries": 7,
+      "queries_complete": 0,
+      "gap_sum": 6832
+    }
+  },
+  "shelves": [
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "queries": 1,
+      "queries_complete": 0,
+      "gap_sum": 976,
+      "failed": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Steaks",
+      "queries": 2,
+      "queries_complete": 0,
+      "gap_sum": 1952,
+      "failed": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Organic Meat",
+      "queries": 2,
+      "queries_complete": 0,
+      "gap_sum": 1952,
+      "failed": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Frozen Meat",
+      "queries": 2,
+      "queries_complete": 0,
+      "gap_sum": 1952,
+      "failed": 0
+    }
+  ],
+  "queries": [
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Beef",
+      "url": "https://www.marianos.com/search?query=Beef&searchType=default_search",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Steaks",
+      "query": "MeatDeptSteakRoast",
+      "url": "https://www.marianos.com/search?keyword=MeatDeptSteakRoast&query=MeatDeptSteakRoast&searchType=mktgattribute&monet=curated&fullfillment=all",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Steaks",
+      "query": "Steaks",
+      "url": "https://www.marianos.com/search?query=Steaks&searchType=default_search",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Organic Meat",
+      "query": "organic meat",
+      "url": "https://www.marianos.com/search?query=organic%20meat&searchType=default_search",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Organic Meat",
+      "query": "meat seafood",
+      "url": "https://www.marianos.com/search?query=meat%20seafood&searchType=default_search",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Frozen Meat",
+      "query": "frozenmeat",
+      "url": "https://www.marianos.com/search?keyword=frozenmeat&query=frozenmeat&searchType=mktgattribute&monet=curated&fulfillment=all",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Frozen Meat",
+      "query": "Frozen Meat",
+      "url": "https://www.marianos.com/search?query=Frozen%20Meat&searchType=default_search",
+      "status": "done",
+      "reported_total": 1000,
+      "listed_first_page": 24,
+      "brand_slices": 0,
+      "brand_slice_reported_sum": 0,
+      "distinct_products_read": 24,
+      "gap": 976,
+      "reported_total_is_capped": true,
+      "complete": false,
+      "open_slices": []
+    }
+  ],
+  "expansion_requests": [
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Ground Beef & Patties",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Simple Truth Beef",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Kroger Beef",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Prepared & Seasoned Beef",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Beef Steaks",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Private Selection Beef",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Laura's Lean Beef",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    },
+    {
+      "category": "Meat",
+      "sub_category": "Beef",
+      "query": "Beef. It's What's For Dinner",
+      "status": "done",
+      "reported_total": 1000,
+      "read": 24,
+      "new_records": 0
+    }
+  ]
+}

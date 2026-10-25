@@ -1,0 +1,7 @@
+# Direct dependencies, exact versions (tested with Python 3.13.14 locally; Azure job image python:3.12-slim)
+httpx==0.28.1
+PyYAML==6.0.3
+azure-storage-blob==12.31.0
+azure-identity==1.26.0
+python-dotenv==1.2.3
+pytest==9.1.1

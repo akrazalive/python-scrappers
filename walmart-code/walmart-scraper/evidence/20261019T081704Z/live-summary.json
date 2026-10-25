@@ -1,0 +1,23 @@
+{
+  "run_id": "20261019T081808Z-78d378",
+  "records": 1269,
+  "runtime_s": 1471.3,
+  "wall_s": 1810,
+  "requests": 1000,
+  "retries": 0,
+  "challenges": 0,
+  "ok": false,
+  "published": false,
+  "store": {
+    "verified": true,
+    "store_id": "100",
+    "store_name": "Bentonville S Walton Blvd Supercenter",
+    "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+    "zipcode": "72712",
+    "url": "https://www.walmart.com/store/100",
+    "checked_at": "2026-10-19T08:18:20+00:00",
+    "reason": ""
+  },
+  "killed_at": 6,
+  "schema_ok": true
+}

@@ -1,0 +1,1344 @@
+{
+  "run_id": "20261019T081808Z-78d378",
+  "scraper": {
+    "version": "1.0.0",
+    "source_sha256": "4c52cef0d790a67ca505200b691719e885d757dab3b09fbfbb7cf52a217a4689"
+  },
+  "location": {
+    "key": "walmart-100-bentonville",
+    "store_id": "100",
+    "zipcode": "72712",
+    "fulfillment": "pickup"
+  },
+  "store_verification": {
+    "verified": true,
+    "store_id": "100",
+    "store_name": "Bentonville S Walton Blvd Supercenter",
+    "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+    "zipcode": "72712",
+    "url": "https://www.walmart.com/store/100",
+    "checked_at": "2026-10-19T08:18:20+00:00",
+    "reason": ""
+  },
+  "fulfillment_context": {
+    "listing_filter": {
+      "facet": "fulfillment_method:Pickup",
+      "stores": "{store_id}"
+    },
+    "store_mismatch_pages": 0,
+    "pages_with_store_verified": 1006
+  },
+  "runtime_seconds": 1471.3,
+  "total_unique_records": 1269,
+  "duplicate_records_in_output": 0,
+  "duplicates_prevented": 250,
+  "excluded": {
+    "marketplace_seller": 71,
+    "shipping_only_or_not_at_store": 74
+  },
+  "count_by_category": {
+    "Balloons": 83,
+    "Beauty": 163,
+    "Diapering": 87,
+    "Food": 169,
+    "Health & Wellness": 170,
+    "Household Essentials": 178,
+    "Office Supplies": 126,
+    "Personal Care": 169,
+    "Pets": 124
+  },
+  "count_by_subcategory": {
+    "Balloons > Balloons": 83,
+    "Beauty > Face Cleansers": 81,
+    "Beauty > Lip Balms & Conditioners": 82,
+    "Diapering > Diapering": 87,
+    "Food > Soda Pop": 84,
+    "Food > Water": 85,
+    "Health & Wellness > Digestive Health": 83,
+    "Health & Wellness > Pain management": 87,
+    "Household Essentials > Cleaning Supplies": 89,
+    "Household Essentials > Paper & Plastic": 89,
+    "Office Supplies > Elementary School Supplies": 78,
+    "Office Supplies > Middle School Supplies": 48,
+    "Personal Care > Deodorants": 89,
+    "Personal Care > Hand Soaps": 80,
+    "Pets > Cats": 84,
+    "Pets > Special Kitty": 40
+  },
+  "listings": [
+    {
+      "category": "Food",
+      "sub_category": "Pantry",
+      "url": "https://www.walmart.com/browse/976759_976794",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "discovery failed: searchResult missing from listing page",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Food",
+      "sub_category": "Soda Pop",
+      "url": "https://www.walmart.com/browse/976759_976782_1001680",
+      "next_page": 3,
+      "max_page": 10,
+      "status": "done",
+      "error": "",
+      "kept": 84,
+      "seen": 108,
+      "capped": 1,
+      "reported_total": 391,
+      "page_size": 58
+    },
+    {
+      "category": "Food",
+      "sub_category": "Water",
+      "url": "https://www.walmart.com/browse/976759_976782_1001659",
+      "next_page": 3,
+      "max_page": 8,
+      "status": "done",
+      "error": "",
+      "kept": 85,
+      "seen": 107,
+      "capped": 1,
+      "reported_total": 304,
+      "page_size": 57
+    },
+    {
+      "category": "Household Essentials",
+      "sub_category": "Paper & Plastic",
+      "url": "https://www.walmart.com/browse/1115193_1073264",
+      "next_page": 3,
+      "max_page": 16,
+      "status": "done",
+      "error": "",
+      "kept": 89,
+      "seen": 110,
+      "capped": 1,
+      "reported_total": 643,
+      "page_size": 60
+    },
+    {
+      "category": "Household Essentials",
+      "sub_category": "Cleaning Supplies",
+      "url": "https://www.walmart.com/browse/1115193_1071966",
+      "next_page": 3,
+      "max_page": 25,
+      "status": "done",
+      "error": "",
+      "kept": 89,
+      "seen": 109,
+      "capped": 1,
+      "reported_total": 1055,
+      "page_size": 59
+    },
+    {
+      "category": "Personal Care",
+      "sub_category": "Hand Soaps",
+      "url": "https://www.walmart.com/browse/1005862_1071969_1001719",
+      "next_page": 3,
+      "max_page": 5,
+      "status": "done",
+      "error": "",
+      "kept": 80,
+      "seen": 106,
+      "capped": 1,
+      "reported_total": 200,
+      "page_size": 56
+    },
+    {
+      "category": "Personal Care",
+      "sub_category": "Deodorants",
+      "url": "https://www.walmart.com/browse/1005862_1071969_1001487",
+      "next_page": 3,
+      "max_page": 17,
+      "status": "done",
+      "error": "",
+      "kept": 89,
+      "seen": 109,
+      "capped": 1,
+      "reported_total": 674,
+      "page_size": 59
+    },
+    {
+      "category": "Beauty",
+      "sub_category": "Face Cleansers",
+      "url": "https://www.walmart.com/browse/1085666_1007039_1001503",
+      "next_page": 3,
+      "max_page": 8,
+      "status": "done",
+      "error": "",
+      "kept": 81,
+      "seen": 108,
+      "capped": 1,
+      "reported_total": 329,
+      "page_size": 58
+    },
+    {
+      "category": "Beauty",
+      "sub_category": "Lip Balms & Conditioners",
+      "url": "https://www.walmart.com/browse/1085666_1007039_6223751",
+      "next_page": 3,
+      "max_page": 9,
+      "status": "done",
+      "error": "",
+      "kept": 82,
+      "seen": 108,
+      "capped": 1,
+      "reported_total": 343,
+      "page_size": 58
+    },
+    {
+      "category": "Diapering",
+      "sub_category": "Diapering",
+      "url": "https://www.walmart.com/browse/5427_486190",
+      "next_page": 3,
+      "max_page": 12,
+      "status": "done",
+      "error": "",
+      "kept": 87,
+      "seen": 110,
+      "capped": 1,
+      "reported_total": 457,
+      "page_size": 60
+    },
+    {
+      "category": "Feeding",
+      "sub_category": "Feeding",
+      "url": "https://www.walmart.com/browse/133283",
+      "next_page": 2,
+      "max_page": 1,
+      "status": "done",
+      "error": "",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Health & Wellness",
+      "sub_category": "Pain management",
+      "url": "https://www.walmart.com/browse/976760_6972993",
+      "next_page": 3,
+      "max_page": 19,
+      "status": "done",
+      "error": "",
+      "kept": 87,
+      "seen": 107,
+      "capped": 1,
+      "reported_total": 735,
+      "page_size": 57
+    },
+    {
+      "category": "Health & Wellness",
+      "sub_category": "Digestive Health",
+      "url": "https://www.walmart.com/browse/976760_1396434",
+      "next_page": 3,
+      "max_page": 15,
+      "status": "done",
+      "error": "",
+      "kept": 83,
+      "seen": 108,
+      "capped": 1,
+      "reported_total": 596,
+      "page_size": 58
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Dogs",
+      "url": "https://www.walmart.com/browse/5440_202072",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "discovery failed: searchResult missing from listing page",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Cats",
+      "url": "https://www.walmart.com/browse/5440_202073",
+      "next_page": 3,
+      "max_page": 24,
+      "status": "done",
+      "error": "",
+      "kept": 84,
+      "seen": 108,
+      "capped": 1,
+      "reported_total": 953,
+      "page_size": 58
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Special Kitty",
+      "url": "https://www.walmart.com/browse/5440_5285960_5343254",
+      "next_page": 3,
+      "max_page": 2,
+      "status": "done",
+      "error": "",
+      "kept": 40,
+      "seen": 56,
+      "capped": 0,
+      "reported_total": 48,
+      "page_size": 48
+    },
+    {
+      "category": "Balloons",
+      "sub_category": "Balloons",
+      "url": "https://www.walmart.com/browse/2637_1042319_1212898_3956207",
+      "next_page": 3,
+      "max_page": 5,
+      "status": "done",
+      "error": "",
+      "kept": 83,
+      "seen": 101,
+      "capped": 1,
+      "reported_total": 185,
+      "page_size": 55
+    },
+    {
+      "category": "Art Supplies",
+      "sub_category": "Art Supplies",
+      "url": "https://www.walmart.com/browse/5899871",
+      "next_page": 2,
+      "max_page": 1,
+      "status": "done",
+      "error": "",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Office Supplies",
+      "sub_category": "Elementary School Supplies",
+      "url": "https://www.walmart.com/browse/1229749_1086045_6534518",
+      "next_page": 3,
+      "max_page": 13,
+      "status": "done",
+      "error": "",
+      "kept": 78,
+      "seen": 103,
+      "capped": 1,
+      "reported_total": 504,
+      "page_size": 57
+    },
+    {
+      "category": "Office Supplies",
+      "sub_category": "Middle School Supplies",
+      "url": "https://www.walmart.com/browse/1229749_1086045_6785010",
+      "next_page": 3,
+      "max_page": 16,
+      "status": "done",
+      "error": "",
+      "kept": 48,
+      "seen": 106,
+      "capped": 1,
+      "reported_total": 646,
+      "page_size": 59
+    }
+  ],
+  "field_completeness": {
+    "zipcode": 1.0,
+    "store_name": 1.0,
+    "store_location": 1.0,
+    "store_logo": 1.0,
+    "store_brand": 1.0,
+    "category": 1.0,
+    "sub_category": 1.0,
+    "product_title": 1.0,
+    "weight": 0.9196,
+    "regular_price": 1.0,
+    "sale_price": 0.0851,
+    "volume_deals_description": 0.0,
+    "volume_deals_price": 0.0,
+    "digital_deals_description": 0.0,
+    "digital_deals_price": 0.0,
+    "image_url": 1.0,
+    "url": 1.0,
+    "upc": 0.7557,
+    "gupc": 0.0,
+    "ppm": 0.8511,
+    "unit_price": 0.0,
+    "crawl_date": 1.0
+  },
+  "category_completeness": {
+    "Food": {
+      "listings": 3,
+      "listings_done": 2,
+      "listings_failed": 1,
+      "walmart_reported": 695,
+      "collected": 215,
+      "kept_records": 169,
+      "fill": {
+        "upc": 1.0,
+        "ppm": 0.988,
+        "weight": 0.994,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Household Essentials": {
+      "listings": 2,
+      "listings_done": 2,
+      "listings_failed": 0,
+      "walmart_reported": 1698,
+      "collected": 219,
+      "kept_records": 178,
+      "fill": {
+        "upc": 1.0,
+        "ppm": 0.91,
+        "weight": 0.966,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Personal Care": {
+      "listings": 2,
+      "listings_done": 2,
+      "listings_failed": 0,
+      "walmart_reported": 874,
+      "collected": 215,
+      "kept_records": 169,
+      "fill": {
+        "upc": 1.0,
+        "ppm": 1.0,
+        "weight": 1.0,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Beauty": {
+      "listings": 2,
+      "listings_done": 2,
+      "listings_failed": 0,
+      "walmart_reported": 672,
+      "collected": 216,
+      "kept_records": 163,
+      "fill": {
+        "upc": 0.92,
+        "ppm": 0.945,
+        "weight": 0.994,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Diapering": {
+      "listings": 1,
+      "listings_done": 1,
+      "listings_failed": 0,
+      "walmart_reported": 457,
+      "collected": 110,
+      "kept_records": 87,
+      "fill": {
+        "upc": 1.0,
+        "ppm": 0.897,
+        "weight": 0.931,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Feeding": {
+      "listings": 1,
+      "listings_done": 1,
+      "listings_failed": 0,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Health & Wellness": {
+      "listings": 2,
+      "listings_done": 2,
+      "listings_failed": 0,
+      "walmart_reported": 1331,
+      "collected": 215,
+      "kept_records": 170,
+      "fill": {
+        "upc": 1.0,
+        "ppm": 0.976,
+        "weight": 0.982,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Pets": {
+      "listings": 3,
+      "listings_done": 2,
+      "listings_failed": 1,
+      "walmart_reported": 1001,
+      "collected": 164,
+      "kept_records": 124,
+      "fill": {
+        "upc": 0.29,
+        "ppm": 0.815,
+        "weight": 0.871,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Balloons": {
+      "listings": 1,
+      "listings_done": 1,
+      "listings_failed": 0,
+      "walmart_reported": 185,
+      "collected": 101,
+      "kept_records": 83,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.422,
+        "weight": 0.614,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    },
+    "Art Supplies": {
+      "listings": 1,
+      "listings_done": 1,
+      "listings_failed": 0,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Office Supplies": {
+      "listings": 2,
+      "listings_done": 2,
+      "listings_failed": 0,
+      "walmart_reported": 1150,
+      "collected": 209,
+      "kept_records": 126,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.381,
+        "weight": 0.706,
+        "image_url": 1.0,
+        "regular_price": 1.0
+      }
+    }
+  },
+  "examples": {
+    "ppm": [
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Pepsi Cola Soda Pop, 12 fl oz, 12 pack Cans",
+        "weight": "12",
+        "regular_price": "7.97",
+        "sale_price": "6.97",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Pepsi-Cola-Soda-Pop-12-fl-oz-12-Pack-Cans_0db0c54c-9439-4d08-9421-1029b6858b72.f640c28e603c41e6774654f8b97b5c15.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Pepsi-Cola-12-oz-12-ct/16785027?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000809941",
+        "gupc": "",
+        "ppm": "4.8 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Pepsi Wild Cherry Cola Soda Pop​, 12 fl. oz. Cans 24 pack",
+        "weight": "24",
+        "regular_price": "14.24",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Wild-Cherry-Pepsi-24-Pack-12-fl-oz-Cans_825eba37-20a8-4311-bfb6-ecc9e5e6615c.7460464f6f4b8aa37f3ce75161705553.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Wild-Cherry-Pepsi-24-Pack-12-fl-oz-Cans/13424358?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR",
+        "upc": "012000107986",
+        "gupc": "",
+        "ppm": "4.9 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Mountain Dew Soda Dragon Fruit 12 fl oz, 12 Count",
+        "weight": "12",
+        "regular_price": "7.97",
+        "sale_price": "5.97",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Mountain-Dew-Dragon-Fruit-12-fl-oz-12ct_da340123-0c83-489e-9f00-c8e77a2912cf.7b22fbb31cedf79628958e30cba126f7.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Mountain-Dew-Dragon-Fruit-12-fl-oz-12ct/16257962941?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000241512",
+        "gupc": "",
+        "ppm": "4.1 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Mountain Dew Citrus Soda, 12 fl oz 24 Pack Cans",
+        "weight": "24",
+        "regular_price": "14.24",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Caffeine-Free-Mountain-Dew-Citrus-Soda-12-oz-24-Cans_591c754e-cd88-419e-8841-b7cceb1c6ce3.15619503084e564b34c4f7c5d3fab6a6.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Caffeine-Free-Mountain-Dew-Citrus-Soda-12-oz-24-Cans/17787301?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000910296",
+        "gupc": "",
+        "ppm": "4.9 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Dr Thunder Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "4.84",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Dr-Thunder-Soda-Pop-12-fl-oz-12-Pack-Cans_e625a2bf-21a5-42c7-ad90-96893ab71b49.39dc14fb229f5827a651c25550e5d88a.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Dr-Thunder-Soda-Pop-12-fl-oz-12-Pack-Cans/10794696?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742209791",
+        "gupc": "",
+        "ppm": "3.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      }
+    ],
+    "volume_deals": [],
+    "digital_deals": [],
+    "sale_price": [
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Pepsi Cola Soda Pop, 12 fl oz, 12 pack Cans",
+        "weight": "12",
+        "regular_price": "7.97",
+        "sale_price": "6.97",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Pepsi-Cola-Soda-Pop-12-fl-oz-12-Pack-Cans_0db0c54c-9439-4d08-9421-1029b6858b72.f640c28e603c41e6774654f8b97b5c15.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Pepsi-Cola-12-oz-12-ct/16785027?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000809941",
+        "gupc": "",
+        "ppm": "4.8 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Mountain Dew Soda Dragon Fruit 12 fl oz, 12 Count",
+        "weight": "12",
+        "regular_price": "7.97",
+        "sale_price": "5.97",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Mountain-Dew-Dragon-Fruit-12-fl-oz-12ct_da340123-0c83-489e-9f00-c8e77a2912cf.7b22fbb31cedf79628958e30cba126f7.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Mountain-Dew-Dragon-Fruit-12-fl-oz-12ct/16257962941?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000241512",
+        "gupc": "",
+        "ppm": "4.1 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Coca-Cola Soda Pop Fridge Pack Cans, 12 fl oz, 12 Pack",
+        "weight": "12 fl oz, 12 Pack",
+        "regular_price": "8.66",
+        "sale_price": "7.77",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Coca-Cola-Classic-Soda-Pop-Fridge-Pack-12-fl-oz-Cans-12-Pack_0d2cecd1-4cf2-448c-83a0-b3112d5ffb30.3637bb767a21e5b339d5424a51007009.jpeg",
+        "url": "https://www.walmart.com/ip/Coca-Cola-Classic-Coke-12-ct-144-fl-oz/12166733?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1300",
+        "upc": "049000028904",
+        "gupc": "",
+        "ppm": "5.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "MUG Root Beer Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "7.97",
+        "sale_price": "6.97",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/MUG-Root-Beer-Soda-Pop-12-fl-oz-12-Pack-Cans_8f794be9-77a3-41fc-8c2f-bc6d3c7ef391.b9a09437dbee4b30391e73114fdb554c.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/MUG-Root-Beer-Soda-Pop-12-fl-oz-12-Pack-Cans/16785032?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000810008",
+        "gupc": "",
+        "ppm": "4.8 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Dr Pepper Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "8.66",
+        "sale_price": "7.67",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Dr-Pepper-Soda-Pop-12-fl-oz-12-Pack-Cans_4e521452-a7ad-4972-b6c6-d862d70c221e.4b7d89d7c78250bc67af123aa991cbed.jpeg",
+        "url": "https://www.walmart.com/ip/Dr-Pepper-Soda-Pop-12-fl-oz-12-Pack-Cans/10452492?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1300",
+        "upc": "078000082166",
+        "gupc": "",
+        "ppm": "5.3 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      }
+    ],
+    "no_deals": [
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Pepsi Wild Cherry Cola Soda Pop​, 12 fl. oz. Cans 24 pack",
+        "weight": "24",
+        "regular_price": "14.24",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Wild-Cherry-Pepsi-24-Pack-12-fl-oz-Cans_825eba37-20a8-4311-bfb6-ecc9e5e6615c.7460464f6f4b8aa37f3ce75161705553.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Wild-Cherry-Pepsi-24-Pack-12-fl-oz-Cans/13424358?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR",
+        "upc": "012000107986",
+        "gupc": "",
+        "ppm": "4.9 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Mountain Dew Citrus Soda, 12 fl oz 24 Pack Cans",
+        "weight": "24",
+        "regular_price": "14.24",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Caffeine-Free-Mountain-Dew-Citrus-Soda-12-oz-24-Cans_591c754e-cd88-419e-8841-b7cceb1c6ce3.15619503084e564b34c4f7c5d3fab6a6.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Caffeine-Free-Mountain-Dew-Citrus-Soda-12-oz-24-Cans/17787301?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=REGULAR&athbdg=L1300",
+        "upc": "012000910296",
+        "gupc": "",
+        "ppm": "4.9 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Dr Thunder Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "4.84",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Dr-Thunder-Soda-Pop-12-fl-oz-12-Pack-Cans_e625a2bf-21a5-42c7-ad90-96893ab71b49.39dc14fb229f5827a651c25550e5d88a.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Dr-Thunder-Soda-Pop-12-fl-oz-12-Pack-Cans/10794696?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742209791",
+        "gupc": "",
+        "ppm": "3.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Mountain Lightning Citrus Flavored Soda Pop, 2 Liter Bottle",
+        "weight": "2 L",
+        "regular_price": "1.16",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Mountain-Lightning-Citrus-Flavored-Soda-Pop-2-Liter-Bottle_75da2e52-f33c-49c6-bcc3-c7190bfeb7f7.3dccb2505f132e7aebb915992faf8bbb.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Mountain-Lightning-Citrus-Flavored-Soda-Pop-2-Liter-Bottle/35506012?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742226835",
+        "gupc": "",
+        "ppm": "1.7 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "no",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Coca-Cola Soda Pop Cans, 12 fl oz, 24 Pack",
+        "weight": "12 fl oz, 24 Pack",
+        "regular_price": "15.54",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Coca-Cola-Classic-Soda-Pop-12-fl-oz-Cans-24-Pack_cbd3d0de-a7a2-40ee-9c39-9f1f32489b56.ff399330253803ea346b2228ef26c33c.jpeg",
+        "url": "https://www.walmart.com/ip/Coca-Cola-Classic-Soda-Pop-12-fl-oz-Cans-24-Pack/10535216?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1102",
+        "upc": "049000012781",
+        "gupc": "",
+        "ppm": "5.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      }
+    ],
+    "private_label": [
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Dr Thunder Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "4.84",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Dr-Thunder-Soda-Pop-12-fl-oz-12-Pack-Cans_e625a2bf-21a5-42c7-ad90-96893ab71b49.39dc14fb229f5827a651c25550e5d88a.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Dr-Thunder-Soda-Pop-12-fl-oz-12-Pack-Cans/10794696?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742209791",
+        "gupc": "",
+        "ppm": "3.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Mountain Lightning Citrus Flavored Soda Pop, 2 Liter Bottle",
+        "weight": "2 L",
+        "regular_price": "1.16",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Mountain-Lightning-Citrus-Flavored-Soda-Pop-2-Liter-Bottle_75da2e52-f33c-49c6-bcc3-c7190bfeb7f7.3dccb2505f132e7aebb915992faf8bbb.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Mountain-Lightning-Citrus-Flavored-Soda-Pop-2-Liter-Bottle/35506012?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742226835",
+        "gupc": "",
+        "ppm": "1.7 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Cream Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "4.84",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Cream-Soda-Pop-12-fl-oz-12-Pack-Cans_4da6e4fd-249d-4045-ac65-5151aa00e86c.8803cfdd4b71a99223bcdb8bc1957fe3.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Cream-Soda-Pop-12-fl-oz-12-Pack-Cans/24553383?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742033662",
+        "gupc": "",
+        "ppm": "3.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Great Value Twist up Lemon Lime Soda Pop, 12 fl oz, 12 Pack Cans",
+        "weight": "12",
+        "regular_price": "4.84",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Great-Value-Twist-up-Lemon-Lime-Soda-Pop-12-fl-oz-12-Pack-Cans_4148bfa9-c170-4050-a64c-5f303e6cbefb.4d4a542333093d3e18c1b783aab2bfdf.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Great-Value-Twist-up-Lemon-Lime-Soda-Pop-12-fl-oz-12-Pack-Cans/10794699?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT&athbdg=L1600",
+        "upc": "078742209821",
+        "gupc": "",
+        "ppm": "3.4 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      },
+      {
+        "zipcode": "72712",
+        "store_name": "Bentonville S Walton Blvd Supercenter",
+        "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+        "store_logo": "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg",
+        "store_brand": "yes",
+        "category": "Food",
+        "sub_category": "Soda Pop",
+        "product_title": "Sams Cola Soda Pop, 12 fl oz, 24 Pack Cans",
+        "weight": "24",
+        "regular_price": "10.64",
+        "sale_price": "",
+        "volume_deals_description": "",
+        "volume_deals_price": "",
+        "digital_deals_description": "",
+        "digital_deals_price": "",
+        "image_url": "https://i5.walmartimages.com/seo/Sams-Cola-Soda-Pop-12-Fl-Oz-24-Pack-Cans_fc8eb7dd-431a-4d30-8024-1c7bf0a3cb01.812e04bfb5cecc44c938b78fad7744d8.jpeg?odnHeight=180&odnWidth=180&odnBg=FFFFFF",
+        "url": "https://www.walmart.com/ip/Sams-Cola-Soda-Pop-12-Fl-Oz-24-Pack-Cans/16504562?fulfillmentIntent=Pickup&filters=%5B%7B%22intent%22%3A%22fulfillmentIntent%22%2C%22values%22%3A%5B%22Pickup%22%5D%7D%5D&classType=VARIANT",
+        "upc": "078742430157",
+        "gupc": "",
+        "ppm": "3.7 ¢/fl oz",
+        "unit_price": "",
+        "crawl_date": "2026-10-19"
+      }
+    ]
+  },
+  "fetch_stats": {
+    "requests": 1000,
+    "retries": 0,
+    "challenges": 0,
+    "http_errors": 0,
+    "slow": 0
+  },
+  "canary": {
+    "start": {
+      "ok": true,
+      "detail": [],
+      "items": [
+        "10450114",
+        "43436773"
+      ]
+    },
+    "end": {
+      "ok": false,
+      "detail": [
+        "10450114: request budget of 1000 reached (fetch.max_requests_per_run)",
+        "43436773: request budget of 1000 reached (fetch.max_requests_per_run)"
+      ],
+      "items": [
+        "10450114",
+        "43436773"
+      ]
+    }
+  },
+  "validation": {
+    "ok": false,
+    "errors": [
+      "listing not completed: Food / Pantry (failed: discovery failed: searchResult missing from listing page)",
+      "listing not completed: Pets / Dogs (failed: discovery failed: searchResult missing from listing page)",
+      "category returned 0 products (min 1): Feeding",
+      "category returned 0 products (min 1): Art Supplies",
+      "zero products on listing (possible silent block): Feeding / Feeding",
+      "zero products on listing (possible silent block): Art Supplies / Art Supplies",
+      "canary check (end) failed: ['10450114: request budget of 1000 reached (fetch.max_requests_per_run)', '43436773: request budget of 1000 reached (fetch.max_requests_per_run)']",
+      "run aborted: RuntimeError: all canary items failed at end – likely blocked or wrong store (checkpoint kept – next run resumes)"
+    ],
+    "warnings": [
+      "listing hit Walmart's page cap, split further for full depth: Food / Soda Pop",
+      "listing hit Walmart's page cap, split further for full depth: Food / Water",
+      "listing hit Walmart's page cap, split further for full depth: Household Essentials / Paper & Plastic",
+      "listing hit Walmart's page cap, split further for full depth: Household Essentials / Cleaning Supplies",
+      "listing hit Walmart's page cap, split further for full depth: Personal Care / Hand Soaps",
+      "listing hit Walmart's page cap, split further for full depth: Personal Care / Deodorants",
+      "listing hit Walmart's page cap, split further for full depth: Beauty / Face Cleansers",
+      "listing hit Walmart's page cap, split further for full depth: Beauty / Lip Balms & Conditioners",
+      "listing hit Walmart's page cap, split further for full depth: Diapering / Diapering",
+      "listing hit Walmart's page cap, split further for full depth: Health & Wellness / Pain management",
+      "listing hit Walmart's page cap, split further for full depth: Health & Wellness / Digestive Health",
+      "listing hit Walmart's page cap, split further for full depth: Pets / Cats",
+      "listing hit Walmart's page cap, split further for full depth: Balloons / Balloons",
+      "listing hit Walmart's page cap, split further for full depth: Office Supplies / Elementary School Supplies",
+      "listing hit Walmart's page cap, split further for full depth: Office Supplies / Middle School Supplies"
+    ]
+  },
+  "events_tail": [
+    {
+      "ts": "2026-10-19 08:48:17",
+      "kind": "run_aborted",
+      "detail": "{\"error\": \"RuntimeError: all canary items failed at end \\u2013 likely blocked or wrong store\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:16",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"5543705799\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:16",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"11630965311\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:15",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"15007071177\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:15",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"397348862\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:15",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"14164797\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:15",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"15165469731\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:14",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"52523457\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:14",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"14906284\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:14",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"14977426\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:13",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"5364581117\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:13",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"179801732\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:13",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"5543200643\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:13",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"102399527\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:12",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"514782752\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:12",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"1506870246\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:12",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"168624279\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:11",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"646526692\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:11",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"5405283280\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:11",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"227789267\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:11",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"14977428\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:10",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"15726913399\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:10",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"764926354\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:10",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"1674849016\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:10",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"15140821497\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:09",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"14977444\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:09",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"19628253384\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:09",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"47041197\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:09",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"890237379\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:08",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"352661454\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:08",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"15051965510\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:08",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"749789118\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:08",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"347481115\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:07",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"13432830\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:07",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"12512524786\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:07",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"774718841\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:07",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"699392576\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:06",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"2547944715\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:06",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"5062245776\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:06",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"20977412\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:05",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"15039950662\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:05",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"14977421\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:05",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"337853606\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:05",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"19572209406\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:04",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"258144696\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:04",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"809005199\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:04",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"622324481\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:03",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"17617453\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:03",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"332982479\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    },
+    {
+      "ts": "2026-10-19 08:48:03",
+      "kind": "enrich_failed",
+      "detail": "{\"item_id\": \"19543066447\", \"error\": \"request budget of 1000 reached (fetch.max_requests_per_run)\"}"
+    }
+  ],
+  "published": null
+}

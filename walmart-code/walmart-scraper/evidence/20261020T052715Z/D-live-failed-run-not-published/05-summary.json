@@ -1,0 +1,16 @@
+{
+  "run_id": "20261020T094514Z-810753",
+  "request_budget": 40,
+  "records_collected": 0,
+  "validation_ok": false,
+  "errors": [
+    "store not verified before collection: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73874-6d98ce9cfd25e3996b8a8572\"}\n",
+    "category never discovered/queued: Food",
+    "category never discovered/queued: Household Essentials",
+    "category never discovered/queued: Personal Care",
+    "category never discovered/queued: Beauty",
+    "category never discovered/queued: Diapering"
+  ],
+  "latest_unchanged": true,
+  "latest_run_id": "20261019T095339Z-b55042"
+}

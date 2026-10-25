@@ -1,0 +1,65 @@
+MARIANO'S #69 → v1.1.0: corrected code portion (live evidence pending; what I need from you is at the end)
+
+Hello,
+
+As you suggested, I am sending the corrected portion now. The live evidence will follow. This package covers Mariano's only; Walmart is in a separate package. Please start with 00-INDEX.md. 01-RESPONSE-TO-REVIEW.md answers each of your points with the exact files and tests.
+
+Version 1.1.0, code_sha256 e6232f2edb21c12ecf0ab8d5089a0c9b3bb7eb7baa1356fe4c1fd8e4bc5029dc. SOURCE_FINGERPRINT.txt in the ZIP also lists the hash of each config file and requirements.txt. The same hashes are written into report.json at run start, at every resume and at finish.
+
+DONE (code, 34 offline tests on saved real marianos.com responses)
+1. Retention
+- Products without a store price, or without a UPC, are kept with empty strings.
+- The UPC comes only from item.upc. A product without one keeps upc "" and its Mariano's product id goes in observations.json, never in the upc field.
+- The prod.id fallback is removed. In all 240 sampled real products, item.upc equals the product key and data.id, and a top-level prod.id does not exist.
+- Products missing from a run are carried with their own last crawl_date. observations.json marks each row fresh or carried, with first/last observed dates and when carrying began.
+2. Weight
+- exclude_sold_by_weight is removed. A product is excluded only when Mariano's own size or price wording is approximate, for example "about $10.39 each".
+- Every exclusion is listed in exclusions.json with the field and exact text.
+- Titles and family-pack or multipack sizes are kept exactly as shown and are never treated as promotions.
+3. Coverage
+- Any seed search returning fewer products than Mariano's reports is split using Mariano's own brandName filter.
+- coverage.json reconciles each search: reported total, distinct products read, remaining gap, and a flag for Mariano's 1,000 display cap.
+- A slice that comes back unfiltered is failed, never counted. There are no production caps.
+- File 07 reconciles what I delivered in #69. It has 99 searches, 19 provably complete; Batteries has a gap of 97 (121 reported, 24 read) and Light Bulbs a gap of 76 (100 reported, 24 read); 22 of the 27 product CSV rows are not covered.
+4. Offers
+- Volume deals keep Mariano's wording plus the terms from the same source object, e.g. "Save $1 each when you buy 5 or more (valid 2026-10-07T00:00:00Z to 2026-10-27T23:59:59Z; applies to: in-store)". Each offer is also stored in structured form.
+- Digital and volume deals never merge.
+- Products with a digital coupon are flagged via Mariano's own savings=Coupons filter, with evidence. The coupon terms themselves are not invented. The exact dependency for full coupon-to-product terms is in 01 §4.
+5. Provenance
+- ledger.json records every page used: response SHA-256, store, request location, modality and price source locations.
+- Every page also has a price-bearing evidence excerpt, and every output row links to its response hash.
+- 02 reconciles each run with the code that collected it. One correction to my #69 message: the second session of run fa0c1b continued an already finished run. It shows checkpoint reuse, not crash recovery.
+6. Azure, built for your limited test access
+- It deploys into your existing resource group only; it never creates resource groups and needs no subscription rights.
+- preflight.sh is a read-only access check.
+- With Contributor only, the deployment writes two scoped role-assignment commands for your administrator. You store the Oxylabs key in Key Vault yourself.
+- collect_evidence.sh gathers read-only proof of unattended runs.
+
+PENDING (live) – blocked until the items below are ready
+- Steps: probe, then a fresh full-CSV run in your Azure with one forced kill and resume, a failed-publication proof, a second unattended scheduled execution, and the coverage gap figures.
+- Oxylabs: my trial key returns HTTP 429 QUOTA_EXCEEDED. It was shared with the Walmart runs. Mariano's used about 411 successful requests; the breakdown by test and the roughly 30k–60k requests still needed are in 03.
+
+WHAT I NEED FROM YOU
+1. Azure: I accepted the invitation. debugging.specialist@gmail.com signs in to tenant b6d4bd45-c947-4f69-9949-7e688a70561e, but no subscription or resource group is visible yet. Please send:
+   a) the subscription ID, the resource group name and its region;
+   b) a role for debugging.specialist@gmail.com on that resource group: Contributor. If you also add "Role Based Access Control Administrator" on the resource group, I can assign the job identity's two roles myself; otherwise your admin runs the two commands the deployment writes;
+   c) confirmation that Microsoft.App, Microsoft.OperationalInsights, Microsoft.Storage, Microsoft.KeyVault and Microsoft.ManagedIdentity are registered;
+   d) any policy limits: allowed regions, required tags, naming rules, network rules, budget cap.
+2. Oxylabs, please choose:
+   a) you provide the quota from your own plan and store the key in the Key Vault yourself (never in chat); or
+   b) I buy it, reimbursed as agreed, in two steps: about 2,000 requests first (probe + one full category), then the rest once the probe confirms the method.
+3. Scope and acceptance:
+   a) confirm store 53100544 Crystal Lake (ZIP 60014) and all 28 CSV rows;
+   b) the gap level you accept per search in coverage.json, given Mariano's 24-per-request and 1,000-total limits;
+   c) the run days and time with time zone (default Tuesday and Friday 07:00 UTC) and the output location (the deployment's Blob container, or yours);
+   d) a time window for the observed fresh run.
+4. Digital coupons, please choose:
+   a) accept what is obtainable now: the coupon list with full wording and expiry, plus the per-product flag from Mariano's own filter; or
+   b) provide a Mariano's test customer account for a browser-based coupon-to-product path (extra time and cost).
+
+Timing: once 1 and 2 are in place, I need about 2 days for the live evidence. I will confirm the exact date and time (PKT, UTC+5) as soon as both are ready.
+
+Please do not send passwords, codes or keys in chat; secrets go directly into your Key Vault.
+
+Regards,
+Asif Khan

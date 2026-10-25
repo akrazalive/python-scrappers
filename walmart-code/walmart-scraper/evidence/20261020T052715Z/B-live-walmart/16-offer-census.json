@@ -1,0 +1,730 @@
+{
+  "distinct_labels": 56,
+  "occurrences_by_class": {
+    "other_label": 11217
+  },
+  "labels": [
+    {
+      "label": "Save with",
+      "classified_as": "other_label",
+      "count": 2268,
+      "examples": [
+        "1231883685",
+        "10532988",
+        "864232084"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Delivery as soon as 6am",
+      "classified_as": "other_label",
+      "count": 1365,
+      "examples": [
+        "1231883685",
+        "10532988",
+        "864232084"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Pickup as soon as 7am",
+      "classified_as": "other_label",
+      "count": 1328,
+      "examples": [
+        "1231883685",
+        "10532988",
+        "864232084"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free shipping, arrives in 3+ days",
+      "classified_as": "other_label",
+      "count": 1034,
+      "examples": [
+        "10306788",
+        "10306790",
+        "10452266"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Shipping, arrives today",
+      "classified_as": "other_label",
+      "count": 929,
+      "examples": [
+        "13374461260",
+        "3006977474",
+        "20113351310"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Shipping, arrives tomorrow",
+      "classified_as": "other_label",
+      "count": 417,
+      "examples": [
+        "10534038",
+        "13538209527",
+        "20900350437"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Best seller",
+      "classified_as": "other_label",
+      "count": 416,
+      "examples": [
+        "45207653",
+        "10534042",
+        "949679892"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "SNAP EBT eligible",
+      "classified_as": "other_label",
+      "count": 405,
+      "examples": [
+        "1231883685",
+        "10532988",
+        "864232084"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "Overall pick",
+      "classified_as": "other_label",
+      "count": 372,
+      "examples": [
+        "10534038",
+        "10306779",
+        "13093654391"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "100+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 324,
+      "examples": [
+        "14621560327",
+        "10309236",
+        "20011102197"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Shipping, arrives in 3+ days",
+      "classified_as": "other_label",
+      "count": 266,
+      "examples": [
+        "10306811",
+        "10448005",
+        "10306780"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Shipping, arrives Thu, Oct 22",
+      "classified_as": "other_label",
+      "count": 196,
+      "examples": [
+        "45207653",
+        "14913670383",
+        "14803756400"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free shipping, arrives Fri, Oct 23",
+      "classified_as": "other_label",
+      "count": 172,
+      "examples": [
+        "20331654429",
+        "907105459",
+        "5199234867"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "In 200+ people's carts",
+      "classified_as": "other_label",
+      "count": 160,
+      "examples": [
+        "164239056",
+        "18107067360",
+        "869986126"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "In 500+ people's carts",
+      "classified_as": "other_label",
+      "count": 138,
+      "examples": [
+        "8940067876",
+        "10323314",
+        "283155065"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "Rollback",
+      "classified_as": "other_label",
+      "count": 102,
+      "examples": [
+        "17707957306",
+        "17204472765",
+        "17672471932"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "In 50+ people's carts",
+      "classified_as": "other_label",
+      "count": 98,
+      "examples": [
+        "5266061858",
+        "5224802499",
+        "20001520804"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "500+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 96,
+      "examples": [
+        "163779659",
+        "771615781",
+        "14864674547"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Low stock",
+      "classified_as": "other_label",
+      "count": 91,
+      "examples": [
+        "19657605720",
+        "378006401",
+        "17751062530"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free shipping, arrives Thu, Oct 22",
+      "classified_as": "other_label",
+      "count": 90,
+      "examples": [
+        "16613367311",
+        "1938409616",
+        "5069411906"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free shipping, arrives tomorrow",
+      "classified_as": "other_label",
+      "count": 88,
+      "examples": [
+        "19142970037",
+        "22846963",
+        "604255534"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "In 100+ people's carts",
+      "classified_as": "other_label",
+      "count": 84,
+      "examples": [
+        "12903512095",
+        "14103270615",
+        "2909536912"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "Clearance",
+      "classified_as": "other_label",
+      "count": 72,
+      "examples": [
+        "20728512210",
+        "16210553237",
+        "17884274334"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "1K+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 68,
+      "examples": [
+        "981888771",
+        "50178075",
+        "13510357513"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Shipping, arrives Fri, Oct 23",
+      "classified_as": "other_label",
+      "count": 63,
+      "examples": [
+        "19399891",
+        "34108331",
+        "29950172"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "2K+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 60,
+      "examples": [
+        "10451542",
+        "10306795",
+        "12167406"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "In 1K+ people's carts",
+      "classified_as": "other_label",
+      "count": 60,
+      "examples": [
+        "18131570324",
+        "3780271705",
+        "191176966"
+      ],
+      "seen_on": [
+        "listing",
+        "product"
+      ]
+    },
+    {
+      "label": "Reduced price",
+      "classified_as": "other_label",
+      "count": 60,
+      "examples": [
+        "8848673562",
+        "8821358543",
+        "18800256632"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free shipping, arrives today",
+      "classified_as": "other_label",
+      "count": 42,
+      "examples": [
+        "5672575068",
+        "21087757771",
+        "18714368611"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free pickup as soon as 7am",
+      "classified_as": "other_label",
+      "count": 37,
+      "examples": [
+        "5672575068",
+        "21087757771",
+        "18714368611"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "2K+ bought since yesterday, try a subscription",
+      "classified_as": "other_label",
+      "count": 34,
+      "examples": [
+        "10451547",
+        "15673600",
+        "10306775"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "5K+ bought since yesterday, try a subscription",
+      "classified_as": "other_label",
+      "count": 30,
+      "examples": [
+        "45207653",
+        "10306771",
+        "10292168"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "Only 1 left",
+      "classified_as": "other_label",
+      "count": 29,
+      "examples": [
+        "109940025",
+        "859955286",
+        "16688065460"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Deal",
+      "classified_as": "other_label",
+      "count": 28,
+      "examples": [
+        "19631516884",
+        "8056404559",
+        "5443745212"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "500+ bought since yesterday, try a subscription",
+      "classified_as": "other_label",
+      "count": 24,
+      "examples": [
+        "771615781",
+        "457066256",
+        "14864674547"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "10K+ bought since yesterday, try a subscription",
+      "classified_as": "other_label",
+      "count": 22,
+      "examples": [
+        "10534045",
+        "10534043",
+        "10534038"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "1K+ bought since yesterday, try a subscription",
+      "classified_as": "other_label",
+      "count": 22,
+      "examples": [
+        "981888771",
+        "50178075",
+        "13510357513"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "100+ bought since yesterday, try a subscription",
+      "classified_as": "other_label",
+      "count": 22,
+      "examples": [
+        "163779659",
+        "626166340",
+        "14621560327"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "In 25+ people's carts",
+      "classified_as": "other_label",
+      "count": 18,
+      "examples": [
+        "14199261137",
+        "1319831393",
+        "18878619256"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Flash Deal",
+      "classified_as": "other_label",
+      "count": 14,
+      "examples": [
+        "19631516884",
+        "8056404559",
+        "5443745212"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "10K+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 10,
+      "examples": [
+        "10534045",
+        "10534043",
+        "10534044"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "5K+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 10,
+      "examples": [
+        "10306799",
+        "51236573",
+        "14233471884"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only 4 left",
+      "classified_as": "other_label",
+      "count": 10,
+      "examples": [
+        "664077418",
+        "15138071155",
+        "16711554229"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "50+ bought since yesterday",
+      "classified_as": "other_label",
+      "count": 8,
+      "examples": [
+        "5076960807",
+        "1506870246"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only 2 left",
+      "classified_as": "other_label",
+      "count": 7,
+      "examples": [
+        "16958667810",
+        "753766137",
+        "6824519267"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only 9 left",
+      "classified_as": "other_label",
+      "count": 5,
+      "examples": [
+        "10306788",
+        "12513755"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only 3 left",
+      "classified_as": "other_label",
+      "count": 5,
+      "examples": [
+        "12167406",
+        "887642",
+        "43160768"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Pickup at a",
+      "classified_as": "other_label",
+      "count": 4,
+      "examples": [
+        "112030842",
+        "831852004",
+        "16904604"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only 5 left",
+      "classified_as": "other_label",
+      "count": 2,
+      "examples": [
+        "10306811",
+        "1096588760"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only at",
+      "classified_as": "other_label",
+      "count": 2,
+      "examples": [
+        "18722654384"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Only 8 left",
+      "classified_as": "other_label",
+      "count": 2,
+      "examples": [
+        "13156373179",
+        "1090347756"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Vet approval required",
+      "classified_as": "other_label",
+      "count": 2,
+      "examples": [
+        "187745979",
+        "909249428"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Top rated for durability",
+      "classified_as": "other_label",
+      "count": 2,
+      "examples": [
+        "24500653"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Benefits eligible (FSA/HSA)",
+      "classified_as": "other_label",
+      "count": 2,
+      "examples": [
+        "532880658",
+        "144632103"
+      ],
+      "seen_on": [
+        "product"
+      ]
+    },
+    {
+      "label": "Delivery as soon as 8am",
+      "classified_as": "other_label",
+      "count": 1,
+      "examples": [
+        "425282262"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    },
+    {
+      "label": "Free pickup as soon as 9am",
+      "classified_as": "other_label",
+      "count": 1,
+      "examples": [
+        "425282262"
+      ],
+      "seen_on": [
+        "listing"
+      ]
+    }
+  ]
+}

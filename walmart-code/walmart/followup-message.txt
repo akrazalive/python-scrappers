@@ -1,0 +1,23 @@
+Hello Darren,
+
+Follow-up to my final package: the re-check of the 198 short listings is finished. The updated package is attached: wm-delivery-v1.1.5-recheck.zip. It replaces wm-delivery-v1.1.5.zip; please start with EVIDENCE-INDEX.md again.
+
+Same run (20261024T043517Z-fa478c), same source hash (1.1.5, 75d76e0ee62a06e8bfaf48b245852463f08528537099f35a99fbfffcc3e343cc). Re-check session 15:56-16:39 UTC.
+
+Result
+- All 198 listings were re-read from page 1 to Walmart's own last page: 1,158 pages, 0 retries, 0 HTTP errors, 0 store mismatches, canaries OK at the start and the end.
+- 23 listings now reconcile with Walmart's total.
+- 175 listings (5% of 3,294) remain short: median 85% seen, 6,810 products in total (down from 7,726).
+- For 147 of these 175, Walmart's own reported total changed between the two reads, and for 110 the number of products Walmart served was within 3 of the first read. The remaining gap therefore comes from Walmart's reported totals, not from missed pages.
+- The per-listing figures (Walmart total and products seen on both reads) are in 09-shortfall-recheck/recheck-before-after.csv.
+
+Dataset after the re-check: 58,312 distinct store #100 products (37,293 available, 20,895 out of stock, 124 carried forward); 2,781 genuine UPCs; PPM on 44,833 products.
+
+I have not loosened validation, so publication stays blocked and latest/ is unchanged. Please confirm how you want these 175 listings treated: accept them as "Walmart count exceeds products served" and publish, or keep them blocked.
+
+Requests used for the re-check: 1,287 (1,158 listing pages, 114 product pages for new items, 15 verification/canary/re-fetch); about 18,290 for the whole run. The Oxylabs dashboard is authoritative for cost.
+
+Still open: the remaining UPCs (up to 1,200 product pages per scheduled run) and the unattended Azure repeat, which needs your credit approval (about 17,000 requests).
+
+Best regards,
+Asif Khan

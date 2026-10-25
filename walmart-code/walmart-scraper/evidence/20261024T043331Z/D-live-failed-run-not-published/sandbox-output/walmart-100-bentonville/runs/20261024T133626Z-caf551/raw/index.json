@@ -1,0 +1,1917 @@
+[
+  {
+    "file": "store-01.html.gz",
+    "kind": "store",
+    "url": "https://www.walmart.com/store/100",
+    "final_url": "https://www.walmart.com/store/100-bentonville-ar",
+    "status": 200,
+    "bytes": 425843,
+    "sha256": "e565fea9cbfa16c6f300ca75a013819eee7a8029be9bdb21a66e7e61850dd82b",
+    "fetched_at": "2026-10-24T13:36:53+00:00",
+    "note": "store verification page",
+    "store_context": [
+      {
+        "path": "$.query.storeId",
+        "value": "100-bentonville-ar"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.displayName",
+        "value": "Bentonville S Walton Blvd Supercenter"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.address.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[0].displayName",
+        "value": "Deli"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[1].displayName",
+        "value": "Pharmacy"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[2].displayName",
+        "value": "Photo Center"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[3].displayName",
+        "value": "Garden Center"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[4].displayName",
+        "value": "Grocery"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[5].displayName",
+        "value": "1-Hour Photo Center"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[6].displayName",
+        "value": "Financial Services"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[7].displayName",
+        "value": "Bakery"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[8].displayName",
+        "value": "Auto Care Center"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[9].displayName",
+        "value": "Walmart EV Charging Station"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[10].displayName",
+        "value": "Wireless Services"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[11].displayName",
+        "value": "Liquor"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[12].displayName",
+        "value": "Vision Center"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[13].displayName",
+        "value": ".COM_SERVICES"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[14].displayName",
+        "value": "EXPANDED_FULFILLMENT"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[15].displayName",
+        "value": "GM_PICKUP_CURBSIDE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[16].displayName",
+        "value": "MFC_ALERT"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[17].displayName",
+        "value": "SCAN_AND_GO"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[18].displayName",
+        "value": "SENSORY_FRIENDLY_HOURS_MORNING"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[19].displayName",
+        "value": "SERVICE DESK"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[20].displayName",
+        "value": "WIRELESS_SERVICES"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[21].displayName",
+        "value": "Budget Truck Rental"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[22].displayName",
+        "value": "Mamava Lactation Suite"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[23].displayName",
+        "value": "Coinstar"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[24].displayName",
+        "value": "ecoATM-Kiosk"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[25].displayName",
+        "value": "Quicktag"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[26].displayName",
+        "value": "Minute Key-Kiosk"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[27].displayName",
+        "value": "Redbox-Kiosk A"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[28].displayName",
+        "value": "Redbox-Kiosk B"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[29].displayName",
+        "value": "Rug Doctor-Kiosk"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[30].displayName",
+        "value": "Pharmacy Drive-Thru"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[31].displayName",
+        "value": "Flu Shots and Immunizations"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[32].displayName",
+        "value": "Test and Treat dotcom appointment scheduling"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[33].displayName",
+        "value": "Hormonal Contraceptive Prescribing"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[34].displayName",
+        "value": "Hormonal Contraception Test and Treat"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[35].displayName",
+        "value": "COVID Immunizations"
+      },
+      {
+        "path": "$.props.pageProps.initialData.initialDataNodeDetail.data.nodeDetail.services[36].displayName",
+        "value": "Arvest Bank"
+      }
+    ]
+  },
+  {
+    "file": "category-01.html.gz",
+    "kind": "category",
+    "url": "https://www.walmart.com/cp/feeding/133283",
+    "final_url": "https://www.walmart.com/cp/feeding/133283",
+    "status": 200,
+    "bytes": 635842,
+    "sha256": "7c046482efddb0f04725dc382109a021e2fd4ad8d55d26e8cfaddcfd7e243cef",
+    "fetched_at": "2026-10-24T13:38:10+00:00",
+    "note": "Feeding landing page",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[6].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[11].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[6].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[9].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[11].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[12].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentSummary[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentSummary[1].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentSummary[2].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentSummary[3].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentSummary[4].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[0].fulfillmentSummary[5].storeId",
+        "value": "0"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[1].fulfillmentSummary[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[1].fulfillmentSummary[1].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[3].configs.productsConfig.products[1].fulfillmentSummary[2].storeId",
+        "value": "100"
+      }
+    ]
+  },
+  {
+    "file": "category-02.html.gz",
+    "kind": "category",
+    "url": "https://www.walmart.com/cp/food/976759",
+    "final_url": "https://www.walmart.com/cp/food/976759",
+    "status": 200,
+    "bytes": 1056987,
+    "sha256": "2d73c3f8a5ced3c77a26900c78251fb4dec7ee7824f009e57a35ce56a3ca97b5",
+    "fetched_at": "2026-10-24T13:38:18+00:00",
+    "note": "Food landing page",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[4].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[6].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[10].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[13].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[11].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[13].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[6].configs.itemCarousel.productsConfig.products[14].fulfillmentType",
+        "value": "STORE"
+      }
+    ]
+  },
+  {
+    "file": "category-03.html.gz",
+    "kind": "category",
+    "url": "https://www.walmart.com/cp/personal-care/1005862",
+    "final_url": "https://www.walmart.com/cp/personal-care/1005862",
+    "status": 200,
+    "bytes": 1164837,
+    "sha256": "a7541a9ac0a7daece5fcb818e92b7d7690808a8144918fb9eddacb6982c63ffe",
+    "fetched_at": "2026-10-24T13:38:24+00:00",
+    "note": "Personal Care landing page",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[6].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[7].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[9].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[11].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[13].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[14].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[15].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[16].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[17].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[18].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[7].configs.productsConfig.products[19].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[4].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[8].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[11].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[13].fulfillmentType",
+        "value": "MARKETPLACE"
+      }
+    ]
+  },
+  {
+    "file": "listing-01.html.gz",
+    "kind": "listing",
+    "url": "https://www.walmart.com/browse/5427_486190_1928754?stores=100&facet=retailer_type%3AWalmart",
+    "final_url": "https://www.walmart.com/browse/5427_486190_1928754?stores=100&facet=retailer_type:Walmart",
+    "status": 200,
+    "bytes": 703130,
+    "sha256": "7c373a32c343396483510c0bacb0f24608fd3915897d43255bf0319e7dc15539",
+    "fetched_at": "2026-10-24T13:38:55+00:00",
+    "note": "Diapering / Parent's Choice Baby Wipes page 1",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeFrontIds[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[2].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[11].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.modules[7].configs.ad.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.modules[7].configs.ad.zipCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeFrontIds[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentSummary[0].fulfillment",
+        "value": "DELIVERY"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentSummary[0].storeId",
+        "value": "0"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].variantCriteria[0].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[0].fulfillment",
+        "value": "DELIVERY"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[1].fulfillment",
+        "value": "DELIVERY"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[1].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[2].fulfillment",
+        "value": "DELIVERY"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[2].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[3].fulfillment",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[3].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[4].fulfillment",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentSummary[4].storeId",
+        "value": "100"
+      }
+    ]
+  },
+  {
+    "file": "category-04.html.gz",
+    "kind": "category",
+    "url": "https://www.walmart.com/cp/beauty/1085666",
+    "final_url": "https://www.walmart.com/cp/beauty/1085666",
+    "status": 200,
+    "bytes": 1842797,
+    "sha256": "611c774df959a52f20caf02a67b0fc4da3aa5c942cd334040935de3a25e8b3a3",
+    "fetched_at": "2026-10-24T13:39:02+00:00",
+    "note": "Beauty landing page",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[0].configs.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[0].configs.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[0].configs.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[2].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[3].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[11].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[13].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[14].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[15].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[16].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[17].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[8].configs.productsConfig.products[18].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[0].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[6].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[7].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[11].fulfillmentType",
+        "value": "STORE"
+      }
+    ]
+  },
+  {
+    "file": "listing-02.html.gz",
+    "kind": "listing",
+    "url": "https://www.walmart.com/browse/5427_486190_486191?stores=100&facet=retailer_type%3AWalmart",
+    "final_url": "https://www.walmart.com/browse/5427_486190_486191?stores=100&facet=retailer_type:Walmart",
+    "status": 200,
+    "bytes": 1176689,
+    "sha256": "f8db67bd9ae5f05cd885a8926405913a0072723c1446a1adccdec113cbcaf41d",
+    "fetched_at": "2026-10-24T13:39:06+00:00",
+    "note": "Diapering / Diaper Pails, Wipe Warmers & Accessories page 1",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeFrontIds[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[2].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[4].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[6].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[6].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[11].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[13].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[17].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[19].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[20].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[21].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[22].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[23].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[23].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[24].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[24].displayName",
+        "value": "options"
+      }
+    ]
+  },
+  {
+    "file": "category-05.html.gz",
+    "kind": "category",
+    "url": "https://www.walmart.com/cp/household-essentials/1115193",
+    "final_url": "https://www.walmart.com/cp/household-essentials/1115193",
+    "status": 200,
+    "bytes": 2256546,
+    "sha256": "611407d33c0cdc43da4731eb3f77690a7b0c3727aaade6ea55244ce48778c2ce",
+    "fetched_at": "2026-10-24T13:39:25+00:00",
+    "note": "Household Essentials landing page",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[0].configs.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[0].configs.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[0].configs.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[1].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[3].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[8].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[11].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[13].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[14].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[15].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[16].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[17].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[18].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[5].configs.productsConfig.products[19].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[0].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[2].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[4].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[6].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[7].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[8].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[9].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialTempoData.contentLayout.modules[11].configs.productsConfig.products[10].fulfillmentType",
+        "value": "FC"
+      }
+    ]
+  },
+  {
+    "file": "listing-03.html.gz",
+    "kind": "listing",
+    "url": "https://www.walmart.com/browse/5427_486190_164195?stores=100&facet=retailer_type%3AWalmart",
+    "final_url": "https://www.walmart.com/browse/5427_486190_164195?stores=100&facet=retailer_type:Walmart",
+    "status": 200,
+    "bytes": 1180796,
+    "sha256": "ed8f9a740aef6bb2529b896062d5a2bff9ce608cc322f3db46c3b618a09c90c0",
+    "fetched_at": "2026-10-24T13:39:25+00:00",
+    "note": "Diapering / Diaper Bags page 1",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeFrontIds[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[2].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[4].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[11].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[13].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[13].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[17].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[19].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[19].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[20].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[20].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[21].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[21].displayName",
+        "value": "options"
+      }
+    ]
+  },
+  {
+    "file": "listing-04.html.gz",
+    "kind": "listing",
+    "url": "https://www.walmart.com/browse/5427_486190_8663653?stores=100&facet=retailer_type%3AWalmart",
+    "final_url": "https://www.walmart.com/browse/5427_486190_8663653?stores=100&facet=retailer_type:Walmart",
+    "status": 200,
+    "bytes": 1209388,
+    "sha256": "4207abb1f02c1036693f46c7a4d49eb04e073e28ca8373468e632158791e8c42",
+    "fetched_at": "2026-10-24T13:39:40+00:00",
+    "note": "Diapering / Backpack Diaper Bags page 1",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeFrontIds[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[2].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[4].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[6].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[11].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[13].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[13].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[17].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[17].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[19].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[19].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[20].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[21].fulfillmentType",
+        "value": "MARKETPLACE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[22].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[22].displayName",
+        "value": "options"
+      }
+    ]
+  },
+  {
+    "file": "listing-05.html.gz",
+    "kind": "listing",
+    "url": "https://www.walmart.com/browse/5427_486190_1457965?stores=100&facet=retailer_type%3AWalmart",
+    "final_url": "https://www.walmart.com/browse/baby/baby-grooming/5427_132943_4294931?stores=100&facet=retailer_type:Walmart",
+    "status": 200,
+    "bytes": 1134463,
+    "sha256": "2907cfd2376c418280fc925d32d63cdc52dbecfb482150a5d74dfa68c391a948",
+    "fetched_at": "2026-10-24T13:41:08+00:00",
+    "note": "Diapering / Baby Care & Grooming page 1",
+    "store_context": [
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+        "value": "PICKUP"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+        "value": "72712"
+      },
+      {
+        "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.pageMetadata.location.storeFrontIds[0].storeId",
+        "value": "100"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[0].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[1].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[2].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[3].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[4].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[5].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[6].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[7].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[9].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[10].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[11].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[12].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[13].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[14].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[15].displayName",
+        "value": "options"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[16].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[17].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[18].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[19].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[20].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[21].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[22].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[23].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[24].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[25].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[26].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[27].fulfillmentType",
+        "value": "STORE"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[28].fulfillmentType",
+        "value": "FC"
+      },
+      {
+        "path": "$.props.pageProps.initialData.searchResult.itemStacks[0].items[29].fulfillmentType",
+        "value": "FC"
+      }
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m wmscraper validate --location walmart-100-bentonville --run-id 20261020T110652Z-e8ccea --previous D:\PROJECTS\Monthly-Test\walmart-scraper\evidence\20261020T110531Z\B-live-walmart\11-SIMULATED-baseline-report.json
+# started 2026-10-20T11:33:18+00:00
+{
+  "run_id": "20261020T110652Z-e8ccea",
+  "records": 1273,
+  "compared_with": "D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\evidence\\20261020T110531Z\\B-live-walmart\\11-SIMULATED-baseline-report.json",
+  "ok": false,
+  "errors": [
+    "yield drop in Art Supplies: 109 vs 327 last good run",
+    "yield drop in Balloons: 97 vs 291 last good run",
+    "yield drop in Beauty: 112 vs 336 last good run",
+    "yield drop in Diapering: 120 vs 360 last good run",
+    "yield drop in Feeding: 168 vs 504 last good run",
+    "yield drop in Food: 106 vs 318 last good run",
+    "yield drop in Health & Wellness: 142 vs 426 last good run",
+    "yield drop in Household Essentials: 114 vs 342 last good run",
+    "yield drop in Office Supplies: 106 vs 318 last good run",
+    "yield drop in Personal Care: 95 vs 285 last good run",
+    "yield drop in Pets: 104 vs 312 last good run"
+  ],
+  "warnings": [
+    "listing hit Walmart's page cap, split further for full depth: Food / Canned beans",
+    "listing hit Walmart's page cap, split further for full depth: Household Essentials / Plastic Cups",
+    "listing hit Walmart's page cap, split further for full depth: Personal Care / Hand Soaps",
+    "listing hit Walmart's page cap, split further for full depth: Beauty / Face Wash",
+    "listing hit Walmart's page cap, split further for full depth: Diapering / Disposable Diapers",
+    "listing hit Walmart's page cap, split further for full depth: Feeding / Baby Food Stages",
+    "listing hit Walmart's page cap, split further for full depth: Health & Wellness / Pain Relief",
+    "listing hit Walmart's page cap, split further for full depth: Pets / Dry dog food",
+    "listing hit Walmart's page cap, split further for full depth: Balloons / Latex Balloons",
+    "listing hit Walmart's page cap, split further for full depth: Art Supplies / Acrylic Paints",
+    "listing hit Walmart's page cap, split further for full depth: Office Supplies / Elementary School Supplies"
+  ]
+}
+
+# finished 2026-10-20T11:33:18+00:00 exit code 2

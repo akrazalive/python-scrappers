@@ -1,0 +1,22 @@
+plugins: anyio-4.15.1
+collecting ... collected 17 items
+
+tests/test_pipeline.py::test_full_run_publishes_valid_data PASSED        [  5%]
+tests/test_pipeline.py::test_wrong_store_is_never_published PASSED       [ 11%]
+tests/test_pipeline.py::test_failed_run_keeps_last_good_data_and_resume_completes PASSED [ 17%]
+tests/test_pipeline.py::test_interruption_resume_does_not_duplicate PASSED [ 23%]
+tests/test_pipeline.py::test_department_page_down_uses_site_menu PASSED  [ 29%]
+tests/test_rules.py::test_field_order_and_empty_pipeline_fields PASSED   [ 35%]
+tests/test_rules.py::test_price_format PASSED                            [ 41%]
+tests/test_rules.py::test_approximate_weight PASSED                      [ 47%]
+tests/test_rules.py::test_store_brand PASSED                             [ 52%]
+tests/test_rules.py::test_deal_classification_and_prices_never_calculated PASSED [ 58%]
+tests/test_rules.py::test_state_store_and_department_shelves PASSED      [ 64%]
+tests/test_rules.py::test_product_mapping_ppm_sale_and_weight_exclusion PASSED [ 70%]
+tests/test_rules.py::test_sale_price_uses_displayed_promo_ppm PASSED     [ 76%]
+tests/test_rules.py::test_upstream_failure_is_not_an_empty_page PASSED   [ 82%]
+tests/test_rules.py::test_challenge_page_detected PASSED                 [ 88%]
+tests/test_rules.py::test_coupons_page PASSED                            [ 94%]
+tests/test_rules.py::test_query_expansion_terms_stay_in_shelf PASSED     [100%]
+
+============================= 17 passed in 9.20s ==============================

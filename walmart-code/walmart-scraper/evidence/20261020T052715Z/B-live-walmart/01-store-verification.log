@@ -1,0 +1,28 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m wmscraper verify-store --location walmart-100-bentonville
+# started 2026-10-20T05:28:03+00:00
+{"ts": "2026-10-20T05:28:16+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "store_verified", "verified": true, "store_id": "100", "store_name": "Bentonville S Walton Blvd Supercenter", "store_location": "406 S Walton Blvd, Bentonville, AR 72712", "zipcode": "72712", "url": "https://www.walmart.com/store/100", "checked_at": "2026-10-20T05:28:16+00:00", "reason": ""}
+{"ts": "2026-10-20T05:28:32+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "canary", "phase": "start", "ok": true, "problems": []}
+{
+  "store": {
+    "verified": true,
+    "store_id": "100",
+    "store_name": "Bentonville S Walton Blvd Supercenter",
+    "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+    "zipcode": "72712",
+    "url": "https://www.walmart.com/store/100",
+    "checked_at": "2026-10-20T05:28:16+00:00",
+    "reason": ""
+  },
+  "canary": {
+    "start": {
+      "ok": true,
+      "detail": [],
+      "items": [
+        "10450114",
+        "43436773"
+      ]
+    }
+  }
+}
+
+# finished 2026-10-20T05:28:32+00:00 exit code 0

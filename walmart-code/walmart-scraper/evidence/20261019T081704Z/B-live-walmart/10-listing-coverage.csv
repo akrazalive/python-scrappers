@@ -1,0 +1,21 @@
+category,sub_category,status,pages,walmart_reported_total,seen,kept,capped,error
+Food,Pantry,failed,0,0,0,0,0,discovery failed: searchResult missing from listing page
+Food,Soda Pop,done,2,391,108,84,1,
+Food,Water,done,2,304,107,85,1,
+Household Essentials,Paper & Plastic,done,2,643,110,89,1,
+Household Essentials,Cleaning Supplies,done,2,1055,109,89,1,
+Personal Care,Hand Soaps,done,2,200,106,80,1,
+Personal Care,Deodorants,done,2,674,109,89,1,
+Beauty,Face Cleansers,done,2,329,108,81,1,
+Beauty,Lip Balms & Conditioners,done,2,343,108,82,1,
+Diapering,Diapering,done,2,457,110,87,1,
+Feeding,Feeding,done,1,0,0,0,0,
+Health & Wellness,Pain management,done,2,735,107,87,1,
+Health & Wellness,Digestive Health,done,2,596,108,83,1,
+Pets,Dogs,failed,0,0,0,0,0,discovery failed: searchResult missing from listing page
+Pets,Cats,done,2,953,108,84,1,
+Pets,Special Kitty,done,2,48,56,40,0,
+Balloons,Balloons,done,2,185,101,83,1,
+Art Supplies,Art Supplies,done,1,0,0,0,0,
+Office Supplies,Elementary School Supplies,done,2,504,103,78,1,
+Office Supplies,Middle School Supplies,done,2,646,106,48,1,

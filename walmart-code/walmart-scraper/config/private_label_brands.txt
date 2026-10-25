@@ -1,0 +1,32 @@
+# Walmart private-label / exclusive brands. One per line, case-insensitive.
+# A product whose brand matches a line below gets store_brand = "yes"; otherwise "no".
+Great Value
+Equate
+Marketside
+Freshness Guaranteed
+bettergoods
+Sam's Choice
+Parent's Choice
+Mainstays
+Pen+Gear
+Spring Valley
+Ol' Roy
+Special Kitty
+Pure Balance
+Vibrant Life
+Equate Beauty
+Clear American
+Hyper Tough
+onn.
+Way To Celebrate
+Holiday Time
+Price First
+Home Bistro
+Great Value Pet
+Ozark Trail
+Time and Tru
+George
+Wonder Nation
+Your Fresh Market
+Prima Della
+Bettergoods

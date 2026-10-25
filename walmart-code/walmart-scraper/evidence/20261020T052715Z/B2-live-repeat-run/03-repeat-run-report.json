@@ -1,0 +1,141 @@
+{
+  "run_id": "20261020T094403Z-054afb",
+  "scraper": {
+    "version": "1.0.0",
+    "source_sha256": "32ff7120bc16128978f903a0b93324fd07605ad6eee4b3f6528d6f8c60c53ef0"
+  },
+  "location": {
+    "key": "walmart-100-bentonville",
+    "store_id": "100",
+    "zipcode": "72712",
+    "fulfillment": "pickup"
+  },
+  "store_verification": {
+    "verified": false,
+    "reason": "provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n",
+    "url": "https://www.walmart.com/store/100"
+  },
+  "fulfillment_context": {
+    "listing_filter": {
+      "stores": "100"
+    },
+    "provider_pinning": {
+      "store_id": "100",
+      "fulfillment_type": "pickup",
+      "delivery_zip": "72712"
+    },
+    "store_mismatch_pages": 0,
+    "pages_with_store_verified": 0
+  },
+  "runtime_seconds": 69.2,
+  "total_unique_records": 0,
+  "duplicate_records_in_output": 0,
+  "duplicates_prevented": 0,
+  "excluded": {},
+  "count_by_category": {},
+  "count_by_subcategory": {},
+  "listings": [],
+  "field_completeness": {
+    "zipcode": 0.0,
+    "store_name": 0.0,
+    "store_location": 0.0,
+    "store_logo": 0.0,
+    "store_brand": 0.0,
+    "category": 0.0,
+    "sub_category": 0.0,
+    "product_title": 0.0,
+    "weight": 0.0,
+    "regular_price": 0.0,
+    "sale_price": 0.0,
+    "volume_deals_description": 0.0,
+    "volume_deals_price": 0.0,
+    "digital_deals_description": 0.0,
+    "digital_deals_price": 0.0,
+    "image_url": 0.0,
+    "url": 0.0,
+    "upc": 0.0,
+    "gupc": 0.0,
+    "ppm": 0.0,
+    "unit_price": 0.0,
+    "crawl_date": 0.0
+  },
+  "category_completeness": {},
+  "examples": {
+    "ppm": [],
+    "volume_deals": [],
+    "digital_deals": [],
+    "sale_price": [],
+    "no_deals": [],
+    "private_label": []
+  },
+  "offer_census": {
+    "distinct_labels": 0,
+    "occurrences_by_class": {},
+    "labels": []
+  },
+  "availability": {
+    "by_status": {},
+    "by_price_source": {},
+    "carried_forward": 0,
+    "examples": {}
+  },
+  "product_identity": {
+    "variant_mismatches": 0,
+    "enriched": 0,
+    "listing_data_only": 0
+  },
+  "fetch_stats": {
+    "requests": 5,
+    "retries": 4,
+    "challenges": 0,
+    "http_errors": 0,
+    "slow": 0
+  },
+  "canary": {},
+  "validation": {
+    "ok": false,
+    "errors": [
+      "store not verified before collection: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n",
+      "category never discovered/queued: Food",
+      "category never discovered/queued: Household Essentials",
+      "category never discovered/queued: Personal Care",
+      "category never discovered/queued: Beauty",
+      "category never discovered/queued: Diapering",
+      "category never discovered/queued: Feeding",
+      "category never discovered/queued: Health & Wellness",
+      "category never discovered/queued: Pets",
+      "category never discovered/queued: Balloons",
+      "category never discovered/queued: Art Supplies",
+      "category never discovered/queued: Office Supplies",
+      "yield drop in Art Supplies: 0 vs 82 last good run",
+      "yield drop in Balloons: 0 vs 83 last good run",
+      "yield drop in Beauty: 0 vs 81 last good run",
+      "yield drop in Diapering: 0 vs 88 last good run",
+      "yield drop in Feeding: 0 vs 85 last good run",
+      "yield drop in Food: 0 vs 89 last good run",
+      "yield drop in Health & Wellness: 0 vs 88 last good run",
+      "yield drop in Household Essentials: 0 vs 87 last good run",
+      "yield drop in Office Supplies: 0 vs 79 last good run",
+      "yield drop in Personal Care: 0 vs 79 last good run",
+      "yield drop in Pets: 0 vs 76 last good run",
+      "field completeness product_title=0.00% below 100%",
+      "field completeness regular_price=0.00% below 100%",
+      "field completeness url=0.00% below 100%",
+      "field completeness image_url=0.00% below 98%",
+      "run produced no records",
+      "run aborted: RuntimeError: store verification failed: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n (checkpoint kept – next run resumes)"
+    ],
+    "warnings": [
+      "canary check (start) skipped – no canary_items configured",
+      "canary check (end) skipped – no canary_items configured"
+    ]
+  },
+  "events_tail": [
+    {
+      "ts": "2026-10-20 09:45:13",
+      "kind": "run_aborted",
+      "detail": "{\"error\": \"RuntimeError: store verification failed: provider HTTP 429: {\\\"status\\\":429,\\\"title\\\":\\\"QUOTA_EXCEEDED\\\",\\\"detail\\\":\\\"You have reached your plan's quota. Upgrade your plan to continue.\\\",\\\"instance\\\":\\\"6ad73829-6b13db021e01f45b31da07de\\\"}\\n\"}"
+    }
+  ],
+  "published": null
+}

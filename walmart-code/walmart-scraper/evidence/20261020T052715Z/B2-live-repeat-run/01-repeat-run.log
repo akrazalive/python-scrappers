@@ -1,0 +1,58 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m wmscraper run --location walmart-100-bentonville --fresh --max-requests 1600
+# started 2026-10-20T09:44:03+00:00
+closing open run 20261020T052832Z-7675e9 (kept for audit), starting a new run
+{"ts": "2026-10-20T09:44:04+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "run_start", "run_id": "20261020T094403Z-054afb", "location": "walmart-100-bentonville", "store_id": "100", "fulfillment": "pickup", "resumed": false, "items_already_kept": 0, "version": "1.0.0", "source_sha256": "32ff7120bc16128978f903a0b93324fd07605ad6eee4b3f6528d6f8c60c53ef0"}
+{"ts": "2026-10-20T09:44:06+00:00", "level": "WARNING", "logger": "wmscraper.fetch", "event": "retry", "url": "https://www.walmart.com/store/100", "attempt": 1, "reason": "provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad737e5-7600664623dbff62dac5be59\"}\n", "sleep": 4.1}
+{"ts": "2026-10-20T09:44:10+00:00", "level": "WARNING", "logger": "wmscraper.fetch", "event": "retry", "url": "https://www.walmart.com/store/100", "attempt": 2, "reason": "provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad737ea-28a5b7f6553c23bbf82e48de\"}\n", "sleep": 9.7}
+{"ts": "2026-10-20T09:44:20+00:00", "level": "WARNING", "logger": "wmscraper.fetch", "event": "retry", "url": "https://www.walmart.com/store/100", "attempt": 3, "reason": "provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad737f4-c15d623dce4462b0005a3499\"}\n", "sleep": 17.6}
+{"ts": "2026-10-20T09:44:39+00:00", "level": "WARNING", "logger": "wmscraper.fetch", "event": "retry", "url": "https://www.walmart.com/store/100", "attempt": 4, "reason": "provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73807-c86ae4cb0a8a18f27b1bfb38\"}\n", "sleep": 33.0}
+{"ts": "2026-10-20T09:45:13+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "run_aborted", "exc": "Traceback (most recent call last):\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\runner.py\", line 227, in verify_store\n    res = await self.fetcher.get(url)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\fetch\\base.py\", line 117, in get\n    raise last_exc or FetchError(\"unknown fetch failure\")\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\fetch\\base.py\", line 93, in get\n    res = await self._fetch_once(url)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\fetch\\base.py\", line 182, in _fetch_once\n    raise FetchError(f\"provider HTTP {r.status_code}: {r.text[:200]}\", \"http\")\nwmscraper.fetch.base.FetchError: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\runner.py\", line 144, in execute\n    await self.verify_store()\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\runner.py\", line 233, in verify_store\n    raise RuntimeError(f\"store verification failed: {exc}\") from exc\nRuntimeError: store verification failed: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n"}
+{"ts": "2026-10-20T09:45:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "not_published", "run_id": "20261020T094403Z-054afb", "errors": ["store not verified before collection: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n", "category never discovered/queued: Food", "category never discovered/queued: Household Essentials", "category never discovered/queued: Personal Care", "category never discovered/queued: Beauty", "category never discovered/queued: Diapering", "category never discovered/queued: Feeding", "category never discovered/queued: Health & Wellness", "category never discovered/queued: Pets", "category never discovered/queued: Balloons", "category never discovered/queued: Art Supplies", "category never discovered/queued: Office Supplies", "yield drop in Art Supplies: 0 vs 82 last good run", "yield drop in Balloons: 0 vs 83 last good run", "yield drop in Beauty: 0 vs 81 last good run", "yield drop in Diapering: 0 vs 88 last good run", "yield drop in Feeding: 0 vs 85 last good run", "yield drop in Food: 0 vs 89 last good run", "yield drop in Health & Wellness: 0 vs 88 last good run", "yield drop in Household Essentials: 0 vs 87 last good run"], "demo": false}
+{"ts": "2026-10-20T09:45:14+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "run_end", "run_id": "20261020T094403Z-054afb", "records": 0, "ok": false, "runtime_s": 69.2}
+{
+  "run_id": "20261020T094403Z-054afb",
+  "total_unique_records": 0,
+  "runtime_seconds": 69.2,
+  "count_by_category": {},
+  "validation": {
+    "ok": false,
+    "errors": [
+      "store not verified before collection: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n",
+      "category never discovered/queued: Food",
+      "category never discovered/queued: Household Essentials",
+      "category never discovered/queued: Personal Care",
+      "category never discovered/queued: Beauty",
+      "category never discovered/queued: Diapering",
+      "category never discovered/queued: Feeding",
+      "category never discovered/queued: Health & Wellness",
+      "category never discovered/queued: Pets",
+      "category never discovered/queued: Balloons",
+      "category never discovered/queued: Art Supplies",
+      "category never discovered/queued: Office Supplies",
+      "yield drop in Art Supplies: 0 vs 82 last good run",
+      "yield drop in Balloons: 0 vs 83 last good run",
+      "yield drop in Beauty: 0 vs 81 last good run",
+      "yield drop in Diapering: 0 vs 88 last good run",
+      "yield drop in Feeding: 0 vs 85 last good run",
+      "yield drop in Food: 0 vs 89 last good run",
+      "yield drop in Health & Wellness: 0 vs 88 last good run",
+      "yield drop in Household Essentials: 0 vs 87 last good run",
+      "yield drop in Office Supplies: 0 vs 79 last good run",
+      "yield drop in Personal Care: 0 vs 79 last good run",
+      "yield drop in Pets: 0 vs 76 last good run",
+      "field completeness product_title=0.00% below 100%",
+      "field completeness regular_price=0.00% below 100%",
+      "field completeness url=0.00% below 100%",
+      "field completeness image_url=0.00% below 98%",
+      "run produced no records",
+      "run aborted: RuntimeError: store verification failed: provider HTTP 429: {\"status\":429,\"title\":\"QUOTA_EXCEEDED\",\"detail\":\"You have reached your plan's quota. Upgrade your plan to continue.\",\"instance\":\"6ad73829-6b13db021e01f45b31da07de\"}\n (checkpoint kept \u2013 next run resumes)"
+    ],
+    "warnings": [
+      "canary check (start) skipped \u2013 no canary_items configured",
+      "canary check (end) skipped \u2013 no canary_items configured"
+    ]
+  },
+  "published": null
+}
+
+# finished 2026-10-20T09:45:14+00:00 exit code 2

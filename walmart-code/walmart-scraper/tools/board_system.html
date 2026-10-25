@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Walmart Scraper System Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1220;--panel:#111b2e;--panel2:#16233b;--line:#22324f;--teal:#19e3c1;--amber:#ffb547;--rose:#ff6b8a;--ink:#e8eefc;--muted:#8fa0bf}
+*{box-sizing:border-box;margin:0;padding:0} html{background:#0b1220}
+body{width:1600px;background:var(--bg);color:var(--ink);font-family:Inter,sans-serif;padding:56px 64px 60px;
+ background-image:radial-gradient(900px 500px at 100% 0,rgba(25,227,193,.10),transparent 60%),radial-gradient(700px 500px at 0 100%,rgba(255,181,71,.07),transparent 60%)}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--line);padding-bottom:26px}
+.tag{font-family:'JetBrains Mono';font-size:14px;color:var(--teal);letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:54px;letter-spacing:-1.5px;line-height:1.05;margin-top:10px}
+h1 span{color:var(--teal)}
+.sub{color:var(--muted);font-size:18px;margin-top:10px}
+.pills{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;max-width:560px}
+.pill{font-family:'JetBrains Mono';font-size:13px;border:1px solid var(--line);background:var(--panel);padding:8px 12px;border-radius:999px;color:#c9d6f2}
+.pill b{color:var(--teal)}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:26px;margin-top:30px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 28px}
+.card h2{font-size:22px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.card h2 i{font-style:normal;font-family:'JetBrains Mono';font-size:13px;color:var(--bg);background:var(--teal);border-radius:6px;padding:3px 8px}
+.flow{display:grid;gap:9px}
+.step{display:grid;grid-template-columns:44px 170px 1fr;align-items:center;gap:14px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.step .n{font-family:'JetBrains Mono';font-weight:700;color:var(--teal);font-size:18px}
+.step b{font-family:'Space Grotesk';font-size:17px}
+.step span{color:var(--muted);font-size:14.5px}
+.step.gate{border-color:rgba(25,227,193,.55);background:linear-gradient(90deg,rgba(25,227,193,.12),var(--panel2))}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rule{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.rule b{display:block;font-family:'Space Grotesk';font-size:15.5px}
+.rule span{color:var(--muted);font-size:13.5px;line-height:1.45;display:block;margin-top:3px}
+.rule.x b::before{content:"✕ ";color:var(--rose)} .rule.k b::before{content:"✓ ";color:var(--teal)}
+.schema{font-family:'JetBrains Mono';font-size:13.5px;line-height:1.75;color:#c9d6f2;background:#0a1322;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.schema em{font-style:normal;color:var(--amber)} .schema u{text-decoration:none;color:var(--teal)}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;margin-top:26px}
+ul.c{list-style:none;display:grid;gap:9px} ul.c li{padding-left:22px;position:relative;color:#d2dcf2;font-size:15px;line-height:1.45}
+ul.c li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;border-radius:2px;background:var(--teal)}
+.az{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.az div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+.az div small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.foot b{color:var(--ink);font-family:'Space Grotesk';font-size:17px}
+.ok{color:var(--teal);font-family:'JetBrains Mono'}
+</style></head><body>
+<div class="top">
+  <div><div class="tag">Contest entry · Board 1 of 2 · System</div>
+  <h1>Walmart Location Scraper<br><span>built to publish only verified data.</span></h1>
+  <div class="sub">Python 3.12 · Walmart __NEXT_DATA__ parsing · Azure Container Apps Job · twice-weekly · resumable</div></div>
+  <div class="pills"><span class="pill"><b>22</b> fields · exact order</span><span class="pill"><b>11</b> categories + all subcategories</span>
+  <span class="pill"><b>store</b> verified on every page</span><span class="pill">tests <b>21/21</b> passing</span><span class="pill">no telemetry · no kill-switch</span></div>
+</div>
+
+<div class="grid">
+  <div class="card"><h2><i>FLOW</i> Every run, every location</h2>
+    <div class="flow">
+      <div class="step"><span class="n">01</span><b>Lock</b><span>Blob lease per location → scheduled runs can never overlap</span></div>
+      <div class="step"><span class="n">02</span><b>Verify store</b><span>Store page: id, name, address and ZIP must match config before collecting</span></div>
+      <div class="step"><span class="n">03</span><b>Canary · start</b><span>Known items must show a local Walmart offer at this store</span></div>
+      <div class="step"><span class="n">04</span><b>Discover</b><span>Category → all subcategories from CSV, exclusions applied (Recipes, Farm Animals…)</span></div>
+      <div class="step"><span class="n">05</span><b>Paginate</b><span>Pickup facet · shape check · store check · filter · dedup · checkpoint per page</span></div>
+      <div class="step"><span class="n">06</span><b>Enrich</b><span>Product page: UPC, size, seller and store re-checked, deals</span></div>
+      <div class="step"><span class="n">07</span><b>Canary · end</b><span>Same items re-read; detects blocking that starts mid-run</span></div>
+      <div class="step gate"><span class="n">08</span><b>Validate → publish</b><span>All checks pass → latest/ swapped atomically. Otherwise last good data stays.</span></div>
+    </div>
+  </div>
+  <div class="card"><h2><i>RULES</i> What gets in, what never does</h2>
+    <div class="rules">
+      <div class="rule k"><b>Local store prices only</b><span>Pickup / in-store offers at the configured store</span></div>
+      <div class="rule x"><b>Marketplace sellers</b><span>Seller ≠ Walmart.com on listing or product page</span></div>
+      <div class="rule x"><b>Shipping-only offers</b><span>No pickup / in-store badge → excluded</span></div>
+      <div class="rule x"><b>Sponsored duplicates</b><span>Ad slots skipped, organic copy kept once</span></div>
+      <div class="rule x"><b>Approx. weights</b><span>approx · approximately · avg wt · ~ · weight varies</span></div>
+      <div class="rule k"><b>One record per item</b><span>Item-id key across pages, categories, sponsored</span></div>
+      <div class="rule k"><b>PPM as displayed</b><span>e.g. 17.4 ¢/oz copied verbatim, never computed</span></div>
+      <div class="rule k"><b>Deals split correctly</b><span>Volume vs clip/coupon digital; Walmart Cash ≠ discount</span></div>
+    </div>
+    <div class="schema" style="margin-top:14px">zipcode · store_name · store_location · store_logo · store_brand · category · sub_category · product_title · weight · regular_price · sale_price · volume_deals_description · volume_deals_price · digital_deals_description · digital_deals_price · image_url · url · <u>upc</u> · <em>gupc=""</em> · <u>ppm</u> · <em>unit_price=""</em> · crawl_date</div>
+  </div>
+</div>
+
+<div class="row3">
+  <div class="card"><h2><i>BLOCK</i> Silent-blocking detection</h2><ul class="c">
+    <li>Challenge pages, block redirects, HTTP errors, tiny or slow responses</li>
+    <li>Response-shape validation: a changed page raises an error, never “0 items”</li>
+    <li>Zero-item listing = failure, not an empty category</li>
+    <li>Yield vs last good run (&lt; 60 % blocks publish)</li>
+    <li>Canary products at start and end</li></ul></div>
+  <div class="card"><h2><i>SAFE</i> Good data is never replaced</h2><ul class="c">
+    <li>Runs write to runs/&lt;id&gt;/ only</li>
+    <li>latest/ swapped only after validation passes</li>
+    <li>Store mismatch on any page blocks the run</li>
+    <li>SQLite checkpoint: page + records in one transaction → true resume</li>
+    <li>Blob versioning + previous-records rollback</li></ul></div>
+  <div class="card"><h2><i>AZURE</i> Deployed with one command</h2><div class="az">
+    <div>Container Apps Job<small>cron Mon + Thu · parallelism 1</small></div><div>Blob Storage<small>output · checkpoints · leases</small></div>
+    <div>Key Vault<small>provider secrets</small></div><div>Managed identity<small>least-privilege RBAC</small></div>
+    <div>Log Analytics<small>JSON logs per event</small></div><div>Bicep + deploy.sh<small>ACR build, no local Docker</small></div></div></div>
+</div>
+
+<div class="foot"><div><b>Asif Khan</b> · Full-stack &amp; data engineer · ASH Rising (SMC-Private) Limited</div>
+<div class="mono">source · config · Bicep · docs · tests → delivered unencrypted with full IP transfer</div></div>
+</body></html>

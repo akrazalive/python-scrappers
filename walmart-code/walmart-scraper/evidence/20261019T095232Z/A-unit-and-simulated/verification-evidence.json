@@ -1,0 +1,205 @@
+{
+  "generated": "2026-10-19 09:52 UTC",
+  "version": {
+    "version": "1.0.0",
+    "source_sha256": "b2e9302824626631cb3699d049433cfc323c1851be1ec6e2a32de4b1976b6196"
+  },
+  "good": {
+    "ok": true,
+    "records": 6,
+    "excluded": {
+      "approximate_weight": 1,
+      "marketplace_seller": 1,
+      "shipping_only_or_not_at_store": 1
+    },
+    "dups_prevented": 2,
+    "dups_out": 0,
+    "store": {
+      "verified": true,
+      "store_id": "1234",
+      "store_name": "Bentonville Supercenter",
+      "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+      "zipcode": "72712",
+      "url": "https://www.walmart.com/store/1234",
+      "checked_at": "2026-10-19T09:52:46+00:00",
+      "reason": ""
+    },
+    "published": true
+  },
+  "mismatch": {
+    "ok": false,
+    "errors": [
+      "1 page(s) returned a different store context \u2013 run not publishable",
+      "listing not completed: Food / Snacks (failed: page 1: store context mismatch)"
+    ],
+    "published": false
+  },
+  "thin": {
+    "ok": false,
+    "errors": [
+      "thin listing: Food / Snacks collected 4 of 40 reachable (Walmart reports 40)"
+    ]
+  },
+  "blocked": {
+    "run1_ok": true,
+    "run2_ok": false,
+    "run2_errors": [
+      "listing not completed: Food / Snacks (failed: discovery failed: bot challenge / block page)"
+    ],
+    "latest_unchanged": true,
+    "latest_run_id": "20261019T095248Z-c12603",
+    "run2_id": "20261019T095248Z-b46ae2"
+  },
+  "kill": {
+    "pid": 17660,
+    "pages_at_kill": 1,
+    "items_at_kill": 3,
+    "run_id": "20261019T095249Z-331693",
+    "resumed_same_run": true,
+    "resume_event": {
+      "pending_listings": 2,
+      "items_already_kept": 3,
+      "next_pages": [
+        [
+          "Food",
+          "Milk",
+          2
+        ],
+        [
+          "Food",
+          "Snacks",
+          1
+        ]
+      ]
+    },
+    "final_records": 6,
+    "dups_out": 0,
+    "ok": true,
+    "exit": 0
+  },
+  "tests": [
+    [
+      [
+        "test_detection.py",
+        "test_thin_listing_fails_validation",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_yield_drop_against_previous_run_blocks_publication",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_category_minimum",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_lock_left_by_dead_process_is_taken_over",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_hard_kill_then_resume",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_location_scope_runs_and_publishes",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_wrong_store_address_fails_before_collection",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_raw_responses_archived_with_store_context",
+        "PASSED"
+      ],
+      [
+        "test_detection.py",
+        "test_cp_landing_root_and_landing_node_split",
+        "PASSED"
+      ],
+      [
+        "test_pipeline.py",
+        "test_full_run_publishes_valid_data",
+        "PASSED"
+      ],
+      [
+        "test_pipeline.py",
+        "test_store_mismatch_blocks_publication",
+        "PASSED"
+      ],
+      [
+        "test_pipeline.py",
+        "test_failed_run_never_replaces_good_data",
+        "PASSED"
+      ],
+      [
+        "test_pipeline.py",
+        "test_interruption_resumes_without_loss_or_duplicates",
+        "PASSED"
+      ],
+      [
+        "test_pipeline.py",
+        "test_demo_runs_are_never_published",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_field_order_and_empty_strings",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_pipeline_fields_forced_empty",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_price_format",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_approx_weight",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_weight_extraction",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_private_label",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_volume_deals_preserve_wording_and_displayed_price_only",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_digital_deals",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_rewards_not_treated_as_digital_reduction",
+        "PASSED"
+      ],
+      [
+        "test_rules.py",
+        "test_volume_and_digital_together",
+        "PASSED"
+      ]
+    ],
+    "24 passed"
+  ]
+}

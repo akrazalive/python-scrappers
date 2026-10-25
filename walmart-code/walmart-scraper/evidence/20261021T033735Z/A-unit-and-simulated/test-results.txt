@@ -1,0 +1,108 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m pytest -v -p no:cacheprovider
+# started 2026-10-21T03:37:36+00:00
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: D:\PROJECTS\Monthly-Test\walmart-scraper
+plugins: anyio-4.15.1
+collecting ... collected 36 items
+
+tests/test_detection.py::test_thin_listing_fails_validation PASSED       [  2%]
+tests/test_detection.py::test_yield_drop_against_previous_run_blocks_publication PASSED [  5%]
+tests/test_detection.py::test_category_minimum PASSED                    [  8%]
+tests/test_detection.py::test_lock_left_by_dead_process_is_taken_over PASSED [ 11%]
+tests/test_detection.py::test_hard_kill_then_resume PASSED               [ 13%]
+tests/test_detection.py::test_location_scope_runs_and_publishes PASSED   [ 16%]
+tests/test_detection.py::test_wrong_store_address_fails_before_collection PASSED [ 19%]
+tests/test_detection.py::test_raw_responses_archived_with_store_context PASSED [ 22%]
+tests/test_detection.py::test_cp_landing_root_and_landing_node_split PASSED [ 25%]
+tests/test_detection.py::test_variant_mismatch_is_never_attributed PASSED [ 27%]
+tests/test_detection.py::test_offer_census_reports_displayed_labels PASSED [ 30%]
+tests/test_detection.py::test_oversize_listing_without_subcategories_is_price_partitioned PASSED [ 33%]
+tests/test_detection.py::test_out_of_stock_product_is_retained PASSED    [ 36%]
+tests/test_detection.py::test_unavailable_product_carried_forward_with_original_crawl_date PASSED [ 38%]
+tests/test_detection.py::test_second_run_reuses_known_upcs_and_fetches_only_new_product_pages PASSED [ 41%]
+tests/test_detection.py::test_capped_listing_blocks_publication PASSED   [ 44%]
+tests/test_detection.py::test_price_ppm_promotions_only_from_store_offer PASSED [ 47%]
+tests/test_detection.py::test_selected_store_context_checked_explicitly PASSED [ 50%]
+tests/test_detection.py::test_repeat_run_refreshes_prices_while_reusing_identity PASSED [ 52%]
+tests/test_detection.py::test_count_reconciliation_failure_blocks_publication PASSED [ 55%]
+tests/test_pipeline.py::test_full_run_publishes_valid_data PASSED        [ 58%]
+tests/test_pipeline.py::test_store_mismatch_blocks_publication PASSED    [ 61%]
+tests/test_pipeline.py::test_failed_run_never_replaces_good_data PASSED  [ 63%]
+tests/test_pipeline.py::test_interruption_resumes_without_loss_or_duplicates PASSED [ 66%]
+tests/test_pipeline.py::test_demo_runs_are_never_published PASSED        [ 69%]
+tests/test_rules.py::test_field_order_and_empty_strings PASSED           [ 72%]
+tests/test_rules.py::test_pipeline_fields_forced_empty PASSED            [ 75%]
+tests/test_rules.py::test_price_format PASSED                            [ 77%]
+tests/test_rules.py::test_approx_weight PASSED                           [ 80%]
+tests/test_rules.py::test_weight_extraction PASSED                       [ 83%]
+tests/test_rules.py::test_private_label PASSED                           [ 86%]
+tests/test_rules.py::test_volume_deals_preserve_wording_and_displayed_price_only PASSED [ 88%]
+tests/test_rules.py::test_digital_deals PASSED                           [ 91%]
+tests/test_rules.py::test_rewards_not_treated_as_digital_reduction PASSED [ 94%]
+tests/test_rules.py::test_volume_and_digital_together PASSED             [ 97%]
+tests/test_rules.py::test_pack_labels_are_not_promotions PASSED          [100%]Task exception was never retrieved
+future: <Task finished name='Task-258' coro=<Run.execute() done, defined at D:\PROJECTS\Monthly-Test\walmart-scraper\src\wmscraper\runner.py:128> exception=KeyboardInterrupt('simulated crash')>
+Traceback (most recent call last):
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\tests\test_pipeline.py", line 97, in test_interruption_resumes_without_loss_or_duplicates
+    asyncio.run(r1.execute())
+    ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    with Runner(debug=debug, loop_factory=loop_factory) as runner:
+         ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 63, in __exit__
+    self.close()
+    ~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 71, in close
+    _cancel_all_tasks(loop)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 207, in _cancel_all_tasks
+    loop.run_until_complete(tasks.gather(*to_cancel, return_exceptions=True))
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 712, in run_until_complete
+    self.run_forever()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 683, in run_forever
+    self._run_once()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 2060, in _run_once
+    handle._run()
+    ~~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\src\wmscraper\runner.py", line 147, in execute
+    await self.crawl_listings()
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\src\wmscraper\runner.py", line 468, in crawl_listings
+    await asyncio.gather(*(one(r) for r in self.ck.pending_listings()))
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 712, in run_until_complete
+    self.run_forever()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 683, in run_forever
+    self._run_once()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 2060, in _run_once
+    handle._run()
+    ~~~~~~~~~~~^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\src\wmscraper\runner.py", line 466, in one
+    await self._crawl_listing(*row, max_pages=max_pages)
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\src\wmscraper\runner.py", line 521, in _crawl_listing
+    new = self.ck.commit_page(category, url, page, lp.max_page, accepted, skipped, sub, stop or capped, capped,
+                              reported_total=lp.total_count, page_size=len(lp.items))
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\tests\test_pipeline.py", line 92, in crash_after_first_page
+    raise KeyboardInterrupt("simulated crash")
+KeyboardInterrupt: simulated crash
+
+
+============================= 36 passed in 21.35s =============================
+
+# finished 2026-10-21T03:37:58+00:00 exit code 0

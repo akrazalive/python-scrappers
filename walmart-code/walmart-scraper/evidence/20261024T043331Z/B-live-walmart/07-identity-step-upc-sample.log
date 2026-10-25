@@ -1,0 +1,860 @@
+# identity step (scraper code Run._reuse_known/_enrich_one) on run 20261024T043517Z-fa478c, 40 products per category; started 2026-10-24T08:24:54+00:00
+2026-10-24 13:27:11,581 INFO wmscraper.run product_details_reused
+2026-10-24 13:27:11,599 INFO identity_sample identity sample: reused=904 to_fetch=415
+Traceback (most recent call last):
+  File "C:\Users\IZACOM~1\AppData\Local\Temp/claude/d--PROJECTS-Monthly-Test/ff52ed47-2088-4326-8d6e-18256a5003bd/scratchpad/identity_sample.py", line 52, in <module>
+    asyncio.run(main())
+    ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\IZACOM~1\AppData\Local\Temp/claude/d--PROJECTS-Monthly-Test/ff52ed47-2088-4326-8d6e-18256a5003bd/scratchpad/identity_sample.py", line 35, in main
+    await r.fetcher.start()
+  File "D:\PROJECTS\Monthly-Test\walmart-scraper\src\wmscraper\fetch\base.py", line 163, in start
+    raise FetchError("OXYLABS_WEBAPI_KEY is not set", "error")
+wmscraper.fetch.base.FetchError: OXYLABS_WEBAPI_KEY is not set
+# finished 2026-10-24T08:27:12+00:00 exit 0
+# second attempt with provider key loaded from .env; started 2026-10-24T08:27:27+00:00
+2026-10-24 13:27:29,184 INFO wmscraper.run product_details_reused
+2026-10-24 13:27:29,206 INFO identity_sample identity sample: reused=0 to_fetch=415
+2026-10-24 13:27:37,645 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:38,264 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:39,752 INFO wmscraper.run product_identity
+2026-10-24 13:27:40,094 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:40,094 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:40,096 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:40,774 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:40,792 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:40,866 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:40,973 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:41,051 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:41,316 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:41,387 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:41,546 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:42,028 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:42,351 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:42,973 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:43,959 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:44,784 INFO wmscraper.run product_identity
+2026-10-24 13:27:45,077 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:45,078 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:45,414 INFO wmscraper.run product_identity
+2026-10-24 13:27:45,870 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:46,264 INFO wmscraper.run product_identity
+2026-10-24 13:27:46,581 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:47,504 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:47,557 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:48,725 INFO wmscraper.run product_identity
+2026-10-24 13:27:49,106 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:49,553 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:51,151 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:51,569 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:51,796 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:53,329 INFO wmscraper.run product_identity
+2026-10-24 13:27:54,575 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:27:56,566 INFO wmscraper.run product_identity
+2026-10-24 13:27:56,987 INFO wmscraper.run product_identity
+2026-10-24 13:27:57,361 INFO wmscraper.run product_identity
+2026-10-24 13:27:58,539 INFO wmscraper.run product_identity
+2026-10-24 13:27:59,535 INFO wmscraper.run product_identity
+2026-10-24 13:28:00,512 INFO wmscraper.run product_identity
+2026-10-24 13:28:01,528 INFO wmscraper.run product_identity
+2026-10-24 13:28:02,388 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:02,432 INFO wmscraper.run product_identity
+2026-10-24 13:28:02,996 INFO wmscraper.run product_identity
+2026-10-24 13:28:03,458 INFO wmscraper.run product_identity
+2026-10-24 13:28:03,666 INFO wmscraper.run product_identity
+2026-10-24 13:28:03,792 INFO wmscraper.run product_identity
+2026-10-24 13:28:04,143 INFO wmscraper.run product_identity
+2026-10-24 13:28:04,439 INFO wmscraper.run product_identity
+2026-10-24 13:28:04,629 INFO wmscraper.run product_identity
+2026-10-24 13:28:04,873 INFO wmscraper.run product_identity
+2026-10-24 13:28:05,041 INFO wmscraper.run product_identity
+2026-10-24 13:28:05,249 INFO wmscraper.run product_identity
+2026-10-24 13:28:05,503 INFO wmscraper.run product_identity
+2026-10-24 13:28:05,665 INFO wmscraper.run product_identity
+2026-10-24 13:28:05,803 INFO wmscraper.run product_identity
+2026-10-24 13:28:05,951 INFO wmscraper.run product_identity
+2026-10-24 13:28:07,795 INFO wmscraper.run product_identity
+2026-10-24 13:28:08,837 INFO wmscraper.run product_identity
+2026-10-24 13:28:09,836 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:10,821 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:11,700 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:11,925 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:12,080 INFO wmscraper.run product_identity
+2026-10-24 13:28:12,236 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:13,173 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:13,230 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:13,350 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:13,382 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:14,041 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:14,070 INFO wmscraper.run product_identity
+2026-10-24 13:28:14,189 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:14,202 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:14,781 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:14,949 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:15,077 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:15,205 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:15,741 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:15,809 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:16,327 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:16,877 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:17,052 INFO wmscraper.run product_identity
+2026-10-24 13:28:17,193 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:17,229 INFO wmscraper.run product_identity
+2026-10-24 13:28:17,399 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:18,061 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:18,238 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:20,318 INFO wmscraper.run product_identity
+2026-10-24 13:28:20,571 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:21,277 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:21,530 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:22,846 INFO wmscraper.run product_identity
+2026-10-24 13:28:23,459 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:25,002 INFO wmscraper.run product_identity
+2026-10-24 13:28:26,268 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:26,699 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:27,685 INFO wmscraper.run product_identity
+2026-10-24 13:28:29,138 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:29,556 INFO wmscraper.run product_identity
+2026-10-24 13:28:31,884 INFO wmscraper.run product_identity
+2026-10-24 13:28:32,045 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:32,332 INFO wmscraper.run product_identity
+2026-10-24 13:28:32,583 INFO wmscraper.run product_identity
+2026-10-24 13:28:32,987 INFO wmscraper.run product_identity
+2026-10-24 13:28:33,150 INFO wmscraper.run product_identity
+2026-10-24 13:28:33,316 INFO wmscraper.run product_identity
+2026-10-24 13:28:33,476 INFO wmscraper.run product_identity
+2026-10-24 13:28:33,636 INFO wmscraper.run product_identity
+2026-10-24 13:28:33,785 INFO wmscraper.run product_identity
+2026-10-24 13:28:33,957 INFO wmscraper.run product_identity
+2026-10-24 13:28:34,072 INFO wmscraper.run product_identity
+2026-10-24 13:28:34,200 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:34,495 INFO wmscraper.run product_identity
+2026-10-24 13:28:35,049 INFO wmscraper.run product_identity
+2026-10-24 13:28:35,283 INFO wmscraper.run product_identity
+2026-10-24 13:28:35,566 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:35,615 INFO wmscraper.run product_identity
+2026-10-24 13:28:35,745 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:36,140 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:36,239 INFO wmscraper.run product_identity
+2026-10-24 13:28:36,474 INFO wmscraper.run product_identity
+2026-10-24 13:28:36,750 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:36,803 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:37,219 INFO wmscraper.run product_identity
+2026-10-24 13:28:37,575 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:38,446 INFO wmscraper.run product_identity
+2026-10-24 13:28:38,562 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:38,767 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:39,699 INFO wmscraper.run product_identity
+2026-10-24 13:28:39,996 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:40,025 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:40,464 INFO wmscraper.run product_identity
+2026-10-24 13:28:41,157 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:41,467 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:41,548 INFO wmscraper.run product_identity
+2026-10-24 13:28:42,551 INFO wmscraper.run product_identity
+2026-10-24 13:28:42,770 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:42,782 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:42,955 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:43,010 INFO wmscraper.run product_identity
+2026-10-24 13:28:43,209 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:43,210 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:44,577 INFO wmscraper.run product_identity
+2026-10-24 13:28:44,867 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:45,133 INFO wmscraper.run product_identity
+2026-10-24 13:28:45,693 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:46,995 INFO wmscraper.run product_identity
+2026-10-24 13:28:47,239 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:47,496 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:48,260 INFO wmscraper.run product_identity
+2026-10-24 13:28:48,433 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:48,448 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:49,290 INFO wmscraper.run product_identity
+2026-10-24 13:28:50,103 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:51,031 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:51,191 INFO wmscraper.run product_identity
+2026-10-24 13:28:51,351 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:52,417 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:52,897 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:54,135 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:54,572 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:54,610 INFO wmscraper.run product_identity
+2026-10-24 13:28:56,218 INFO wmscraper.run product_identity
+2026-10-24 13:28:57,160 INFO wmscraper.run product_identity
+2026-10-24 13:28:57,547 INFO wmscraper.run product_identity
+2026-10-24 13:28:58,160 INFO wmscraper.run product_identity
+2026-10-24 13:28:58,727 INFO wmscraper.run product_identity
+2026-10-24 13:28:58,918 INFO wmscraper.run product_identity
+2026-10-24 13:28:59,096 INFO wmscraper.run product_identity
+2026-10-24 13:28:59,344 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:28:59,424 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:00,822 INFO wmscraper.run product_identity
+2026-10-24 13:29:01,012 INFO wmscraper.run product_identity
+2026-10-24 13:29:01,169 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:01,201 INFO wmscraper.run product_identity
+2026-10-24 13:29:01,347 INFO wmscraper.run product_identity
+2026-10-24 13:29:01,962 INFO wmscraper.run product_identity
+2026-10-24 13:29:03,644 INFO wmscraper.run product_identity
+2026-10-24 13:29:03,827 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:03,854 INFO wmscraper.run product_identity
+2026-10-24 13:29:04,015 INFO wmscraper.run product_identity
+2026-10-24 13:29:04,158 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:04,184 INFO wmscraper.run product_identity
+2026-10-24 13:29:04,337 INFO wmscraper.run product_identity
+2026-10-24 13:29:05,013 INFO wmscraper.run product_identity
+2026-10-24 13:29:05,633 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:06,495 INFO wmscraper.run product_identity
+2026-10-24 13:29:06,674 INFO wmscraper.run product_identity
+2026-10-24 13:29:07,889 INFO wmscraper.run product_identity
+2026-10-24 13:29:08,209 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:08,291 INFO wmscraper.run product_identity
+2026-10-24 13:29:08,478 INFO wmscraper.run product_identity
+2026-10-24 13:29:08,633 INFO wmscraper.run product_identity
+2026-10-24 13:29:08,812 INFO wmscraper.run product_identity
+2026-10-24 13:29:09,306 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:09,437 INFO wmscraper.run product_identity
+2026-10-24 13:29:09,902 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:10,724 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:10,761 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:11,693 INFO wmscraper.run product_identity
+2026-10-24 13:29:11,848 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:11,853 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:11,878 INFO wmscraper.run product_identity
+2026-10-24 13:29:12,029 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:12,031 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:12,050 INFO wmscraper.run product_identity
+2026-10-24 13:29:12,158 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:12,505 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:12,723 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:12,891 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:13,397 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:13,706 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:14,568 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:14,693 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:15,221 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:15,948 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:16,818 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:17,120 INFO wmscraper.run product_identity
+2026-10-24 13:29:17,374 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:18,373 INFO wmscraper.run product_identity
+2026-10-24 13:29:19,202 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:19,634 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:20,528 INFO wmscraper.run product_identity
+2026-10-24 13:29:21,845 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:21,898 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:23,512 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:26,387 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:28,178 INFO wmscraper.run product_identity
+2026-10-24 13:29:28,510 INFO wmscraper.run product_identity
+2026-10-24 13:29:29,924 INFO wmscraper.run product_identity
+2026-10-24 13:29:30,784 INFO wmscraper.run product_identity
+2026-10-24 13:29:30,951 INFO wmscraper.run product_identity
+2026-10-24 13:29:31,358 INFO wmscraper.run product_identity
+2026-10-24 13:29:32,141 INFO wmscraper.run product_identity
+2026-10-24 13:29:32,503 INFO wmscraper.run product_identity
+2026-10-24 13:29:32,673 INFO wmscraper.run product_identity
+2026-10-24 13:29:32,853 INFO wmscraper.run product_identity
+2026-10-24 13:29:33,300 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:33,947 INFO wmscraper.run product_identity
+2026-10-24 13:29:34,085 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:34,156 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:34,274 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:34,705 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:34,786 INFO wmscraper.run product_identity
+2026-10-24 13:29:35,065 INFO wmscraper.run product_identity
+2026-10-24 13:29:35,487 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:35,585 INFO wmscraper.run product_identity
+2026-10-24 13:29:35,950 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:36,062 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:37,081 INFO wmscraper.run product_identity
+2026-10-24 13:29:37,456 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:37,945 INFO wmscraper.run product_identity
+2026-10-24 13:29:38,114 INFO wmscraper.run product_identity
+2026-10-24 13:29:39,167 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:39,460 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:39,921 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:40,307 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:41,015 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:42,055 INFO wmscraper.run product_identity
+2026-10-24 13:29:42,534 INFO wmscraper.run product_identity
+2026-10-24 13:29:42,793 INFO wmscraper.run product_identity
+2026-10-24 13:29:42,926 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:43,018 INFO wmscraper.run product_identity
+2026-10-24 13:29:43,743 INFO wmscraper.run product_identity
+2026-10-24 13:29:43,882 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:44,976 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:46,320 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:46,626 INFO wmscraper.run product_identity
+2026-10-24 13:29:46,759 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:47,350 WARNING wmscraper.fetch slow_response
+2026-10-24 13:29:47,378 INFO wmscraper.run product_identity
+2026-10-24 13:29:47,531 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:47,737 INFO wmscraper.run product_identity
+2026-10-24 13:29:47,877 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:48,040 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:49,538 INFO wmscraper.run product_identity
+2026-10-24 13:29:50,370 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:50,537 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:51,143 INFO wmscraper.run product_identity
+2026-10-24 13:29:51,805 INFO wmscraper.run product_identity
+2026-10-24 13:29:52,263 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:54,120 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:55,865 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:56,093 INFO wmscraper.run product_identity
+2026-10-24 13:29:56,296 INFO wmscraper.run product_identity
+2026-10-24 13:29:56,834 INFO wmscraper.run product_identity
+2026-10-24 13:29:57,030 INFO wmscraper.run product_identity
+2026-10-24 13:29:58,113 INFO wmscraper.run product_identity
+2026-10-24 13:29:58,280 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:29:58,626 INFO wmscraper.run product_identity
+2026-10-24 13:29:59,070 WARNING wmscraper.fetch slow_response
+2026-10-24 13:29:59,101 INFO wmscraper.run product_identity
+2026-10-24 13:29:59,359 INFO wmscraper.run product_identity
+2026-10-24 13:29:59,731 INFO wmscraper.run product_identity
+2026-10-24 13:29:59,929 INFO wmscraper.run product_identity
+2026-10-24 13:30:00,211 INFO wmscraper.run product_identity
+2026-10-24 13:30:00,358 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:01,028 INFO wmscraper.run product_identity
+2026-10-24 13:30:01,233 INFO wmscraper.run product_identity
+2026-10-24 13:30:01,506 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:02,010 INFO wmscraper.run product_identity
+2026-10-24 13:30:02,204 INFO wmscraper.run product_identity
+2026-10-24 13:30:02,337 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:02,539 INFO wmscraper.run product_identity
+2026-10-24 13:30:02,736 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:02,792 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:03,107 INFO wmscraper.run product_identity
+2026-10-24 13:30:03,371 INFO wmscraper.run product_identity
+2026-10-24 13:30:03,500 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:03,561 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:04,177 WARNING wmscraper.fetch slow_response
+2026-10-24 13:30:04,208 INFO wmscraper.run product_identity
+2026-10-24 13:30:04,377 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:04,393 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:04,406 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:04,654 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:04,930 INFO wmscraper.run product_identity
+2026-10-24 13:30:05,094 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:05,864 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:05,936 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:05,980 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:06,461 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:06,476 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:06,896 INFO wmscraper.run product_identity
+2026-10-24 13:30:07,654 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:07,869 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:08,012 INFO wmscraper.run product_identity
+2026-10-24 13:30:08,861 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:10,316 INFO wmscraper.run product_identity
+2026-10-24 13:30:14,052 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:14,411 INFO wmscraper.run product_identity
+2026-10-24 13:30:14,924 INFO wmscraper.run product_identity
+2026-10-24 13:30:15,150 INFO wmscraper.run product_identity
+2026-10-24 13:30:16,175 INFO wmscraper.run product_identity
+2026-10-24 13:30:17,932 INFO wmscraper.run product_identity
+2026-10-24 13:30:18,039 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:18,136 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:18,522 INFO wmscraper.run product_identity
+2026-10-24 13:30:18,846 INFO wmscraper.run product_identity
+2026-10-24 13:30:19,350 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:20,200 INFO wmscraper.run product_identity
+2026-10-24 13:30:20,334 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:20,358 INFO wmscraper.run product_identity
+2026-10-24 13:30:20,483 INFO wmscraper.run product_identity
+2026-10-24 13:30:20,722 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:21,850 INFO wmscraper.run product_identity
+2026-10-24 13:30:22,001 INFO wmscraper.run product_identity
+2026-10-24 13:30:22,281 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:22,459 INFO wmscraper.run product_identity
+2026-10-24 13:30:22,681 INFO wmscraper.run product_identity
+2026-10-24 13:30:22,826 INFO wmscraper.run product_identity
+2026-10-24 13:30:23,019 INFO wmscraper.run product_identity
+2026-10-24 13:30:23,724 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:23,914 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:24,127 INFO wmscraper.run product_identity
+2026-10-24 13:30:24,638 INFO wmscraper.run product_identity
+2026-10-24 13:30:24,905 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:25,135 INFO wmscraper.run product_identity
+2026-10-24 13:30:25,309 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:25,696 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:26,150 INFO wmscraper.run product_identity
+2026-10-24 13:30:26,498 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:27,196 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:27,234 INFO wmscraper.run product_identity
+2026-10-24 13:30:27,711 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:28,011 INFO wmscraper.run product_identity
+2026-10-24 13:30:28,198 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:28,641 INFO wmscraper.run product_identity
+2026-10-24 13:30:29,756 INFO wmscraper.run product_identity
+2026-10-24 13:30:30,367 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:30,444 INFO wmscraper.run product_identity
+2026-10-24 13:30:30,655 INFO wmscraper.run product_identity
+2026-10-24 13:30:31,044 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:31,161 INFO wmscraper.run product_identity
+2026-10-24 13:30:31,278 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:31,620 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:31,916 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:32,419 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:32,587 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:33,416 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:34,043 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:34,136 INFO wmscraper.run product_identity
+2026-10-24 13:30:34,452 INFO wmscraper.run product_identity
+2026-10-24 13:30:35,187 INFO wmscraper.run product_identity
+2026-10-24 13:30:35,434 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:35,522 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:35,625 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:36,013 INFO wmscraper.run product_identity
+2026-10-24 13:30:36,239 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:38,849 INFO wmscraper.run product_identity
+2026-10-24 13:30:39,176 INFO wmscraper.run product_identity
+2026-10-24 13:30:39,332 INFO wmscraper.run product_identity
+2026-10-24 13:30:40,065 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:40,615 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:40,721 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:41,470 INFO wmscraper.run product_identity
+2026-10-24 13:30:41,671 INFO wmscraper.run product_identity
+2026-10-24 13:30:41,820 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:42,002 INFO wmscraper.run product_identity
+2026-10-24 13:30:42,135 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:42,718 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:43,125 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:44,049 INFO wmscraper.run product_identity
+2026-10-24 13:30:44,468 INFO wmscraper.run product_identity
+2026-10-24 13:30:46,836 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:47,389 INFO wmscraper.run product_identity
+2026-10-24 13:30:47,498 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:47,528 INFO wmscraper.run product_identity
+2026-10-24 13:30:47,681 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:47,841 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:48,389 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:48,476 INFO wmscraper.run product_identity
+2026-10-24 13:30:49,653 INFO wmscraper.run product_identity
+2026-10-24 13:30:49,872 INFO wmscraper.run product_identity
+2026-10-24 13:30:50,021 INFO wmscraper.run product_identity
+2026-10-24 13:30:50,219 INFO wmscraper.run product_identity
+2026-10-24 13:30:50,371 INFO wmscraper.run product_identity
+2026-10-24 13:30:50,748 INFO wmscraper.run product_identity
+2026-10-24 13:30:51,064 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:51,538 INFO wmscraper.run product_identity
+2026-10-24 13:30:52,883 INFO wmscraper.run product_identity
+2026-10-24 13:30:53,016 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:53,018 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:53,367 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:53,469 INFO wmscraper.run product_identity
+2026-10-24 13:30:53,662 INFO wmscraper.run product_identity
+2026-10-24 13:30:54,120 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:54,217 INFO wmscraper.run product_identity
+2026-10-24 13:30:54,405 INFO wmscraper.run product_identity
+2026-10-24 13:30:55,144 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:55,696 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:55,874 INFO wmscraper.run product_identity
+2026-10-24 13:30:56,627 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:57,042 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:57,318 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:57,356 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:57,501 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:57,628 INFO wmscraper.run product_identity
+2026-10-24 13:30:57,828 INFO wmscraper.run product_identity
+2026-10-24 13:30:57,948 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:58,680 INFO wmscraper.run product_identity
+2026-10-24 13:30:58,859 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:30:59,684 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:01,024 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:01,242 INFO wmscraper.run product_identity
+2026-10-24 13:31:01,975 INFO wmscraper.run product_identity
+2026-10-24 13:31:02,183 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:02,626 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:02,824 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:03,070 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:04,622 INFO wmscraper.run product_identity
+2026-10-24 13:31:05,025 INFO wmscraper.run product_identity
+2026-10-24 13:31:05,380 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:05,383 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:05,423 INFO wmscraper.run product_identity
+2026-10-24 13:31:08,072 INFO wmscraper.run product_identity
+2026-10-24 13:31:08,717 INFO wmscraper.run product_identity
+2026-10-24 13:31:08,968 INFO wmscraper.run product_identity
+2026-10-24 13:31:09,578 INFO wmscraper.run product_identity
+2026-10-24 13:31:09,876 INFO wmscraper.run product_identity
+2026-10-24 13:31:10,346 INFO wmscraper.run product_identity
+2026-10-24 13:31:10,911 INFO wmscraper.run product_identity
+2026-10-24 13:31:11,852 INFO wmscraper.run product_identity
+2026-10-24 13:31:12,027 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:12,052 INFO wmscraper.run product_identity
+2026-10-24 13:31:12,215 INFO wmscraper.run product_identity
+2026-10-24 13:31:12,352 INFO wmscraper.run product_identity
+2026-10-24 13:31:12,523 INFO wmscraper.run product_identity
+2026-10-24 13:31:12,650 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:13,513 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:13,568 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:14,115 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:14,156 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:14,189 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:14,436 INFO wmscraper.run product_identity
+2026-10-24 13:31:14,620 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:15,292 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:15,320 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:15,352 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:16,116 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:16,171 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:16,205 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:16,790 INFO wmscraper.run product_identity
+2026-10-24 13:31:17,484 INFO wmscraper.run product_identity
+2026-10-24 13:31:18,138 INFO wmscraper.run product_identity
+2026-10-24 13:31:18,344 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:19,339 INFO wmscraper.run product_identity
+2026-10-24 13:31:19,539 INFO wmscraper.run product_identity
+2026-10-24 13:31:19,863 INFO wmscraper.run product_identity
+2026-10-24 13:31:20,622 INFO wmscraper.run product_identity
+2026-10-24 13:31:20,840 INFO wmscraper.run product_identity
+2026-10-24 13:31:21,441 INFO wmscraper.run product_identity
+2026-10-24 13:31:21,662 INFO wmscraper.run product_identity
+2026-10-24 13:31:22,632 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:22,673 INFO wmscraper.run product_identity
+2026-10-24 13:31:22,967 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:23,742 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:24,278 INFO wmscraper.run product_identity
+2026-10-24 13:31:24,622 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:24,860 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:25,055 INFO wmscraper.run product_identity
+2026-10-24 13:31:25,512 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:25,961 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:26,600 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:26,815 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:27,246 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:27,453 INFO wmscraper.run product_identity
+2026-10-24 13:31:27,618 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:29,051 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:29,144 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:29,677 INFO wmscraper.run product_identity
+2026-10-24 13:31:29,819 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:30,669 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:31,320 INFO wmscraper.run product_identity
+2026-10-24 13:31:31,536 INFO wmscraper.run product_identity
+2026-10-24 13:31:32,394 INFO wmscraper.run product_identity
+2026-10-24 13:31:33,168 INFO wmscraper.run product_identity
+2026-10-24 13:31:33,602 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:34,282 INFO wmscraper.run product_identity
+2026-10-24 13:31:34,483 INFO wmscraper.run product_identity
+2026-10-24 13:31:34,630 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:34,870 INFO wmscraper.run product_identity
+2026-10-24 13:31:35,264 INFO wmscraper.run product_identity
+2026-10-24 13:31:35,407 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:35,449 INFO wmscraper.run product_identity
+2026-10-24 13:31:36,843 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:37,117 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:37,367 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:37,921 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:37,979 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:38,668 INFO wmscraper.run product_identity
+2026-10-24 13:31:38,915 INFO wmscraper.run product_identity
+2026-10-24 13:31:40,133 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:40,293 INFO wmscraper.run product_identity
+2026-10-24 13:31:40,491 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:41,057 INFO wmscraper.run product_identity
+2026-10-24 13:31:41,683 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:42,300 INFO wmscraper.run product_identity
+2026-10-24 13:31:42,645 INFO wmscraper.run product_identity
+2026-10-24 13:31:43,259 INFO wmscraper.run product_identity
+2026-10-24 13:31:43,556 INFO wmscraper.run product_identity
+2026-10-24 13:31:43,686 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:43,794 INFO wmscraper.run product_identity
+2026-10-24 13:31:44,057 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:44,240 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:45,355 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:46,040 INFO wmscraper.run product_identity
+2026-10-24 13:31:46,184 INFO wmscraper.run product_identity
+2026-10-24 13:31:46,429 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:46,853 INFO wmscraper.run product_identity
+2026-10-24 13:31:47,062 INFO wmscraper.run product_identity
+2026-10-24 13:31:47,539 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:48,185 INFO wmscraper.run product_identity
+2026-10-24 13:31:48,711 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:49,439 INFO wmscraper.run product_identity
+2026-10-24 13:31:49,604 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:49,605 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:50,011 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:50,238 INFO wmscraper.run product_identity
+2026-10-24 13:31:50,389 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:50,694 INFO wmscraper.run product_identity
+2026-10-24 13:31:51,446 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:51,587 INFO wmscraper.run product_identity
+2026-10-24 13:31:52,532 INFO wmscraper.run product_identity
+2026-10-24 13:31:52,704 INFO wmscraper.run product_identity
+2026-10-24 13:31:52,838 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:53,838 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:54,167 INFO wmscraper.run product_identity
+2026-10-24 13:31:54,420 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:54,936 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:54,976 INFO wmscraper.run product_identity
+2026-10-24 13:31:55,111 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:56,239 INFO wmscraper.run product_identity
+2026-10-24 13:31:56,586 INFO wmscraper.run product_identity
+2026-10-24 13:31:56,903 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:57,834 INFO wmscraper.run product_identity
+2026-10-24 13:31:58,043 INFO wmscraper.run product_identity
+2026-10-24 13:31:58,201 INFO wmscraper.run product_identity
+2026-10-24 13:31:58,373 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:58,902 INFO wmscraper.run product_identity
+2026-10-24 13:31:59,082 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:59,278 INFO wmscraper.run product_identity
+2026-10-24 13:31:59,665 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:31:59,698 INFO wmscraper.run product_identity
+2026-10-24 13:32:01,662 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:01,749 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:01,954 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:02,013 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:02,652 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:02,843 INFO wmscraper.run product_identity
+2026-10-24 13:32:02,991 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:02,994 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:04,153 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:05,513 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:08,169 INFO wmscraper.run product_identity
+2026-10-24 13:32:10,674 INFO wmscraper.run product_identity
+2026-10-24 13:32:11,324 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:12,001 INFO wmscraper.run product_identity
+2026-10-24 13:32:12,420 INFO wmscraper.run product_identity
+2026-10-24 13:32:12,674 INFO wmscraper.run product_identity
+2026-10-24 13:32:13,658 INFO wmscraper.run product_identity
+2026-10-24 13:32:14,260 INFO wmscraper.run product_identity
+2026-10-24 13:32:14,565 INFO wmscraper.run product_identity
+2026-10-24 13:32:15,973 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:16,344 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:16,372 INFO wmscraper.run product_identity
+2026-10-24 13:32:16,723 INFO wmscraper.run product_identity
+2026-10-24 13:32:16,864 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:17,643 INFO wmscraper.run product_identity
+2026-10-24 13:32:18,244 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:18,707 INFO wmscraper.run product_identity
+2026-10-24 13:32:19,317 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:19,521 INFO wmscraper.run product_identity
+2026-10-24 13:32:20,255 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:20,311 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:20,402 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:20,975 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:21,529 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:21,841 INFO wmscraper.run product_identity
+2026-10-24 13:32:22,133 INFO wmscraper.run product_identity
+2026-10-24 13:32:22,910 INFO wmscraper.run product_identity
+2026-10-24 13:32:23,120 INFO wmscraper.run product_identity
+2026-10-24 13:32:23,241 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:23,262 INFO wmscraper.run product_identity
+2026-10-24 13:32:23,856 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:25,047 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:25,088 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:25,583 INFO wmscraper.run product_identity
+2026-10-24 13:32:25,753 INFO wmscraper.run product_identity
+2026-10-24 13:32:26,295 INFO wmscraper.run product_identity
+2026-10-24 13:32:26,472 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:26,495 INFO wmscraper.run product_identity
+2026-10-24 13:32:26,617 INFO wmscraper.run product_identity
+2026-10-24 13:32:26,765 INFO wmscraper.run product_identity
+2026-10-24 13:32:27,650 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:27,716 INFO wmscraper.run product_identity
+2026-10-24 13:32:27,869 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:29,180 INFO wmscraper.run product_identity
+2026-10-24 13:32:29,510 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:29,687 INFO wmscraper.run product_identity
+2026-10-24 13:32:30,344 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:31,316 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:31,659 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:32,114 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:32,413 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:32,661 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:33,087 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:33,197 INFO wmscraper.run product_identity
+2026-10-24 13:32:33,601 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:33,994 INFO wmscraper.run product_identity
+2026-10-24 13:32:36,860 INFO wmscraper.run product_identity
+2026-10-24 13:32:37,018 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:37,022 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:37,760 INFO wmscraper.run product_identity
+2026-10-24 13:32:39,386 INFO wmscraper.run product_identity
+2026-10-24 13:32:40,496 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:40,704 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:42,425 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:42,539 INFO wmscraper.run product_identity
+2026-10-24 13:32:42,710 INFO wmscraper.run product_identity
+2026-10-24 13:32:42,943 INFO wmscraper.run product_identity
+2026-10-24 13:32:43,264 INFO wmscraper.run product_identity
+2026-10-24 13:32:44,829 INFO wmscraper.run product_identity
+2026-10-24 13:32:45,095 INFO wmscraper.run product_identity
+2026-10-24 13:32:45,406 INFO wmscraper.run product_identity
+2026-10-24 13:32:45,576 INFO wmscraper.run product_identity
+2026-10-24 13:32:46,023 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:46,281 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:46,388 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:47,628 INFO wmscraper.run product_identity
+2026-10-24 13:32:47,887 INFO wmscraper.run product_identity
+2026-10-24 13:32:48,010 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:48,164 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:48,906 INFO wmscraper.run product_identity
+2026-10-24 13:32:49,027 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:49,341 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:49,615 INFO wmscraper.run product_identity
+2026-10-24 13:32:50,305 INFO wmscraper.run product_identity
+2026-10-24 13:32:50,472 INFO wmscraper.run product_identity
+2026-10-24 13:32:50,822 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:51,028 INFO wmscraper.run product_identity
+2026-10-24 13:32:51,359 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:51,513 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:51,583 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:52,078 INFO wmscraper.run product_identity
+2026-10-24 13:32:52,670 INFO wmscraper.run product_identity
+2026-10-24 13:32:52,971 INFO wmscraper.run product_identity
+2026-10-24 13:32:53,534 INFO wmscraper.run product_identity
+2026-10-24 13:32:53,735 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:54,910 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:55,253 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:55,355 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:55,795 INFO wmscraper.run product_identity
+2026-10-24 13:32:55,932 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:55,933 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:56,039 INFO wmscraper.run product_identity
+2026-10-24 13:32:56,259 INFO wmscraper.run product_identity
+2026-10-24 13:32:57,892 INFO wmscraper.run product_identity
+2026-10-24 13:32:58,860 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:59,292 INFO wmscraper.run product_identity
+2026-10-24 13:32:59,460 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:59,461 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:32:59,486 INFO wmscraper.run product_identity
+2026-10-24 13:33:01,052 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:01,097 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:01,691 INFO wmscraper.run product_identity
+2026-10-24 13:33:01,845 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:03,417 INFO wmscraper.run product_identity
+2026-10-24 13:33:03,759 INFO wmscraper.run product_identity
+2026-10-24 13:33:03,922 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:03,922 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:03,975 INFO wmscraper.run product_identity
+2026-10-24 13:33:04,490 INFO wmscraper.run product_identity
+2026-10-24 13:33:04,745 INFO wmscraper.run product_identity
+2026-10-24 13:33:05,930 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:07,293 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:07,328 INFO wmscraper.run product_identity
+2026-10-24 13:33:07,802 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:07,858 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:07,886 INFO wmscraper.run product_identity
+2026-10-24 13:33:08,014 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:08,608 INFO wmscraper.run product_identity
+2026-10-24 13:33:08,804 INFO wmscraper.run product_identity
+2026-10-24 13:33:08,935 INFO wmscraper.run product_identity
+2026-10-24 13:33:09,294 INFO wmscraper.run product_identity
+2026-10-24 13:33:09,639 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:09,695 INFO wmscraper.run product_identity
+2026-10-24 13:33:10,916 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:11,585 INFO wmscraper.run product_identity
+2026-10-24 13:33:12,358 INFO wmscraper.run product_identity
+2026-10-24 13:33:12,507 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:12,910 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:12,999 INFO wmscraper.run product_identity
+2026-10-24 13:33:13,530 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:13,593 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:13,959 INFO wmscraper.run product_identity
+2026-10-24 13:33:14,121 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:14,415 INFO wmscraper.run product_identity
+2026-10-24 13:33:14,626 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:15,198 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:15,299 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:15,814 INFO wmscraper.run product_identity
+2026-10-24 13:33:17,175 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:18,330 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:18,586 INFO wmscraper.run product_identity
+2026-10-24 13:33:18,774 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:18,803 INFO wmscraper.run product_identity
+2026-10-24 13:33:18,942 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:19,588 INFO wmscraper.run product_identity
+2026-10-24 13:33:20,551 INFO wmscraper.run product_identity
+2026-10-24 13:33:20,831 INFO wmscraper.run product_identity
+2026-10-24 13:33:21,672 INFO wmscraper.run product_identity
+2026-10-24 13:33:22,112 INFO wmscraper.run product_identity
+2026-10-24 13:33:22,267 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:22,323 INFO wmscraper.run product_identity
+2026-10-24 13:33:22,492 INFO wmscraper.run product_identity
+2026-10-24 13:33:22,620 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:22,621 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:23,769 INFO wmscraper.run product_identity
+2026-10-24 13:33:23,944 INFO wmscraper.run product_identity
+2026-10-24 13:33:24,208 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:24,421 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:25,081 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:25,678 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:25,827 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:26,113 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:26,802 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:28,734 INFO wmscraper.run product_identity
+2026-10-24 13:33:28,896 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:29,012 INFO wmscraper.run product_identity
+2026-10-24 13:33:29,849 INFO wmscraper.run product_identity
+2026-10-24 13:33:30,700 INFO wmscraper.run product_identity
+2026-10-24 13:33:31,129 INFO wmscraper.run product_identity
+2026-10-24 13:33:31,730 INFO wmscraper.run product_identity
+2026-10-24 13:33:31,914 INFO wmscraper.run product_identity
+2026-10-24 13:33:32,037 INFO wmscraper.run product_identity
+2026-10-24 13:33:32,313 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:33,033 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:33,667 INFO wmscraper.run product_identity
+2026-10-24 13:33:33,784 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:33,807 INFO wmscraper.run product_identity
+2026-10-24 13:33:33,935 INFO wmscraper.run product_identity
+2026-10-24 13:33:34,088 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:34,113 INFO wmscraper.run product_identity
+2026-10-24 13:33:34,547 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:35,201 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:36,101 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:36,411 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:37,175 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:37,345 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:37,476 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:38,251 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:39,691 INFO wmscraper.run product_identity
+2026-10-24 13:33:39,893 INFO wmscraper.run product_identity
+2026-10-24 13:33:40,552 INFO wmscraper.run product_identity
+2026-10-24 13:33:40,768 INFO wmscraper.run product_identity
+2026-10-24 13:33:40,948 INFO wmscraper.run product_identity
+2026-10-24 13:33:41,114 INFO wmscraper.run product_identity
+2026-10-24 13:33:41,555 INFO wmscraper.run product_identity
+2026-10-24 13:33:42,355 INFO wmscraper.run product_identity
+2026-10-24 13:33:43,160 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:43,673 INFO wmscraper.run product_identity
+2026-10-24 13:33:43,884 INFO wmscraper.run product_identity
+2026-10-24 13:33:44,045 INFO wmscraper.run product_identity
+2026-10-24 13:33:44,278 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:44,542 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:44,988 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:45,827 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:45,878 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:46,187 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:47,150 INFO httpx HTTP Request: POST https://webapi.oxylabs.io/v1/scrape/walmart "HTTP/1.1 200 OK"
+2026-10-24 13:33:47,453 INFO wmscraper.run product_identity
+2026-10-24 13:33:47,885 INFO wmscraper.run product_identity
+2026-10-24 13:33:49,884 INFO wmscraper.run product_identity
+2026-10-24 13:33:51,866 INFO wmscraper.run product_identity
+2026-10-24 13:33:52,264 INFO wmscraper.run product_identity
+2026-10-24 13:33:52,511 INFO wmscraper.run product_identity
+2026-10-24 13:33:52,665 INFO wmscraper.run product_identity
+2026-10-24 13:33:52,798 INFO wmscraper.run product_identity
+2026-10-24 13:33:52,963 INFO wmscraper.run product_identity
+2026-10-24 13:33:53,088 INFO wmscraper.run product_identity
+2026-10-24 13:33:53,232 INFO wmscraper.run product_identity
+2026-10-24 13:33:53,407 INFO wmscraper.run product_identity
+2026-10-24 13:33:53,763 INFO wmscraper.run product_identity
+2026-10-24 13:33:54,213 INFO wmscraper.run product_identity
+2026-10-24 13:33:55,369 INFO wmscraper.run product_identity
+2026-10-24 13:33:55,796 INFO wmscraper.run product_identity
+2026-10-24 13:33:56,172 INFO wmscraper.run product_identity
+2026-10-24 13:33:56,338 INFO wmscraper.run product_identity
+2026-10-24 13:33:56,505 INFO wmscraper.run product_identity
+2026-10-24 13:33:57,037 INFO wmscraper.run product_identity
+2026-10-24 13:33:57,253 INFO wmscraper.run product_identity
+2026-10-24 13:33:57,566 INFO identity_sample done: {0: 34563, 1: 415, 5: 904} requests=415
+# finished 2026-10-24T08:33:57+00:00 exit 0

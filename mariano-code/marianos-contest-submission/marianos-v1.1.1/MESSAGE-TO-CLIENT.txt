@@ -1,0 +1,44 @@
+MARIANO'S #69 → v1.1.1: changes from your answers (offline-tested; nothing run live)
+
+Hello,
+
+Thank you for the clear answers. v1.1.1 is attached and replaces v1.1.0. Section A of 01-RESPONSE-TO-REVIEW.md maps each of your points to the files and tests involved. Version 1.1.1, code_sha256 268b672e28873599357b42b45703f670b5a7e1655b5ed71f5f4ae0ae13b92f42. Nothing in it was collected live after 21 Oct. Today I re-checked: the subscription is still not visible to my account, and my Oxylabs trial key still returns QUOTA_EXCEEDED.
+
+WHAT CHANGED
+1. Coverage, zero unexplained gaps
+- For each seed search, every count Mariano's reported is kept with its response SHA-256, so a stale, capped or changing count stays visible.
+- The remaining gap is broken down into explained items with their evidence: search or slice not completed, capped total, slice larger than one page, brands not yet found, inconsistent site count.
+- A search is "complete" only when that is proven.
+- The run fails validation if any gap has no explained reason, and an incomplete search is never counted as complete.
+2. Stores
+- Crystal Lake 53100544 / 60014 stays labelled as is.
+- Vernon Hills (1720 N Milwaukee Ave, IL 60061) is added as candidate 53100502, taken from Mariano's public store page URL. It stays disabled and unverified until verify-store confirms the store ID, ZIP, address, IN_STORE fulfillment and store-sourced prices from Mariano's own responses.
+- A test proves that one store's settings run against another store's responses fail verification and collect nothing, so results are never relabelled.
+- I will name the store before every live run.
+3. Azure
+- I will use the Contributor-only path you chose: preflight (read-only), then infra, then your admin runs the two scoped managed-identity role commands, then the job.
+- The job deploys as MANUAL, with no unattended schedule. Twice-weekly stays configurable and will only be switched on after you approve the days and time.
+- The planned resources and sizes are in 01 §A. Nothing will be created until you approve the deployment and cost plan.
+4. Coupons
+- 09 documents the exact missing coupon-to-product link, where it lives, what the current provider cannot do (verified), and the proposed dependency.
+- The first step would be a browser path; a customer account only if needed. Nothing is assumed or charged.
+- Missing values stay empty strings; no PPM or coupon price is ever calculated.
+5. Oxylabs endpoint, bounded tests and test window (10)
+- Compatible endpoint: Oxylabs Web Scraper API, Kroger target, https://webapi.oxylabs.io/v1/scrape/kroger, with an API key and the store pinned on each request. This is what all my runs used.
+- If your paid service is the classic realtime endpoint (realtime.oxylabs.io, username/password), the included adapter must first pass Test 1.
+- Hard caps are enforced in code, retries included:
+  Test 1: up to 19 requests (verify both stores + paging/brand-filter probe, about 10 minutes).
+  Test 2: up to 300 requests (Batteries and Light Bulbs end to end, about 30–45 minutes).
+  Test 3: the fresh full run, sized from what Test 2 measures.
+- Cost = requests x your plan's rate per request. JS rendering is used only for the Coupons page and one probe request; Oxylabs does not charge faulted requests.
+- Proposed window: a weekday at 09:00–09:30 CT for Test 1 and 10:00–11:00 CT for Test 2. I will propose the exact date once access and the key are confirmed, so it does not overlap your tests.
+
+WHAT I NEED FROM YOU
+- Confirmation once the role is applied on scraper-contest-asif-test, and approval of the deployment and cost plan.
+- Your Oxylabs product and endpoint (Web Scraper API key, or classic realtime username/password), and agreement to Test 1 (up to 19 requests). The key goes straight into Key Vault and is never sent in chat.
+- A preferred Central-time day for Tests 1 and 2.
+
+The 38 tests remain labelled offline. The earlier 19/99 searches and the checkpoint continuation are not presented as coverage or recovery.
+
+Regards,
+Asif Khan

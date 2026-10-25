@@ -1,0 +1,9 @@
+{
+  "run_id": "20261020T113321Z-48ec5f",
+  "records": 1307,
+  "validation_ok": true,
+  "published": true,
+  "compared_with_run": "20261020T110652Z-e8ccea",
+  "overlap_with_run1": 1271,
+  "yield_check": "real: validated against the previous published run"
+}

@@ -1,0 +1,90 @@
+{
+  "label": "REAL available-to-unavailable example from saved Walmart source responses for store #100",
+  "item": "43922523",
+  "observations": [
+    {
+      "observed": "2026-10-19T06:00Z (pickup-context listing)",
+      "file": "source-response-2026-10-19.html.gz",
+      "usItemId": "43922523",
+      "name": "fairlife Lactose Free Reduced Fat Chocolate Ultra Filtered Milk, 52 fl oz",
+      "availability": {
+        "display": "In stock",
+        "value": "IN_STOCK"
+      },
+      "fulfillmentType": "STORE",
+      "fulfillmentSummary": [
+        {
+          "fulfillment": "PICKUP",
+          "storeId": "100"
+        }
+      ],
+      "price": 5.32,
+      "page_store_context": [
+        {
+          "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+          "value": "PICKUP"
+        },
+        {
+          "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+          "value": "72712"
+        },
+        {
+          "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+          "value": "100"
+        },
+        {
+          "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+          "value": "PICKUP"
+        },
+        {
+          "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+          "value": "72712"
+        },
+        {
+          "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+          "value": "100"
+        }
+      ]
+    },
+    {
+      "observed": "2026-10-20T05:00Z (store-pinned listing, no availability facet)",
+      "file": "source-response-2026-10-20.html.gz",
+      "usItemId": "43922523",
+      "name": "fairlife Lactose Free Reduced Fat Chocolate Ultra Filtered Milk, 52 fl oz",
+      "availability": {
+        "display": "Out of stock",
+        "value": "OUT_OF_STOCK"
+      },
+      "fulfillmentType": "STORE",
+      "fulfillmentSummary": [],
+      "price": 5.32,
+      "page_store_context": [
+        {
+          "path": "$.props.pageProps.initialData.pageMetadata.location.intent",
+          "value": "PICKUP"
+        },
+        {
+          "path": "$.props.pageProps.initialData.pageMetadata.location.postalCode",
+          "value": "72712"
+        },
+        {
+          "path": "$.props.pageProps.initialData.pageMetadata.location.storeId",
+          "value": "100"
+        },
+        {
+          "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.intent",
+          "value": "PICKUP"
+        },
+        {
+          "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.postalCode",
+          "value": "72712"
+        },
+        {
+          "path": "$.props.pageProps.initialData.contentLayout.pageMetadata.location.storeId",
+          "value": "100"
+        }
+      ]
+    }
+  ],
+  "handling": "retained with identity and source price; availability recorded in the availability log, never used to remove the product"
+}

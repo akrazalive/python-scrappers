@@ -1,0 +1,91 @@
+# Walmart scraper – runtime settings.
+# Secrets (provider keys, storage connection strings) are NEVER stored here.
+# They come from environment variables / Azure Key Vault (see .env.example).
+
+retailer: walmart
+categories_file: config/categories.csv
+locations_file: config/locations.yaml
+private_label_file: config/private_label_brands.txt
+
+store_logo_url: "https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg"
+
+fetch:
+  provider: oxylabs_webapi     # oxylabs_webapi | oxylabs | zyte | playwright  (credentials via env vars)
+  concurrency: 24              # parallel product-page requests (provider handles IP rotation)
+  max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
+  timeout_seconds: 90
+  max_retries: 4               # per request, exponential backoff with jitter
+  backoff_base_seconds: 4
+  min_delay_seconds: 0.15      # controlled pacing between request starts
+  max_delay_seconds: 0.4
+  slow_response_seconds: 45    # logged as abnormal latency
+  # Provider request templates. {url} {store_id} {zipcode} are filled per request.
+  # Store / fulfillment parameters are provider-specific: confirm them against the
+  # provider's Walmart documentation. Whatever is sent, every page is still checked
+  # for the configured store id and fails the run on mismatch.
+  oxylabs:
+    payload:
+      source: universal
+      url: "{url}"
+      render: html
+      geo_location: "{zipcode}"
+  zyte:
+    payload:
+      url: "{url}"
+      browserHtml: true
+      geolocation: US
+  playwright:
+    store_cookies: []          # optional cookies that pin the store, e.g. [{name, value, domain, path}]
+
+crawl:
+  max_pages_per_listing: 25    # Walmart serves at most 25 pages per listing
+  subcategory_max_depth: 4     # a node is split into its Departments children only while it exceeds the page window
+  max_listings_per_category: 0 # 0 = every listing (production); scoped locations may limit this
+  # Merchandising shelves that only repeat products of real departments (CSV already excludes "Shop All Foods")
+  skip_subcategory_patterns: ["^Shop All\\b", "^Shop by Brand$", "^Brands$", "^Breadcrumbs$"]
+  # Listings are store-pinned (provider store_id + delivery_zip, stores=<id>) and Walmart-sold (Retailer facet:
+  # marketplace sellers removed by Walmart itself), WITHOUT an availability facet, so temporarily out-of-stock store
+  # products stay visible. The page's selected location is verified on every response.
+  listing_params:
+    stores: "{store_id}"
+    facet: "retailer_type:Walmart"
+  # Scope = the selected store's assortment (fulfillmentType STORE, incl. temporarily out of stock).
+  # Online-only (FC) and marketplace offers are not part of the store assortment and are not collected.
+  # coverage: source_count = every planned listing fits the 25-page window and is paginated to Walmart's last page;
+  # products seen must reconcile with Walmart's own reported total (validation.thin_listing_ratio).
+  # (Walmart's pickup-facet count is NOT used as a floor: it also counts marketplace and online-only offers.)
+  coverage: source_count
+  max_split_children: 30                # more children than this = overlapping merchandising shelves -> price bands
+  full_page_min_items: 20               # a first page with fewer products cannot back a larger Walmart total
+  store_window_ratio: 0.75              # legacy store_count mode only
+  store_exhausted_empty_pages: 1        # legacy store_count mode only
+  category_concurrency: 6               # categories planned in parallel
+  planning_concurrency: 12              # nodes of one category planned in parallel
+  max_product_pages_per_run: 0          # identity (UPC) budget per run; 0 = all new items. Deferred items fetched next run
+  carry_forward: true                        # keep previously published products Walmart did not return this run
+  enrich_product_pages: true   # fetch product page for UPC, size, store-level offer check
+  max_products_per_run: 0      # 0 = no cap (production). Use --limit for demos.
+
+validation:
+  min_products_per_category: 1        # 0 products = category failure, never "legitimately empty"
+  yield_drop_threshold: 0.6           # flag if < 60% of last successful run
+  max_failed_category_ratio: 0.0      # any failed category blocks publication
+  min_field_completeness:             # share of records that must have the field
+    product_title: 1.0
+    regular_price: 0.99           # over fresh store offers (a store item may show no price)
+    url: 1.0
+    image_url: 0.98
+  canary_required: true
+  thin_listing_ratio: 0.95            # source-count reconciliation: products seen >= 95% of Walmart's reported total
+  source_count_tolerance: 2           # ...or at most 2 short (Walmart's counts drift by one or two products)
+  thin_listing_action: fail           # fail | warn
+  store_count_reconciliation: 0.97    # legacy store_count mode only
+  category_minimums: {}               # optional floors, e.g. {"Food": 3000, "Pets": 800}
+
+evidence:
+  raw_samples_per_kind: 5             # raw store / listing / product responses kept per run (gzip)
+
+output:
+  backend: local                # local | azure_blob
+  local_dir: output
+  blob_container: walmart-scraper

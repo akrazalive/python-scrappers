@@ -1,0 +1,71 @@
+{
+  "label": "PRODUCTION TRAVERSAL - discovery and partition plan from live store-#100 responses; full page crawl deliberately stopped (see README)",
+  "category": "Balloons",
+  "category_splits": [
+    {
+      "node": "Balloons",
+      "walmart_total": 43891,
+      "children": 16
+    },
+    {
+      "node": "Balloon Accessories",
+      "walmart_total": 10269,
+      "children": 8
+    },
+    {
+      "node": "Balloons by Color",
+      "walmart_total": 24201,
+      "children": 11
+    }
+  ],
+  "price_band_probes": 154,
+  "bands_fitting_25_page_window": 131,
+  "one_dollar_bands_still_above_window": 23,
+  "examples_one_dollar_bands_above_window": [
+    {
+      "category": "Balloons",
+      "sub_category": "Latex Balloons",
+      "band": [
+        10.0,
+        11
+      ],
+      "walmart_total": 1096
+    },
+    {
+      "category": "Balloons",
+      "sub_category": "Mylar Balloons",
+      "band": [
+        6,
+        7
+      ],
+      "walmart_total": 1191
+    },
+    {
+      "category": "Balloons",
+      "sub_category": "Mylar Balloons",
+      "band": [
+        7,
+        8
+      ],
+      "walmart_total": 2083
+    },
+    {
+      "category": "Balloons",
+      "sub_category": "Mylar Balloons",
+      "band": [
+        8,
+        9
+      ],
+      "walmart_total": 1165
+    },
+    {
+      "category": "Balloons",
+      "sub_category": "Mylar Balloons",
+      "band": [
+        9,
+        10.0
+      ],
+      "walmart_total": 1204
+    }
+  ]
+}

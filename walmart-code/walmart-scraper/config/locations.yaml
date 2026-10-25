@@ -1,0 +1,35 @@
+# One entry per Walmart store to collect. Add a location here – no code changes needed.
+# store_id: Walmart store number (shown on walmart.com/store/<id>).
+# canary_items: Walmart item IDs that this store normally stocks for pickup.
+#   They are fetched at the start and end of every run; if they cannot be read
+#   with a local pickup / in-store offer, the run is treated as blocked.
+
+locations:
+  - key: walmart-100-bentonville
+    enabled: true
+    store_id: "100"
+    zipcode: "72712"
+    expected_address: "406 S Walton Blvd"   # Walmart Supercenter #100, Bentonville, AR 72712
+    fulfillment: pickup          # pickup | in_store
+    schedule_note: "Mon and Thu 06:00 UTC (Azure cron)"
+    # Verified pickup items at store #100 (Great Value Whole Milk 1 gal, fairlife Lactose Free Whole Milk 52 fl oz)
+    canary_items: ["10450114", "43436773"]
+    # PRODUCTION SCOPE: all 11 CSV categories, every listing, uncapped (store assortment incl. out-of-stock).
+    # Identity budget: product pages (UPC/size) fetched for up to 1,200 new items per run; the rest are
+    # fetched first on the following runs. Prices, PPM and promotions are always fresh from the store offer.
+    crawl:
+      max_product_pages_per_run: 1200
+
+  # Production-traversal proof for the acceptance evidence: one complete category, NO demonstration caps
+  # (every listing paginated to Walmart's last page, price partitioning beyond 25 pages). Listing pages only.
+  # Not scheduled (enabled: false); run explicitly with: python -m wmscraper run --location walmart-100-traversal-proof
+  - key: walmart-100-traversal-proof
+    enabled: false
+    store_id: "100"
+    zipcode: "72712"
+    expected_address: "406 S Walton Blvd"
+    fulfillment: pickup
+    canary_items: ["10450114", "43436773"]
+    categories: ["Balloons"]
+    crawl:
+      enrich_product_pages: false

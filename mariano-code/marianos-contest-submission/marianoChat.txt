@@ -1,0 +1,73 @@
+Path of Mariano Last Submission Files
+D:\PROJECTS\Monthly-Test\marianos-contest-submission\marianos-entry-69
+
+Path of the Mariano Scraper
+D:\PROJECTS\Monthly-Test\marianos-scraper
+
+My entry #69 for the Mariano's scraper contest is attached: a working scraper, a live run with 1,027 valid records, and the full source code.
+
+LIVE RUN
+- Store: Marianos Crystal Lake, store 53100544, 105 Northwest Hwy, Crystal Lake, IL 60014
+- Run 20261021T042105Z-fa0c1b, crawl_date 2026-10-21, runtime 16.1 min, 131 requests
+- 1,027 unique records (by UPC), 0 duplicates in the output (2,325 repeats prevented)
+- Count by category: Dairy 339, Breakfast 396, Coffee 244, Batteries 24, Light Bulbs 24
+- Coupons: 24 digital coupons read from the Coupons page (04-coupons.json)
+- Completeness: title, weight, regular price, image, URL, UPC and store brand 100%; PPM 99.4%; sale price 30.4%; volume deal 20.5%; gupc and unit_price empty as required
+- Store proof: every page and every price is checked against store 53100544 (192 pages verified, 0 mismatches). The canary passed at the start and the end of the run.
+
+FILES
+01-records-store53100544.json the JSON, exact 22-field order
+02-run-report.json counts, completeness, examples, store checks, canaries, exclusions, request stats, audit events
+03-run-report-as-collected.json the report written at collection time (see note 3)
+04-coupons.json digital coupons with ID, wording and expiry
+05-run.log structured JSON log of the run
+06-test-results.txt 17 automated tests
+marianos-scraper-1.0.0-src.zip complete source, config, tests, Azure Bicep, docs
+SHA256SUMS.txt checksums of all files
+
+EVIDENCE THE SCRAPER GENERATED THE DATA
+The source code SHA-256 is recorded in SOURCE_FINGERPRINT.txt inside the source ZIP:
+version 1.0.0, code_sha256=1ce1f359ff3842b47b1be2d48c3c72274fdf2f5e620ef2d8f67881b83dbc0240.
+The same value is printed by tools/package_source.py when the ZIP is regenerated from the attached source tree, so the ZIP is reproducible from the delivered code. In this release the value is carried in SOURCE_FINGERPRINT.txt rather than inside 02-run-report.json; adding it to the report is on the v1.0.1 list. Every record's store, price and PPM can be checked on marianos.com with the Crystal Lake store selected.
+
+HOW IT WORKS (summary)
+- Each request goes through the Oxylabs Web Scraper API (Kroger endpoint) with the store pinned. The scraper reads Mariano's own page state (store price, sale, PPM as displayed, UPC, offers, taxonomy). It does not rely on CSS selectors.
+- Subcategories come from Mariano's site menu for each CSV department. Products are kept only when their taxonomy code belongs to the subcategory.
+- Volume and digital deals are kept separate, with the retailer's wording. Prices are never calculated. Approximate-weight items ("about $X each") are excluded.
+- Failed or blocked runs never replace good data. latest/ is written only after validation passes, and the previous dataset is kept for rollback.
+- SQLite checkpoints let an interrupted run resume. This run was resumed once, live.
+- Azure: a Container Apps Job runs Tuesday and Friday. It uses Blob Storage for output, Azure Files for checkpoints, Key Vault and Log Analytics. Deployment is one command (deploy/azure/deploy.sh).
+- Estimated monthly cost: about $32-$115 per store. Details are in docs/COST.md.
+
+HONEST NOTES
+1. Scope of this run is a demonstration subset, not the full CSV. Mariano's server-rendered search returns only the first 24 results of a query, whatever page number is requested. Version 1.0.0 therefore covers each subcategory by query expansion: each new product's subcategory names and brand become further searches, up to a per-shelf cap. The attached run predates this, so Batteries and Light Bulbs show only the first 24 results (Mariano's reports 121 and 100), and 5 of the 28 CSV categories are represented. The scraper's own validation flagged this run as "demo scope (category subset / per-category limit): never published to latest/". That warning is accurate: this is a qualifying demonstration run (>=500 records, multiple categories, one assigned location), not the full production run. A second run with query expansion collected 950 records in its first wave, then stopped when my Oxylabs trial quota ran out. It is checkpointed and will resume when the quota is renewed.
+2. Digital coupons: for an anonymous visitor, Mariano's shows coupon terms on the Coupons page, not in each product's data. The scraper captures every displayed coupon and fills digital_deals_* wherever Mariano's links the deal to a product. Signing in with a Mariano's account could link coupons to products; this is optional and can be discussed.
+3. The run was re-validated with the final v1.0.0 rules. The records file is byte-identical to the collected one. The only change is that three Coffee menu links with no products of their own code at this store (Creamers, Filters, Espresso Machines) are now warnings instead of errors.
+
+Regards,
+Asif Khan
+
+
+Client message 
+MARIANO'S #69 (earlier #60) — v1.0.0: specific corrections and evidence needed
+
+1. Retention: in src/mscraper/parse.py, map_product returns no_price when the regular-price object is absent and has a no_upc rejection path. Keep all unavailable store-assortment products indefinitely, including those without a current price or UPC. Use empty strings for missing fields; retain a source-backed identity without putting an item ID into the UPC field. The item.upc-or-prod.id fallback needs evidence that prod.id is actually a UPC whenever used. Preserve carried observations/dates separately from fresh observations.
+
+2. Weight filtering: config/settings.yaml sets exclude_sold_by_weight: true, and parse.py rejects every sellBy=weight product. That is broader than our rule. Exclude products whose source wording indicates approximate/estimated weight; do not exclude a genuine product solely because it is sold by weight. Preserve real bulk, family-pack and multipack identities and source sizes.
+
+3. Coverage: the supplied 1,027 rows cover five categories, as you disclosed. Batteries and Light Bulbs stop at 24 despite your reported source totals of 121 and 100. Resolve the first-page/pagination limitation and demonstrate full required CSV category/subcategory coverage without production per-shelf/demo caps. Query expansion alone does not prove exhaustive coverage. Supply a machine-readable coverage/remaining-gap reconciliation.
+
+4. Offers: we counted 211 volume descriptions but no product-level digital descriptions. The separate 24-coupon file is useful supporting evidence, but does not establish which coupons apply to which products. Show retailer-supported product associations and complete quantity, clipping, eligibility, limits and validity terms. Keep digital and volume offers distinct; a family-pack label alone is not a volume promotion. If an account or source limitation blocks this, specify the exact dependency and what is obtainable now.
+
+5. Provenance/testing: the inspected sample supports Crystal Lake store 53100544 / IN_STORE; it does not independently verify every output row. Provide price-bearing response evidence and the store/fulfillment-check ledger for the fresh run. Reconcile the delivered code, original collected run, later revalidation and query-expansion changes, and record the actual code/config hashes in new run evidence. Include the reported live resume evidence, failed-publication protection and actual unattended Azure collection/repeat results. Deployment scripts and offline tests alone do not establish Azure execution.
+E
+For the next delivery, please keep Walmart and Mariano's in separate versioned packages, each with:
+- Runnable source, exact dependencies/commands, version and checksums.
+- Actual JSON, raw/source examples, original run logs and a concise completed/pending index.
+- Full coverage reconciliation and live recovery/publication/Azure evidence, with offline tests labeled separately.
+- Actual Oxylabs requests/credits and cost by retailer and test, plus realistic twice-weekly-per-store usage. Explain the Mariano's trial-quota interruption and what quota is still needed before any additional purchase.
+- A concrete completion date/time/time zone and any exact access or technical blocker.
+
+Keep the brief's exact 22-field order, empty strings rather than null, gupc and unit_price blank, directly scraped PPM, and complete separate promotion terms. Missing values must not cause valid unavailable products to disappear. Scheduling remains twice per week per store.
+
+You can attach revisions to your existing entries here in our private Freelancer conversation for review before an award. Please send the corrected completed portion as soon as it is ready rather than waiting for every remaining item. If anything above has already been resolved in a newer package, identify the file/version and evidence so we can update the assessment. Do not post passwords, keys or verification codes.

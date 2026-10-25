@@ -1,0 +1,92 @@
+[
+  {
+    "identity": "0020235300000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $10.39 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0027236600000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $19.98 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0020235000000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $9.71 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0021198350000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $14.39 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0020158100000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $28.78 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0020234700000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $22.08 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0020252400000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $7.99 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0020235200000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $23.98 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0022191200000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $11.56 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  },
+  {
+    "identity": "0024202450000",
+    "category": "Meat",
+    "sub_category": "Beef",
+    "reason": "approximate_weight",
+    "trigger_field": "storePrices.regular.defaultDescription",
+    "trigger_text": "about $19.79 each",
+    "response_sha256": "c8b84289d8001999727e2e1e6613665ade80cc939b50702091067a4536973dd3"
+  }
+]

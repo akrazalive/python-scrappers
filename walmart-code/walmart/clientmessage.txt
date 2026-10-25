@@ -1,0 +1,37 @@
+Hello Darren,
+
+Attached is my final package for Walmart #32/#38: wm-delivery-v1.1.5.zip. Please start with EVIDENCE-INDEX.md; it maps every requirement to the file that proves it and keeps live results separate from offline tests.
+
+Source: walmart-scraper 1.1.5, source_sha256 75d76e0ee62a06e8bfaf48b245852463f08528537099f35a99fbfffcc3e343cc (run instructions in README.md and docs/OPERATIONS.md inside the source ZIP)
+Live run: 20261024T043517Z-fa478c on store #100, 406 S Walton Blvd, Bentonville, AR 72712. Started 04:35 UTC; traversal finished 12:47 UTC; run ended 13:56 UTC.
+
+Completed – live, observed
+1. Full uncapped traversal: all 11 categories, 3,294 listings (subcategories, then whole-dollar price bands where a node exceeds 25 pages) and 14,238 listing pages, every listing read to Walmart's last page with no demo caps. 2,458 listings reconcile exactly with Walmart's own total. Empty-at-source listings, and listings where Walmart's total is not backed by served products (empty pages re-fetched to confirm), are listed separately in the reconciliation CSV.
+2. Correct store and fulfilment: store #100 verified before collection; canary items readable for store #100 at the start and the end; 14,665 price-bearing pages verified at pageMetadata.location (storeId 100, PICKUP, ZIP 72712) with 0 mismatches. Raw responses and raw-to-output examples are included.
+3. Data: 58,198 distinct genuine store #100 products in the exact 22-field order (a 500-product demo is included), empty strings for missing values, blank gupc/unit_price.
+   - Prices, Rollback and PPM come only from the store offer: PPM exactly as displayed on 44,736 products.
+   - 2,673 genuine UPCs from product pages with store #100 confirmed; nothing inferred.
+   - No volume or digital offers were displayed on these store offers; all 102 displayed labels are classified in offer-census.json.
+   - 251 approximate-weight items and all online-only and marketplace offers are excluded.
+4. Unavailable products: 20,855 out-of-stock store products retained. 124 previously published products not returned this run are carried forward with their original observation date, marked as last observed.
+5. Recovery and safety, on this same hash:
+   - Hard kill without cleanup at 04:44:48 UTC, resumed under the same run ID with no loss or duplicates.
+   - Deliberately failed live run 20261024T133626Z-caf551: not published, last good output's checksums identical before and after.
+   - The full run itself failed validation (see below), and latest/ was correctly left unchanged.
+6. Corrections made during the run are disclosed, and every session records its exact source hash.
+
+Outstanding
+- Source-count gap in 198 of 3,294 listings (6%). All 198 were read to Walmart's own last page, yet Walmart's reported total is higher (median 86% seen; 7,726 products in total). The likely cause is Walmart counting variants it shows as one tile, or count drift during the crawl. That is not proven yet, so validation correctly blocked publication. Next step: re-crawl only those 198 listings (about 1,200 requests) and check the variant counts, then publish or report the cause per listing.
+- Remaining UPCs: Walmart listings carry no UPC, so the remaining products are queued for product pages (up to 1,200 per scheduled run).
+- Unattended Azure repeat: not run for this version; it needs a second full traversal (about 17,000 requests).
+
+What the $25 covered: about 17,000 requests in this run (collection 14,238; planning 921; identity 1,615; failed-run protection 120; verification and canaries 21; recovery 0 extra), as shown in 08-final-run-validation/requests-by-phase.json. The Oxylabs dashboard is authoritative for cost. To finish, I need credit approval for the 198-listing re-check (about 1,200 requests) and the Azure repeat (about 17,000 requests). I will not spend beyond the funded balance without your approval.
+
+Realistic completion after approval: the 198-listing re-check and publication within 6 hours, and the Azure repeat within 24 hours (by 26 October 2026, 18:00 UTC).
+
+Mariano's #60: code only; no live collection yet. It stays a separate package.
+
+Credentials are only in local .env and Azure Key Vault, never in code, logs or the package.
+
+Best regards,
+Asif Khan

@@ -1,0 +1,15 @@
+{
+  "run_id": "20261020T110652Z-e8ccea",
+  "killed_after_committed_pages": 6,
+  "items_in_checkpoint_at_kill": 169,
+  "resumed_same_run_id": true,
+  "final_unique_records": 1273,
+  "duplicates_in_output": 0,
+  "events": [
+    {
+      "ts": "2026-10-20 11:14:51",
+      "kind": "run_resumed",
+      "detail": "{\"pending_listings\": 8, \"items_already_kept\": 169, \"next_pages\": [[\"Beauty\", \"Face Wash\", 1], [\"Diapering\", \"Disposable Diapers\", 1], [\"Feeding\", \"Baby Food Stages\", 1], [\"Health & Wellness\", \"Pain Relief\", 1], [\"Pets\", \"Dry dog food\", 1], [\"Balloons\", \"Latex Balloons\", 1], [\"Art Supplies\", \"Acrylic Paints\", 1], [\"Office Supplies\", \"Elementary School Supplies\", 1]]}"
+    }
+  ]
+}

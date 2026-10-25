@@ -1,0 +1,16 @@
+COMPLETED:
+- v1.1.0 source code (hash 3e1b782330959f5e0070f8789158d9b211932d5481a007acb11778c1ac9a3d98)
+- 36 automated tests pass (offline, labelled separately from live results)
+- Store #100 verified: Bentonville S Walton Blvd Supercenter, 406 S Walton Blvd, Bentonville, AR 72712
+- Canary check passed (items 10450114, 43436773)
+- Partial live collection retained: 33,384+ store offers in checkpoint
+- 500 genuine product demonstration JSON (walmart-500-demo.json, from live run data)
+
+PENDING / BLOCKED:
+- Full uncapped traversal: Food > Ground Coffee listing returns the same ~8,239 store assortment for every $1 price band, so the partition never drops below the 25-page pagination window. Fix in progress: fallback to skip-and-log or split by brand instead of price.
+- Hard kill/resume evidence: not yet captured for the final v1.1.0 run.
+- Deliberately failed run: not yet captured.
+- Azure repeat run: not yet executed for v1.1.0.
+- Actual Oxylabs request count and cost: to be reported from dashboard and final report.json.
+
+REALISTIC COMPLETION: After the Ground Coffee fallback fix, remaining run plus recovery/Azure evidence needs approximately 24 hours.

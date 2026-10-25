@@ -1,0 +1,16 @@
+{
+  "run_id": "20261020T115229Z-7a5f3b",
+  "request_budget": 40,
+  "records_collected": 0,
+  "validation_ok": false,
+  "errors": [
+    "listing not completed: Food / Canned beans (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+    "listing not completed: Household Essentials / Plastic Cups (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+    "listing not completed: Personal Care / Hand Soaps (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+    "listing not completed: Beauty / Face Wash (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+    "listing not completed: Diapering / Disposable Diapers (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+    "listing not completed: Feeding / Baby Food Stages (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))"
+  ],
+  "latest_unchanged": true,
+  "latest_run_id": "20261020T113321Z-48ec5f"
+}

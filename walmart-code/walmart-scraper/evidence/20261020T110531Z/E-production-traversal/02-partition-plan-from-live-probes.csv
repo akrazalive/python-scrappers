@@ -1,0 +1,155 @@
+category,sub_category,price_band_min,price_band_max,walmart_reported_total,fits_25_page_window
+Balloons,Latex Balloons,0.0,3.0,110,True
+Balloons,Latex Balloons,3.0,5.0,247,True
+Balloons,Latex Balloons,5.0,7,485,True
+Balloons,Latex Balloons,7,8,487,True
+Balloons,Latex Balloons,8,9,403,True
+Balloons,Latex Balloons,9,10.0,866,True
+Balloons,Latex Balloons,10.0,11,1096,False
+Balloons,Latex Balloons,11,12,703,True
+Balloons,Latex Balloons,12,13,784,True
+Balloons,Latex Balloons,13,14,460,True
+Balloons,Latex Balloons,14,15,879,True
+Balloons,Latex Balloons,15,16,709,True
+Balloons,Latex Balloons,16,17,619,True
+Balloons,Latex Balloons,17,18,546,True
+Balloons,Latex Balloons,18,19,466,True
+Balloons,Latex Balloons,19,20.0,736,True
+Balloons,Latex Balloons,20.0,21,409,True
+Balloons,Latex Balloons,21,23,855,True
+Balloons,Latex Balloons,23,25,651,True
+Balloons,Latex Balloons,25,27,456,True
+Balloons,Latex Balloons,27,35,985,True
+Balloons,Latex Balloons,35,50.0,668,True
+Balloons,Latex Balloons,50.0,100.0,248,True
+Balloons,Latex Balloons,100.0,100000.0,27,True
+Balloons,Helium Tanks,0.0,3.0,44,True
+Balloons,Helium Tanks,3.0,5.0,57,True
+Balloons,Helium Tanks,5.0,10.0,292,True
+Balloons,Helium Tanks,10.0,20.0,348,True
+Balloons,Helium Tanks,20.0,50.0,327,True
+Balloons,Helium Tanks,50.0,100.0,292,True
+Balloons,Helium Tanks,100.0,100000.0,127,True
+Balloons,All Balloon Accessories,0.0,3.0,213,True
+Balloons,All Balloon Accessories,3.0,5.0,196,True
+Balloons,All Balloon Accessories,5.0,10.0,851,True
+Balloons,All Balloon Accessories,10.0,15,724,True
+Balloons,All Balloon Accessories,15,20.0,402,True
+Balloons,All Balloon Accessories,20.0,35,798,True
+Balloons,All Balloon Accessories,35,50.0,507,True
+Balloons,All Balloon Accessories,50.0,100.0,547,True
+Balloons,All Balloon Accessories,100.0,100000.0,175,True
+Balloons,Balloon Arch,0.0,3.0,10,True
+Balloons,Balloon Arch,3.0,5.0,14,True
+Balloons,Balloon Arch,5.0,10.0,97,True
+Balloons,Balloon Arch,10.0,20.0,357,True
+Balloons,Balloon Arch,20.0,35,684,True
+Balloons,Balloon Arch,35,50.0,510,True
+Balloons,Balloon Arch,50.0,100.0,294,True
+Balloons,Balloon Arch,100.0,100000.0,12,True
+Balloons,Balloon Tassels & Garlands,0.0,3.0,35,True
+Balloons,Balloon Tassels & Garlands,3.0,5.0,19,True
+Balloons,Balloon Tassels & Garlands,5.0,10.0,158,True
+Balloons,Balloon Tassels & Garlands,10.0,20.0,672,True
+Balloons,Balloon Tassels & Garlands,20.0,35,743,True
+Balloons,Balloon Tassels & Garlands,35,50.0,537,True
+Balloons,Balloon Tassels & Garlands,50.0,100.0,171,True
+Balloons,Balloon Tassels & Garlands,100.0,100000.0,4,True
+Balloons,Curling Ribbon,0.0,3.0,206,True
+Balloons,Curling Ribbon,3.0,5.0,187,True
+Balloons,Curling Ribbon,5.0,10.0,761,True
+Balloons,Curling Ribbon,10.0,15,722,True
+Balloons,Curling Ribbon,15,20.0,421,True
+Balloons,Curling Ribbon,20.0,50.0,560,True
+Balloons,Curling Ribbon,50.0,100.0,59,True
+Balloons,Curling Ribbon,100.0,100000.0,13,True
+Balloons,Helium Tanks,0.0,3.0,44,True
+Balloons,Helium Tanks,3.0,5.0,56,True
+Balloons,Helium Tanks,5.0,10.0,291,True
+Balloons,Helium Tanks,10.0,20.0,350,True
+Balloons,Helium Tanks,20.0,50.0,325,True
+Balloons,Helium Tanks,50.0,100.0,291,True
+Balloons,Helium Tanks,100.0,100000.0,129,True
+Balloons,Wedding Balloons,0.0,3.0,202,True
+Balloons,Wedding Balloons,3.0,5.0,387,True
+Balloons,Wedding Balloons,5.0,7,514,True
+Balloons,Wedding Balloons,7,8,392,True
+Balloons,Wedding Balloons,8,10.0,751,True
+Balloons,Wedding Balloons,10.0,12,941,True
+Balloons,Wedding Balloons,12,15,889,True
+Balloons,Wedding Balloons,15,17,536,True
+Balloons,Wedding Balloons,17,20.0,751,True
+Balloons,Wedding Balloons,20.0,23,586,True
+Balloons,Wedding Balloons,23,27,616,True
+Balloons,Wedding Balloons,27,35,777,True
+Balloons,Wedding Balloons,35,50.0,471,True
+Balloons,Wedding Balloons,50.0,100.0,207,True
+Balloons,Wedding Balloons,100.0,100000.0,44,True
+Balloons,Mylar Balloons,0.0,3.0,248,True
+Balloons,Mylar Balloons,3.0,5.0,559,True
+Balloons,Mylar Balloons,5.0,6,642,True
+Balloons,Mylar Balloons,6,7,1191,False
+Balloons,Mylar Balloons,7,8,2083,False
+Balloons,Mylar Balloons,8,9,1165,False
+Balloons,Mylar Balloons,9,10.0,1204,False
+Balloons,Mylar Balloons,10.0,11,1204,False
+Balloons,Mylar Balloons,11,12,1567,False
+Balloons,Mylar Balloons,12,13,1759,False
+Balloons,Mylar Balloons,13,14,1265,False
+Balloons,Mylar Balloons,14,15,1768,False
+Balloons,Mylar Balloons,15,16,1781,False
+Balloons,Mylar Balloons,16,17,1619,False
+Balloons,Mylar Balloons,17,18,1721,False
+Balloons,Mylar Balloons,18,19,1658,False
+Balloons,Mylar Balloons,19,20.0,2136,False
+Balloons,Mylar Balloons,20.0,21,1445,False
+Balloons,Mylar Balloons,21,22,1348,False
+Balloons,Mylar Balloons,22,23,1126,False
+Balloons,Mylar Balloons,23,24,929,True
+Balloons,Mylar Balloons,24,25,619,True
+Balloons,Mylar Balloons,25,27,760,True
+Balloons,Mylar Balloons,27,35,852,True
+Balloons,Mylar Balloons,35,42,460,True
+Balloons,Mylar Balloons,42,50.0,760,True
+Balloons,Mylar Balloons,50.0,100.0,284,True
+Balloons,Mylar Balloons,100.0,100000.0,113,True
+Balloons,Blue Balloons,0.0,3.0,89,True
+Balloons,Blue Balloons,3.0,5.0,174,True
+Balloons,Blue Balloons,5.0,10.0,998,True
+Balloons,Blue Balloons,10.0,12,859,True
+Balloons,Blue Balloons,12,13,632,True
+Balloons,Blue Balloons,13,14,704,True
+Balloons,Blue Balloons,14,15,929,True
+Balloons,Blue Balloons,15,16,1043,False
+Balloons,Blue Balloons,16,17,1050,False
+Balloons,Blue Balloons,17,18,1150,False
+Balloons,Blue Balloons,18,19,1134,False
+Balloons,Blue Balloons,19,20.0,1134,False
+Balloons,Blue Balloons,20.0,21,964,True
+Balloons,Blue Balloons,21,22,882,True
+Balloons,Blue Balloons,22,23,764,True
+Balloons,Blue Balloons,23,27,858,True
+Balloons,Blue Balloons,27,35,465,True
+Balloons,Blue Balloons,35,50.0,342,True
+Balloons,Blue Balloons,50.0,100.0,94,True
+Balloons,Blue Balloons,100.0,100000.0,20,True
+Balloons,Purple Balloons,0.0,3.0,38,True
+Balloons,Purple Balloons,3.0,5.0,53,True
+Balloons,Purple Balloons,5.0,10.0,378,True
+Balloons,Purple Balloons,10.0,12,611,True
+Balloons,Purple Balloons,12,13,489,True
+Balloons,Purple Balloons,13,15,914,True
+Balloons,Purple Balloons,15,16,920,True
+Balloons,Purple Balloons,16,17,922,True
+Balloons,Purple Balloons,17,18,978,True
+Balloons,Purple Balloons,18,19,970,True
+Balloons,Purple Balloons,19,20.0,969,True
+Balloons,Purple Balloons,20.0,21,850,True
+Balloons,Purple Balloons,21,23,883,True
+Balloons,Purple Balloons,23,27,687,True
+Balloons,Purple Balloons,27,35,284,True
+Balloons,Purple Balloons,35,50.0,165,True
+Balloons,Purple Balloons,50.0,100.0,58,True
+Balloons,Purple Balloons,100.0,100000.0,16,True
+Balloons,Green Balloons,0.0,3.0,56,True
+Balloons,Green Balloons,3.0,5.0,97,True

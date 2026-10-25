@@ -1,0 +1,15 @@
+{
+  "run_id": "20261019T081808Z-78d378",
+  "killed_after_committed_pages": 6,
+  "items_in_checkpoint_at_kill": 258,
+  "resumed_same_run_id": true,
+  "final_unique_records": 1269,
+  "duplicates_in_output": 0,
+  "events": [
+    {
+      "ts": "2026-10-19 08:48:17",
+      "kind": "run_aborted",
+      "detail": "{\"error\": \"RuntimeError: all canary items failed at end \\u2013 likely blocked or wrong store\"}"
+    }
+  ]
+}

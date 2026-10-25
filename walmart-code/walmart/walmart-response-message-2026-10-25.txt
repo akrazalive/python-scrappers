@@ -1,0 +1,54 @@
+Hello Darren,
+
+Thank you for the feedback and for fixing the Azure access. I can see scraper-contest-asif-test with Contributor access. This message covers Walmart only; Mariano's follows separately.
+
+Attached is wm-walmart-response-2026-10-25.zip. Please start with RESPONSE-INDEX.md. It supplements wm-delivery-v1.1.5-recheck.zip. It was made entirely offline: 0 provider requests, nothing deployed, source unchanged (1.1.5, 75d76e0e...), and publication stays blocked.
+
+1. The 175 short listings (1-shortfall-175/)
+- All 175 were read to Walmart's own maxPage on both reads, with store #100 on every page. There is no cursor: Walmart's paginationV2 ends at maxPage.
+- short-listings-pagination.csv gives, per listing and tied to recheck-before-after.csv by URL: Walmart's total on both reads, products served on both reads, tiles per page and the last page's count.
+- In 165 listings, Walmart served fewer than 40 tiles on pages before its last page. In 2, its page count cannot hold its own total. 3 have full pages and are truly unexplained, and 5 need raw pages.
+- Proposed narrow exception (section 1.3; not implemented): a listing qualifies only if it was read to maxPage twice, its served count is stable, Walmart withheld tiles before its last page, the gap is 25% or less, and every served tile is accounted for in the raw pages. On the evidence so far, 80 listings (2,096 products) would qualify and 95 (4,714 products) stay blocking. Coverage validation stays on for everything else.
+- Variants: Walmart folds size and colour variants into one tile. On 4 archived pages, 463 of 484 folded variant IDs (96%) were never served as their own tile anywhere in the run. If they are store #100 offers, the dataset misses them. I have not assumed either way.
+- To settle both points I need your approval for at most 1,220 requests. The cap includes retries, and the fetcher refuses anything beyond it:
+  E1: every page of the 175 listings (1,032 pages, cap 1,100).
+  E2: 100 product pages of folded variants (cap 120).
+  The exact commands are in section 1.5. Package B would follow 4 hours after approval.
+
+2. Source changes and the hard-stop test (2-version-ledger/)
+All 5 versions used in the run (1.1.1 to 1.1.5) were recomputed from their zips and match the hash each session recorded. The patches between versions are included. The live hard stop and resume ran on 1.1.1 (b53b1a4e...), not on the final hash. A hard stop on the final hash is planned in Azure. I also disclose a correction: the dist/ copy of the 1.1.1 zip was rebuilt after the run started. The original from 04:33 UTC is the one included.
+
+3. UPCs (3-upc-status/)
+- 2,781 have a UPC: 1,663 from store #100-confirmed product pages, 997 reused from the verified v1.0.0 run, and 121 carried.
+- 69 are source-absent: Walmart shows no UPC.
+- 55,462 are not yet fetched.
+- Of the product pages fetched in this run, 96.2% showed a UPC.
+- To complete: about 55,500 to 57,700 requests. At 1,200 per run that is 47 runs (about 23 weeks at two runs a week); as one pass, about 16 hours.
+- I also found a dependency: new runs reuse UPCs only from published data, so while publication is blocked the queue would not advance. The fix is in the plan.
+
+4. Observations (4-observations/)
+58,188 fresh store offers; 124 carried with their original observation dates (19 and 20 October); 20,895 out-of-stock products retained.
+
+5. Azure
+- My earlier Azure evidence was v1.0.0 in my own subscription.
+- Nothing has been deployed to your group, and nothing will be until you approve.
+- The final version will deploy a manual-only job (no schedule) into your existing group.
+- Sequence: final code, deploy, provider probe, smoke test, hard stop and resume, deliberately failed run, full repeat, UPC pass. Each step has its own request cap and needs your approval.
+- What I need from you:
+  a) The three role assignments for the job's managed identity, which Contributor cannot create: Storage Blob Data Contributor, Key Vault Secrets User, and AcrPull only if a registry is used. Either you create them, or you grant me a role-assignment role limited to the group.
+  b) The Oxylabs credential type in your plan. The Walmart run used the Walmart endpoint webapi.oxylabs.io/v1/scrape/walmart with an API key (Bearer), sending store_id=100 and delivery_zip=72712. The scraper also supports realtime.oxylabs.io/v1/queries with API username and password, but store pinning on that path is not yet verified. Please check which one your plan provides, and its quota. You can put the credential into the Key Vault yourself; please do not send it to me. A probe of at most 10 requests verifies store #100 before anything larger runs.
+  c) Quota and a test window.
+
+6. Completion plan (US Central, CDT, details in section 6)
+- Package B (raw evidence and variant check): 4 hours after you approve the 1,220 requests, e.g. Mon 26 Oct 15:00 CDT if approved by 11:00.
+- v1.1.6 code (the exception you agree, the UPC queue fix, the manual-only Azure template): Tue 27 Oct 20:00 CDT, or Wed 28 Oct 14:00 if variants must also be collected.
+- Azure deploy and tests on the final hash, including the hard stop: Wed 28 Oct 16:00 CDT.
+- Azure full repeat (about 17,000 requests): Thu 29 Oct 12:00 CDT.
+- UPC pass (about 57,700 requests): Fri 30 Oct 06:00 CDT.
+- Final evidence package, all on one hash: Fri 30 Oct 2026, 18:00 CDT.
+These dates assume your decisions and the Azure prerequisites by Tue 27 Oct 12:00 CDT. Each day of delay moves them by a day. No requests, deployment or schedules will happen without your approval.
+
+Credentials stay only in local .env and Key Vault, never in code, logs or packages.
+
+Best regards,
+Asif Khan

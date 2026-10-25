@@ -1,0 +1,116 @@
+{
+  "run_id": "20261020T110652Z-e8ccea",
+  "records": 1273,
+  "runtime_s": 1030.1,
+  "requests": 713,
+  "retries": 0,
+  "challenges": 0,
+  "ok": true,
+  "published": true,
+  "store": {
+    "verified": true,
+    "store_id": "100",
+    "store_name": "Bentonville S Walton Blvd Supercenter",
+    "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+    "zipcode": "72712",
+    "url": "https://www.walmart.com/store/100",
+    "checked_at": "2026-10-20T11:06:59+00:00",
+    "reason": ""
+  },
+  "repeat": {
+    "run_id": "20261020T113321Z-48ec5f",
+    "records": 1307,
+    "validation_ok": true,
+    "published": true,
+    "compared_with_run": "20261020T110652Z-e8ccea",
+    "overlap_with_run1": 1271,
+    "yield_check": "real: validated against the previous published run"
+  },
+  "blocked": {
+    "run_id": "20261020T115229Z-7a5f3b",
+    "request_budget": 40,
+    "records_collected": 0,
+    "validation_ok": false,
+    "errors": [
+      "listing not completed: Food / Canned beans (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Household Essentials / Plastic Cups (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Personal Care / Hand Soaps (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Beauty / Face Wash (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Diapering / Disposable Diapers (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Feeding / Baby Food Stages (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))"
+    ],
+    "latest_unchanged": true,
+    "latest_run_id": "20261020T113321Z-48ec5f"
+  },
+  "traversal": {
+    "label": "PRODUCTION TRAVERSAL - discovery and partition plan from live store-#100 responses; full page crawl deliberately stopped (see README)",
+    "category": "Balloons",
+    "category_splits": [
+      {
+        "node": "Balloons",
+        "walmart_total": 43891,
+        "children": 16
+      },
+      {
+        "node": "Balloon Accessories",
+        "walmart_total": 10269,
+        "children": 8
+      },
+      {
+        "node": "Balloons by Color",
+        "walmart_total": 24201,
+        "children": 11
+      }
+    ],
+    "price_band_probes": 154,
+    "bands_fitting_25_page_window": 131,
+    "one_dollar_bands_still_above_window": 23,
+    "examples_one_dollar_bands_above_window": [
+      {
+        "category": "Balloons",
+        "sub_category": "Latex Balloons",
+        "band": [
+          10.0,
+          11
+        ],
+        "walmart_total": 1096
+      },
+      {
+        "category": "Balloons",
+        "sub_category": "Mylar Balloons",
+        "band": [
+          6,
+          7
+        ],
+        "walmart_total": 1191
+      },
+      {
+        "category": "Balloons",
+        "sub_category": "Mylar Balloons",
+        "band": [
+          7,
+          8
+        ],
+        "walmart_total": 2083
+      },
+      {
+        "category": "Balloons",
+        "sub_category": "Mylar Balloons",
+        "band": [
+          8,
+          9
+        ],
+        "walmart_total": 1165
+      },
+      {
+        "category": "Balloons",
+        "sub_category": "Mylar Balloons",
+        "band": [
+          9,
+          10.0
+        ],
+        "walmart_total": 1204
+      }
+    ]
+  }
+}

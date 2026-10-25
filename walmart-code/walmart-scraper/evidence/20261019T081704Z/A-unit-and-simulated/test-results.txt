@@ -1,0 +1,35 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m pytest -v -p no:cacheprovider
+# started 2026-10-19T08:17:04+00:00
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: D:\PROJECTS\Monthly-Test\walmart-scraper
+plugins: anyio-4.15.1
+collecting ... collected 23 items
+
+tests/test_detection.py::test_thin_listing_fails_validation PASSED       [  4%]
+tests/test_detection.py::test_yield_drop_against_previous_run_blocks_publication PASSED [  8%]
+tests/test_detection.py::test_category_minimum PASSED                    [ 13%]
+tests/test_detection.py::test_lock_left_by_dead_process_is_taken_over PASSED [ 17%]
+tests/test_detection.py::test_hard_kill_then_resume PASSED               [ 21%]
+tests/test_detection.py::test_location_scope_runs_and_publishes PASSED   [ 26%]
+tests/test_detection.py::test_wrong_store_address_fails_before_collection PASSED [ 30%]
+tests/test_detection.py::test_raw_responses_archived_with_store_context PASSED [ 34%]
+tests/test_pipeline.py::test_full_run_publishes_valid_data PASSED        [ 39%]
+tests/test_pipeline.py::test_store_mismatch_blocks_publication PASSED    [ 43%]
+tests/test_pipeline.py::test_failed_run_never_replaces_good_data PASSED  [ 47%]
+tests/test_pipeline.py::test_interruption_resumes_without_loss_or_duplicates PASSED [ 52%]
+tests/test_pipeline.py::test_demo_runs_are_never_published PASSED        [ 56%]
+tests/test_rules.py::test_field_order_and_empty_strings PASSED           [ 60%]
+tests/test_rules.py::test_pipeline_fields_forced_empty PASSED            [ 65%]
+tests/test_rules.py::test_price_format PASSED                            [ 69%]
+tests/test_rules.py::test_approx_weight PASSED                           [ 73%]
+tests/test_rules.py::test_weight_extraction PASSED                       [ 78%]
+tests/test_rules.py::test_private_label PASSED                           [ 82%]
+tests/test_rules.py::test_volume_deals_preserve_wording_and_displayed_price_only PASSED [ 86%]
+tests/test_rules.py::test_digital_deals PASSED                           [ 91%]
+tests/test_rules.py::test_rewards_not_treated_as_digital_reduction PASSED [ 95%]
+tests/test_rules.py::test_volume_and_digital_together PASSED             [100%]
+
+============================= 23 passed in 11.64s =============================
+
+# finished 2026-10-19T08:17:17+00:00 exit code 0

@@ -1,0 +1,43 @@
+# One entry per Mariano's store. Adding a store = adding an entry here (no code change).
+#
+# store_id      Kroger enterprise location id: division 531 + 5-digit store number (Mariano's Crystal Lake = 53100544).
+#               Find it on marianos.com/stores (the store page URL ends with the id) or in any page's store details.
+# zipcode       expected store ZIP; the run fails if the store page shows a different one
+# expected_address  text that must appear in the selected store's address (second, independent check)
+# canary        a search query and product UPCs that must come back with a store price at the start and end of each run
+# categories    optional: limit this location to some CSV categories (empty = all)
+# limit_per_category  optional: cap products per category (demo / smoke runs only; 0 = no cap)
+
+locations:
+  - key: marianos-544-crystal-lake
+    store_id: "53100544"
+    zipcode: "60014"
+    expected_address: "105 Northwest Hwy"
+    canary:
+      query: milk
+      upcs: ["0001111050438", "0001111082556"]   # Simple Truth Organic 2% milk, Kroger lactose-free 2% milk
+    enabled: true
+
+  # Client-supplied store: Mariano's Vernon Hills, 1720 N Milwaukee Ave, Vernon Hills, IL 60061.
+  # store_id 53100502 is a CANDIDATE taken from the public store page URL (marianos.com/stores/grocery/il/vernon-hills/
+  # marianos-vernon-hills/531/00502). It is NOT verified until `verify-store --location marianos-502-vernon-hills`
+  # shows, from Mariano's own responses, location id 53100502 + ZIP 60061 + "1720 N Milwaukee" + store-sourced prices.
+  # Kept disabled until then; its results are always labelled with the store details read from its own responses.
+  - key: marianos-502-vernon-hills
+    store_id: "53100502"
+    zipcode: "60061"
+    expected_address: "1720 N Milwaukee"
+    canary:
+      query: milk
+      upcs: []          # set after verification (UPCs priced at this store)
+    enabled: false
+
+  # Example of another store (disabled). Fill zipcode/expected_address from verify-store before enabling.
+  - key: marianos-539-bronzeville
+    store_id: "53100539"
+    zipcode: ""
+    expected_address: ""
+    canary:
+      query: milk
+      upcs: ["0001111050438"]
+    enabled: false

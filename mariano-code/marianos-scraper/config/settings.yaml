@@ -1,0 +1,76 @@
+# Mariano's scraper – runtime settings.
+# Secrets (provider key, storage connection string) are NEVER stored here.
+# They come from environment variables / Azure Key Vault (see .env.example).
+
+retailer: marianos
+base_url: https://www.marianos.com
+categories_file: config/categories.csv
+locations_file: config/locations.yaml
+private_label_file: config/private_label_brands.txt
+store_logo_fallback: https://www.marianos.com/cdn/images/multiColor-4Jf6i6B.svg   # used only if the page logo cannot be read
+
+fetch:
+  provider: oxylabs_kroger     # oxylabs_kroger (Web Scraper API, webapi.oxylabs.io, Bearer key – used for all runs so far)
+                               # | oxylabs_realtime (classic realtime.oxylabs.io, username/password – validate with probe)
+                               # | fixture (offline tests). Credentials only via env vars / Key Vault.
+  oxylabs_realtime:
+    payload: {source: kroger, url: "{url}", store_id: "{store_id}"}   # adjust to the plan's Kroger source if needed
+  concurrency: 4               # parallel page requests (env MSCRAPER_CONCURRENCY overrides; set from the Test 2 measurement)
+  max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
+  timeout_seconds: 120
+  max_retries: 4               # per request, exponential backoff with jitter
+  backoff_base_seconds: 3
+  min_delay_seconds: 0.4       # controlled pacing between request starts
+  max_delay_seconds: 1.0
+  slow_response_seconds: 60    # logged as abnormal latency
+  min_page_bytes: 50000        # smaller responses are treated as blocked / malformed
+
+crawl:
+  page_size: 24                # Mariano's search grid page size
+  paginate: false              # Mariano's server-rendered search returns the first 24 results for every page
+                               # number, so coverage comes from query expansion. Set true if Mariano's starts paging.
+  brand_slices: true           # a request reporting more products than it returned is partitioned with Mariano's own
+                               # brandName filter (disjoint slices, reconciled in coverage.json)
+  max_brand_slices_per_request: 0   # 0 = no cap (production)
+  max_queries_per_shelf: 0     # query-expansion cap per sub-category; 0 = no cap (production)
+  max_pages_per_query: 42      # only used when paginate: true
+  stop_after_empty_pages: 3    # only used when paginate: true
+  include_curated_shelves: true          # department "curated" shelves (e.g. Steaks & Roasts) are crawled ...
+  curated_department_filter: true        # ... but only products of the same department are kept
+  skip_shelf_patterns:                    # merchandising/brand shelves that only repeat products of real subcategories
+    - "^Simple Truth$"
+    - "^Private Selection$"
+    - "^Kroger( Brand)?$"
+    - "^Our Brands$"
+    - "^Shop All\\b"
+  approximate_weight_price_wording: true  # exclude ONLY when Mariano's own size or price wording is approximate /
+                               # estimated (e.g. "about $10.39 each"); sold-by-weight alone never excludes a product
+  max_products_per_run: 0      # 0 = no cap (production). Use --limit for demos.
+
+evidence:
+  raw_pages_per_category: 2    # full raw HTML kept for the first N pages per category (all pages keep a price-bearing
+                               # gzip excerpt + SHA-256 in the ledger)
+
+coupons:
+  enabled: true                # the "Coupons" CSV row: collect every displayed digital coupon (wording, expiry, id)
+  render_js: true
+  product_flag_via_search_filter: true   # one request per shelf with Mariano's savings=Coupons filter: products it returns
+                                         # are flagged in observations.json (coupon terms are not exposed per product)
+
+validation:
+  min_products_per_category: 1        # 0 products = category failure, never "legitimately empty"
+  yield_drop_threshold: 0.6           # fail if a category drops below 60% of the last successful run
+  max_failed_listing_ratio: 0.0       # any failed listing blocks publication
+  min_field_completeness:
+    product_title: 1.0
+    regular_price: 1.0
+    url: 1.0
+    upc: 1.0
+    image_url: 0.98
+  canary_required: true
+
+output:
+  backend: local                # local | azure_blob
+  local_dir: output
+  blob_container: marianos-scraper
+state_dir: state

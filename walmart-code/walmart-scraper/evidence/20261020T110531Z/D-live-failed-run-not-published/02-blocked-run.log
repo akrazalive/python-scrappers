@@ -1,0 +1,116 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m wmscraper run --location walmart-100-bentonville --fresh --max-requests 40
+# started 2026-10-20T11:52:29+00:00
+{"ts": "2026-10-20T11:52:30+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "run_start", "run_id": "20261020T115229Z-7a5f3b", "location": "walmart-100-bentonville", "store_id": "100", "fulfillment": "pickup", "resumed": false, "items_already_kept": 0, "version": "1.0.0", "source_sha256": "29492665b7663a59f471e2766ae74e8abec4e7ca05fe56bc9020033ddf26a4bb"}
+{"ts": "2026-10-20T11:52:37+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "store_verified", "verified": true, "store_id": "100", "store_name": "Bentonville S Walton Blvd Supercenter", "store_location": "406 S Walton Blvd, Bentonville, AR 72712", "zipcode": "72712", "url": "https://www.walmart.com/store/100", "checked_at": "2026-10-20T11:52:37+00:00", "reason": ""}
+{"ts": "2026-10-20T11:52:51+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "canary", "phase": "start", "ok": true, "problems": []}
+{"ts": "2026-10-20T11:52:57+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Food", "csv_id": "976759", "root_id": "976759"}
+{"ts": "2026-10-20T11:53:05+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Food", "node": "Food", "walmart_total": 1621505, "children": 55}
+{"ts": "2026-10-20T11:53:11+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "landing_page_split", "category": "Food", "node": "Pantry", "children": 61}
+{"ts": "2026-10-20T11:53:19+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Food", "listings": 1, "excluded": ["recipes", "shop all foods"]}
+{"ts": "2026-10-20T11:53:30+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Household Essentials", "csv_id": "1115193", "root_id": "1115193"}
+{"ts": "2026-10-20T11:53:36+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Household Essentials", "node": "Household Essentials", "walmart_total": 474986, "children": 20}
+{"ts": "2026-10-20T11:53:43+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Household Essentials", "node": "Paper & Plastic", "walmart_total": 79722, "children": 18}
+{"ts": "2026-10-20T11:53:51+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Household Essentials", "node": "Disposable Tableware", "walmart_total": 24491, "children": 22}
+{"ts": "2026-10-20T11:53:58+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Household Essentials", "node": "Disposable Cups", "walmart_total": 15585, "children": 6}
+{"ts": "2026-10-20T11:54:03+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Household Essentials", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:54:10+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Personal Care", "csv_id": "1005862", "root_id": "1005862"}
+{"ts": "2026-10-20T11:54:19+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Personal Care", "node": "Personal Care", "walmart_total": 250448, "children": 62}
+{"ts": "2026-10-20T11:54:27+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Personal Care", "node": "Bath & Body", "walmart_total": 106666, "children": 67}
+{"ts": "2026-10-20T11:54:38+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Personal Care", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:54:46+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Beauty", "csv_id": "1085666", "root_id": "1085666"}
+{"ts": "2026-10-20T11:54:52+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Beauty", "node": "Beauty", "walmart_total": 900010, "children": 50}
+{"ts": "2026-10-20T11:55:00+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Beauty", "node": "Skincare", "walmart_total": 41272, "children": 18}
+{"ts": "2026-10-20T11:55:05+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Beauty", "node": "Face Cleansers", "walmart_total": 8614, "children": 8}
+{"ts": "2026-10-20T11:55:11+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Beauty", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:55:19+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Diapering", "node": "Diapering", "walmart_total": 30498, "children": 35}
+{"ts": "2026-10-20T11:55:27+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Diapering", "node": "Diapers", "walmart_total": 2894, "children": 19}
+{"ts": "2026-10-20T11:55:34+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Diapering", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:55:39+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Feeding", "csv_id": "133283", "root_id": "5427_133283"}
+{"ts": "2026-10-20T11:55:47+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Feeding", "node": "Feeding", "walmart_total": 87296, "children": 210}
+{"ts": "2026-10-20T11:55:53+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Feeding", "node": "Baby Food", "walmart_total": 1309, "children": 32}
+{"ts": "2026-10-20T11:55:59+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Feeding", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:56:06+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Health & Wellness", "csv_id": "976760", "root_id": "976760"}
+{"ts": "2026-10-20T11:56:13+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Health & Wellness", "node": "Health & Wellness", "walmart_total": 900010, "children": 52}
+{"ts": "2026-10-20T11:56:21+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Health & Wellness", "node": "Pain management", "walmart_total": 6889, "children": 41}
+{"ts": "2026-10-20T11:56:28+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Health & Wellness", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:56:35+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Pets", "csv_id": "5440", "root_id": "5440"}
+{"ts": "2026-10-20T11:56:42+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Pets", "node": "Pets", "walmart_total": 900010, "children": 36}
+{"ts": "2026-10-20T11:56:48+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "landing_page_split", "category": "Pets", "node": "Dogs", "children": 12}
+{"ts": "2026-10-20T11:56:54+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Pets", "listings": 1, "excluded": ["farm animals"]}
+{"ts": "2026-10-20T11:57:01+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_split", "category": "Balloons", "node": "Balloons", "walmart_total": 43891, "children": 16}
+{"ts": "2026-10-20T11:57:08+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Balloons", "listings": 1, "excluded": []}
+{"ts": "2026-10-20T11:57:13+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_root", "category": "Art Supplies", "csv_id": "5899871", "root_id": "1334134_5899871"}
+{"ts": "2026-10-20T11:57:13+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "discovery_failed", "category": "Art Supplies", "url": "https://www.walmart.com/browse/1334134_5899871", "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:13+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Art Supplies", "listings": 0, "excluded": []}
+{"ts": "2026-10-20T11:57:13+00:00", "level": "WARNING", "logger": "wmscraper.run", "event": "root_id_unresolved", "category": "Office Supplies", "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:13+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "discovery_failed", "category": "Office Supplies", "url": "https://www.walmart.com/browse/1229749", "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:13+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "category_discovered", "category": "Office Supplies", "listings": 0, "excluded": []}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Food", "sub_category": "Canned beans", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Household Essentials", "sub_category": "Plastic Cups", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Personal Care", "sub_category": "Hand Soaps", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Beauty", "sub_category": "Face Wash", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Diapering", "sub_category": "Disposable Diapers", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Feeding", "sub_category": "Baby Food Stages", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Health & Wellness", "sub_category": "Pain Relief", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:14+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Pets", "sub_category": "Dry dog food", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:15+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "listing_failed", "category": "Balloons", "sub_category": "Latex Balloons", "page": 1, "error": "request budget of 40 reached (fetch.max_requests_per_run)"}
+{"ts": "2026-10-20T11:57:15+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "product_details_reused", "reused": 0, "product_pages_to_fetch": 0}
+{"ts": "2026-10-20T11:57:15+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "canary", "phase": "end", "ok": false, "problems": ["10450114: request budget of 40 reached (fetch.max_requests_per_run)", "43436773: request budget of 40 reached (fetch.max_requests_per_run)"]}
+{"ts": "2026-10-20T11:57:15+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "run_aborted", "exc": "Traceback (most recent call last):\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\runner.py\", line 150, in execute\n    await self.canary(\"end\")\n  File \"D:\\PROJECTS\\Monthly-Test\\walmart-scraper\\src\\wmscraper\\runner.py\", line 281, in canary\n    raise RuntimeError(f\"all canary items failed at {phase} – likely blocked or wrong store\")\nRuntimeError: all canary items failed at end – likely blocked or wrong store"}
+{"ts": "2026-10-20T11:57:15+00:00", "level": "ERROR", "logger": "wmscraper.run", "event": "not_published", "run_id": "20261020T115229Z-7a5f3b", "errors": ["listing not completed: Food / Canned beans (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Household Essentials / Plastic Cups (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Personal Care / Hand Soaps (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Beauty / Face Wash (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Diapering / Disposable Diapers (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Feeding / Baby Food Stages (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Health & Wellness / Pain Relief (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Pets / Dry dog food (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Balloons / Latex Balloons (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Art Supplies / Art Supplies (failed: discovery failed: request budget of 40 reached (fetch.max_requests_per_run))", "listing not completed: Office Supplies / Office Supplies (failed: discovery failed: request budget of 40 reached (fetch.max_requests_per_run))", "category returned 0 products (min 1): Food", "category returned 0 products (min 1): Household Essentials", "category returned 0 products (min 1): Personal Care", "category returned 0 products (min 1): Beauty", "category returned 0 products (min 1): Diapering", "category returned 0 products (min 1): Feeding", "category returned 0 products (min 1): Health & Wellness", "category returned 0 products (min 1): Pets", "category returned 0 products (min 1): Balloons"], "demo": false}
+{"ts": "2026-10-20T11:57:15+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "run_end", "run_id": "20261020T115229Z-7a5f3b", "records": 0, "ok": false, "runtime_s": 284.9}
+{
+  "run_id": "20261020T115229Z-7a5f3b",
+  "total_unique_records": 0,
+  "runtime_seconds": 284.9,
+  "count_by_category": {},
+  "validation": {
+    "ok": false,
+    "errors": [
+      "listing not completed: Food / Canned beans (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Household Essentials / Plastic Cups (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Personal Care / Hand Soaps (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Beauty / Face Wash (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Diapering / Disposable Diapers (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Feeding / Baby Food Stages (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Health & Wellness / Pain Relief (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Pets / Dry dog food (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Balloons / Latex Balloons (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Art Supplies / Art Supplies (failed: discovery failed: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Office Supplies / Office Supplies (failed: discovery failed: request budget of 40 reached (fetch.max_requests_per_run))",
+      "category returned 0 products (min 1): Food",
+      "category returned 0 products (min 1): Household Essentials",
+      "category returned 0 products (min 1): Personal Care",
+      "category returned 0 products (min 1): Beauty",
+      "category returned 0 products (min 1): Diapering",
+      "category returned 0 products (min 1): Feeding",
+      "category returned 0 products (min 1): Health & Wellness",
+      "category returned 0 products (min 1): Pets",
+      "category returned 0 products (min 1): Balloons",
+      "category returned 0 products (min 1): Art Supplies",
+      "category returned 0 products (min 1): Office Supplies",
+      "yield drop in Art Supplies: 0 vs 111 last good run",
+      "yield drop in Balloons: 0 vs 98 last good run",
+      "yield drop in Beauty: 0 vs 115 last good run",
+      "yield drop in Diapering: 0 vs 122 last good run",
+      "yield drop in Feeding: 0 vs 182 last good run",
+      "yield drop in Food: 0 vs 106 last good run",
+      "yield drop in Health & Wellness: 0 vs 143 last good run",
+      "yield drop in Household Essentials: 0 vs 114 last good run",
+      "yield drop in Office Supplies: 0 vs 107 last good run",
+      "yield drop in Personal Care: 0 vs 103 last good run",
+      "yield drop in Pets: 0 vs 106 last good run",
+      "canary check (end) failed: ['10450114: request budget of 40 reached (fetch.max_requests_per_run)', '43436773: request budget of 40 reached (fetch.max_requests_per_run)']",
+      "field completeness product_title=0.00% below 100%",
+      "field completeness regular_price=0.00% below 100%",
+      "field completeness url=0.00% below 100%",
+      "field completeness image_url=0.00% below 98%",
+      "run produced no records",
+      "run aborted: RuntimeError: all canary items failed at end \u2013 likely blocked or wrong store (checkpoint kept \u2013 next run resumes)"
+    ],
+    "warnings": []
+  },
+  "published": null
+}
+
+# finished 2026-10-20T11:57:15+00:00 exit code 2

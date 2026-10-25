@@ -1,0 +1,11 @@
+.env
+output/
+tests/
+docs/
+deploy/
+**/__pycache__/
+*.sqlite
+evidence/
+dist/
+entry/
+.pytest_cache/

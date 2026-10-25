@@ -1,0 +1,72 @@
+retailer: walmart
+categories_file: config/categories.csv
+locations_file: config/locations.yaml
+private_label_file: config/private_label_brands.txt
+store_logo_url: https://i5.walmartimages.com/dfw/63fd9f59-b3e1/7a569e53-f29a-4c3d-bfaf-6f7a158bfadd/v1/walmartLogo.svg
+fetch:
+  provider: oxylabs_webapi
+  concurrency: 24
+  max_requests_per_run: 0
+  timeout_seconds: 90
+  max_retries: 4
+  backoff_base_seconds: 4
+  min_delay_seconds: 0.15
+  max_delay_seconds: 0.4
+  slow_response_seconds: 45
+  oxylabs:
+    payload:
+      source: universal
+      url: '{url}'
+      render: html
+      geo_location: '{zipcode}'
+  zyte:
+    payload:
+      url: '{url}'
+      browserHtml: true
+      geolocation: US
+  playwright:
+    store_cookies: []
+crawl:
+  max_pages_per_listing: 25
+  subcategory_max_depth: 4
+  max_listings_per_category: 0
+  skip_subcategory_patterns:
+  - ^Shop All\b
+  - ^Shop by Brand$
+  - ^Brands$
+  - ^Breadcrumbs$
+  listing_params:
+    stores: '{store_id}'
+    facet: retailer_type:Walmart
+  coverage: source_count
+  max_split_children: 30
+  full_page_min_items: 20
+  store_window_ratio: 0.75
+  store_exhausted_empty_pages: 1
+  category_concurrency: 6
+  planning_concurrency: 12
+  max_product_pages_per_run: 0
+  carry_forward: true
+  enrich_product_pages: true
+  max_products_per_run: 0
+validation:
+  min_products_per_category: 1
+  yield_drop_threshold: 0.6
+  max_failed_category_ratio: 0.0
+  min_field_completeness:
+    product_title: 1.0
+    regular_price: 0.99
+    url: 1.0
+    image_url: 0.98
+  canary_required: true
+  thin_listing_ratio: 0.95
+  source_count_tolerance: 2
+  thin_listing_action: fail
+  store_count_reconciliation: 0.97
+  category_minimums: {}
+evidence:
+  raw_samples_per_kind: 5
+output:
+  backend: local
+  local_dir: evidence/20261024T043331Z/D-live-failed-run-not-published/sandbox-output
+  blob_container: walmart-scraper

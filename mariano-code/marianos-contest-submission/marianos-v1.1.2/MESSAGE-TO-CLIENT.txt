@@ -1,0 +1,72 @@
+MARIANO'S #69 → v1.1.2: completion plan, bounded tests with enforced totals, Oxylabs feature (no new live data)
+
+Hello,
+
+Thank you for applying the Azure access and for the encouragement. I can now see scraper-contest-asif-test with my invited account. v1.1.2 is attached (marianos-v1.1.2.zip, code_sha256 c6a0f502d12f1c1ba8f8f13cae3f196ff40a49a71eb2b03f4202f0bd2feccb38). It replaces v1.1.1. Nothing new was collected live: the only live Mariano's evidence is still from 21 Oct.
+
+PACKAGE STATUS (00-INDEX.md)
+- There is one Mariano's entry, #69. Your review heading called it "#69 (earlier #60)"; there is no separate #60 package.
+- Entry #69 = live data of 21 Oct (demonstration subset, never published).
+- v1.1.0 and v1.1.1 are superseded. v1.1.2 is current (code + offline tests).
+- Live and offline material are in separate folders: A-LIVE-EVIDENCE-2026-10-21 and B-OFFLINE-ONLY (42 offline tests).
+
+OXYLABS: EXACT FEATURE NEEDED (03 §1)
+- Oxylabs Web API, Kroger dedicated scraper: POST https://webapi.oxylabs.io/v1/scrape/kroger, with the store_id on every request.
+- Authentication: an API key as a Bearer token, generated on a Web API instance in your dashboard. A separate instance for this test is recommended.
+- JS rendering is used only for the Coupons page and one probe request.
+- This is what all my 21-Oct runs used.
+- If your dashboard instead shows an API user name and password (the older realtime endpoint), the included adapter is chosen at deployment and must pass Test 1 first.
+- Your administrator stores the key in the test Key Vault. My Contributor role cannot read it, and no credentials are sent to me.
+
+BOUNDED TESTS: COMMANDS AND ENFORCED TOTALS (03 §3)
+- Test 1: python -m mscraper bounded-test test1
+  Verifies Crystal Lake 53100544 and Vernon Hills candidate 53100502, then runs the paging/brand-filter probe. Total of 19 requests or fewer.
+- Test 2: python -m mscraper bounded-test test2
+  Batteries + Light Bulbs at Crystal Lake, no publication. Total of 300 requests or fewer.
+- In Azure: ./deploy/azure/run_test.sh <subscription> scraper-contest-asif-test test1 (or test2). Each test is one manual job execution, and the script refuses to start unless the job is Manual.
+- How the totals are enforced: every request, retries included, is counted before it is sent, against a budget file on the job's storage share. The count holds across steps, resumes, restarts and repeated executions. A total cannot be raised, and every request is logged with time, store and URL.
+- An offline test shows the worst case stays at 19 requests or fewer, even when Test 1 is started twice.
+
+STORE / FULFILLMENT EVIDENCE (A-LIVE-EVIDENCE-2026-10-21/README.md)
+- Raw 21-Oct responses for Crystal Lake: store 53100544, ZIP 60014, modality IN_STORE, request pinned to 53100544, 24 of 24 product prices sourced from 53100544, 24 of 24 available in store.
+- A control response for store 53100539 shows PICKUP and its own prices.
+- Run fa0c1b: store verification passed; 192 pages verified, 0 mismatches.
+- Limits: v1.0.0 did not check the modality during the run and did not save each page. The first new live run includes the per-page ledger.
+- Vernon Hills is verified in Test 1 and stays disabled unless every check passes.
+
+COUPONS (04)
+The product linkage is still unresolved. 04 lists exactly what is missing and why the current provider cannot reach it. It proposes a browser feasibility probe (10 page loads or fewer, no account) for your decision. Missing values stay empty strings; no coupon price or PPM is calculated.
+
+SEQUENCE (manual only, 03 §2)
+1. Read-only preflight
+2. Infrastructure
+3. Your administrator: 2 role assignments + the Oxylabs key into Key Vault
+4. Job (Manual; its default command makes no provider requests)
+5. Test 1
+6. Test 2
+7. Test 3, only after you approve its request cap
+No schedule is created at any step.
+
+COMPLETION PLAN (02, US Central; assumes D1-D5 below are met on the dates shown)
+- Mon 26 Oct 12:00 CDT: preflight result (roles, providers, policy)
+- Wed 28 Oct 09:30-10:00 CDT: Test 1
+- Thu 29 Oct 09:00-10:00 CDT: Test 2
+- Thu 29 Oct 17:00 CDT: next reviewable package v1.1.3 (Test 1 + 2 live evidence, measured requests per CSV row, proposed Test 3 cap)
+- Fri 30 Oct 09:00 CDT – Sun 1 Nov: Test 3, a fresh run of all 28 CSV rows at Crystal Lake, with one forced kill and resume. At the 21-Oct throughput (about 8-9 requests per minute) a full run takes about 28-56 hours. Test 2 will give the real figure.
+- Mon 2 – Tue 3 Nov: coverage review, failed-publication proof, scoped second execution
+- Wed 4 Nov 17:00 CST: final evidence package v1.2.0
+- Coupon linkage depends on D6 and is not included in the 4 Nov date.
+My working time is about 4 days. It is spread over 10 calendar days because of the approvals, test windows and the measured runtime. This replaces the earlier two-day estimate.
+
+WHAT I NEED FROM YOU
+- D1, by Tue 27 Oct 12:00 CDT: approval of the deployment/cost plan; confirmation that Microsoft.App, Microsoft.OperationalInsights, Microsoft.Storage, Microsoft.KeyVault and Microsoft.ManagedIdentity are registered; any policy limits (regions, SKUs, tags, network rules).
+- D2, after the infrastructure step: your administrator runs the two role-assignment commands and stores the Oxylabs Web API key in Key Vault.
+- D3: approval of Test 1 (19 requests or fewer) and Test 2 (300 requests or fewer). The per-request rate is in your Oxylabs dashboard.
+- D4: confirmation of the Test 1 and Test 2 windows above, or other times.
+- D5, after v1.1.3: approval of the Test 3 request cap.
+- D6, any time: decision on the coupon browser probe.
+
+Nothing will be deployed, run or spent until you confirm each step. The 42 tests remain labelled offline.
+
+Regards,
+Asif Khan

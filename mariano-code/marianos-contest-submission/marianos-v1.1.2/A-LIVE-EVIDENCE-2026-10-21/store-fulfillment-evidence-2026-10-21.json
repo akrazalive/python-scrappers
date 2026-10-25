@@ -1,0 +1,2439 @@
+{
+  "responses": [
+    {
+      "file": "search_milk_store544.html.gz",
+      "sha256_of_file": "489e5829371c0bb6f36d7486d7ae789379e27086c2bf563369374b3764c256c8",
+      "selected_store": {
+        "location_id": "53100544",
+        "name": "Marianos Crystal Lake",
+        "address": "105 Northwest Hwy, Crystal Lake, IL 60014",
+        "zipcode": "60014",
+        "banner": "marianos"
+      },
+      "fulfillment_modalities": [
+        {
+          "modalityType": "IN_STORE",
+          "destination_locationId": "53100544"
+        }
+      ],
+      "search_request_location": "53100544",
+      "products_on_page": 24,
+      "price_source_location_ids": {
+        "53100544": 24
+      },
+      "in_store_availability_at_selected_store": {
+        "True": 24
+      },
+      "price_bearing_excerpts": [
+        {
+          "upc": "0001111042852",
+          "title": "Simple Truth Organic® 2% Reduced Fat Milk Half Gallon",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$4.49",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 4.49",
+              "unitPrice": "USD 4.49",
+              "price": "USD 4.49",
+              "equivalizedUnitPrice": {
+                "amount": "7.02",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.07/fl oz"
+            },
+            "promo": {
+              "defaultDescription": "$3.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 3.99",
+              "unitPrice": "USD 3.99",
+              "price": "USD 3.99",
+              "equivalizedUnitPrice": {
+                "amount": "6.23",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.06/fl oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "BACK WALL",
+                  "aisleNumber": "152",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "005",
+                  "bayNumberInAisle": "16",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "DR",
+                  "departmentDescription": "Dairy",
+                  "fixtureNumber": "2",
+                  "itemDepth": "3.90000",
+                  "itemHeight": "9.50",
+                  "itemWidth": "3.90",
+                  "numberOfDepthFacings": "8",
+                  "numberOfFacings": "3",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00000_D17_C388_V231_D005_MX_H076_B30_U30",
+                  "position": "1",
+                  "shelfNumber": "2",
+                  "shelfPositionInBay": "1",
+                  "subAreaId": "001",
+                  "subAreaTypeCode": "DR",
+                  "subAreaTypeDescription": "DOOR"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:17.640Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-28T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$4.49",
+                    "equivalizedUnitPrice": {
+                      "amount": "7.02",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 4.49"
+                    },
+                    "price": "USD 4.49"
+                  },
+                  "sale": {
+                    "defaultDescription": "$3.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "6.23",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "linkedOfferCode": "121625",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 3.99"
+                    },
+                    "price": "USD 3.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 41,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0001111042850",
+          "title": "Simple Truth Organic® Vitamin D Whole Milk Half Gallon",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$4.49",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 4.49",
+              "unitPrice": "USD 4.49",
+              "price": "USD 4.49",
+              "equivalizedUnitPrice": {
+                "amount": "7.02",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.07/fl oz"
+            },
+            "promo": {
+              "defaultDescription": "$3.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 3.99",
+              "unitPrice": "USD 3.99",
+              "price": "USD 3.99",
+              "equivalizedUnitPrice": {
+                "amount": "6.23",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.06/fl oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "BACK WALL",
+                  "aisleNumber": "152",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "005",
+                  "bayNumberInAisle": "16",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "DR",
+                  "departmentDescription": "Dairy",
+                  "fixtureNumber": "2",
+                  "itemDepth": "3.90000",
+                  "itemHeight": "9.50",
+                  "itemWidth": "3.90",
+                  "numberOfDepthFacings": "8",
+                  "numberOfFacings": "3",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00000_D17_C388_V231_D005_MX_H076_B30_U30",
+                  "position": "2",
+                  "shelfNumber": "2",
+                  "shelfPositionInBay": "2",
+                  "subAreaId": "001",
+                  "subAreaTypeCode": "DR",
+                  "subAreaTypeDescription": "DOOR"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:17.585Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-28T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$4.49",
+                    "equivalizedUnitPrice": {
+                      "amount": "7.02",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 4.49"
+                    },
+                    "price": "USD 4.49"
+                  },
+                  "sale": {
+                    "defaultDescription": "$3.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "6.23",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "linkedOfferCode": "121625",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 3.99"
+                    },
+                    "price": "USD 3.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 38,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0009396651300",
+          "title": "Organic Valley® Whole Milk Half Gallon",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$5.99",
+              "expirationDate": {
+                "value": "2026-11-11T04:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 5.99",
+              "unitPrice": "USD 5.99",
+              "price": "USD 5.99",
+              "equivalizedUnitPrice": {
+                "amount": "9.36",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.09/fl oz"
+            },
+            "promo": {
+              "defaultDescription": "$5.79",
+              "expirationDate": {
+                "value": "2026-11-11T04:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 5.79",
+              "unitPrice": "USD 5.79",
+              "price": "USD 5.79",
+              "equivalizedUnitPrice": {
+                "amount": "9.05",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.09/fl oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "BACK WALL",
+                  "aisleNumber": "152",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "004",
+                  "bayNumberInAisle": "17",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "DR",
+                  "departmentDescription": "Dairy",
+                  "fixtureNumber": "2",
+                  "itemDepth": "4.00000",
+                  "itemHeight": "9.50",
+                  "itemWidth": "4.00",
+                  "numberOfDepthFacings": "8",
+                  "numberOfFacings": "2",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00000_D17_C388_V231_D005_MX_H076_B30_U30",
+                  "position": "4",
+                  "shelfNumber": "2",
+                  "shelfPositionInBay": "4",
+                  "subAreaId": "001",
+                  "subAreaTypeCode": "DR",
+                  "subAreaTypeDescription": "DOOR"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:17.807Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-11-11T04:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$5.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "9.36",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 5.99"
+                    },
+                    "price": "USD 5.99"
+                  },
+                  "sale": {
+                    "defaultDescription": "$5.79",
+                    "equivalizedUnitPrice": {
+                      "amount": "9.05",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "linkedOfferCode": "121208",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 5.79"
+                    },
+                    "price": "USD 5.79"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 5,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "LOW",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "search_beef_store544.html.gz",
+      "sha256_of_file": "2830d5747633d5648985d61f9dd3a36b196c222aff249f8ed05a05fde5638168",
+      "selected_store": {
+        "location_id": "53100544",
+        "name": "Marianos Crystal Lake",
+        "address": "105 Northwest Hwy, Crystal Lake, IL 60014",
+        "zipcode": "60014",
+        "banner": "marianos"
+      },
+      "fulfillment_modalities": [
+        {
+          "modalityType": "IN_STORE",
+          "destination_locationId": "53100544"
+        }
+      ],
+      "search_request_location": "53100544",
+      "products_on_page": 24,
+      "price_source_location_ids": {
+        "53100544": 24
+      },
+      "in_store_availability_at_selected_store": {
+        "True": 24
+      },
+      "price_bearing_excerpts": [
+        {
+          "upc": "0001111094893",
+          "title": "Simple Truth Organic® 85/15 Grass Fed Ground Beef Packs 3 LB BIG DEAL!",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$20.00",
+              "expirationDate": {
+                "value": "9999-12-31T00:00:00Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 20.00",
+              "unitPrice": "USD 20.00",
+              "price": "USD 20.00",
+              "equivalizedUnitPrice": {
+                "amount": "6.67",
+                "denomination": "DOLLAR",
+                "unit": "PER POUND"
+              },
+              "equivalizedUnitPriceString": "$6.67/lb"
+            },
+            "promo": null
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "MEAT",
+                  "aisleNumber": "101",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "002",
+                  "bayNumberInAisle": "3",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "MT",
+                  "departmentDescription": "Meat",
+                  "fixtureNumber": "4",
+                  "itemDepth": "1.00000",
+                  "itemHeight": "5.25",
+                  "itemWidth": "15.25",
+                  "numberOfDepthFacings": "2",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "2",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00544_D09_C500_V775_F036_MH",
+                  "position": "1",
+                  "shelfNumber": "4",
+                  "shelfPositionInBay": "1",
+                  "subAreaId": "001",
+                  "subAreaTypeCode": "CL",
+                  "subAreaTypeDescription": "COOLER"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "EveryDayLowPrice",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-07-27T08:24:56.783Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "9999-12-31T00:00:00Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$20.00",
+                    "equivalizedUnitPrice": {
+                      "amount": "6.67",
+                      "denomination": "DOLLAR",
+                      "unit": "PER POUND"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 20.00"
+                    },
+                    "price": "USD 20.00"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 23,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0001111097971",
+          "title": "Kroger® 80/20 Ground Beef Roll 1 LB",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$6.99",
+              "expirationDate": {
+                "value": "9999-12-31T00:00:00Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 6.99",
+              "unitPrice": "USD 6.99",
+              "price": "USD 6.99",
+              "equivalizedUnitPrice": {
+                "amount": "6.99",
+                "denomination": "DOLLAR",
+                "unit": "PER POUND"
+              },
+              "equivalizedUnitPriceString": "$6.99/lb"
+            },
+            "promo": null
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "MEAT",
+                  "aisleNumber": "101",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "003",
+                  "bayNumberInAisle": "4",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "MT",
+                  "departmentDescription": "Meat",
+                  "fixtureNumber": "1",
+                  "itemDepth": "2.75000",
+                  "itemHeight": "2.75",
+                  "itemWidth": "6.50",
+                  "numberOfDepthFacings": "5",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "2",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00544_D09_C500_V775_F036_MH",
+                  "position": "5",
+                  "shelfNumber": "1",
+                  "shelfPositionInBay": "5",
+                  "subAreaId": "001",
+                  "subAreaTypeCode": "CL",
+                  "subAreaTypeDescription": "COOLER"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "EveryDayLowPrice",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-14T09:25:25.778Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "9999-12-31T00:00:00Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$6.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "6.99",
+                      "denomination": "DOLLAR",
+                      "unit": "PER POUND"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 6.99"
+                    },
+                    "price": "USD 6.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 17,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0001111034567",
+          "title": "Kroger® Beef Shaved Steak",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$7.99",
+              "expirationDate": {
+                "value": "9999-12-31T00:00:00Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 7.99",
+              "unitPrice": "USD 7.99",
+              "price": "USD 7.99",
+              "equivalizedUnitPrice": {
+                "amount": "57.07",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.57/oz"
+            },
+            "promo": null
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "MEAT",
+                  "aisleNumber": "101",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "005",
+                  "bayNumberInAisle": "6",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "MT",
+                  "departmentDescription": "Meat",
+                  "fixtureNumber": "1",
+                  "itemDepth": "1.75000",
+                  "itemHeight": "6.75",
+                  "itemWidth": "8.50",
+                  "numberOfDepthFacings": "2",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "2",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00544_D09_C500_V775_F036_MH",
+                  "position": "5",
+                  "shelfNumber": "1",
+                  "shelfPositionInBay": "5",
+                  "subAreaId": "001",
+                  "subAreaTypeCode": "CL",
+                  "subAreaTypeDescription": "COOLER"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "WhiteTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-14T09:25:37.416Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "9999-12-31T00:00:00Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$7.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "57.07",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 7.99"
+                    },
+                    "price": "USD 7.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "search_cereal_coupons_store544.html.gz",
+      "sha256_of_file": "f18fc3ec85819dc1dd69ce1539c00053fdb1e1e126c6f0f827aab1d397401112",
+      "selected_store": {
+        "location_id": "53100544",
+        "name": "Marianos Crystal Lake",
+        "address": "105 Northwest Hwy, Crystal Lake, IL 60014",
+        "zipcode": "60014",
+        "banner": "marianos"
+      },
+      "fulfillment_modalities": [
+        {
+          "modalityType": "IN_STORE",
+          "destination_locationId": "53100544"
+        }
+      ],
+      "search_request_location": "53100544",
+      "products_on_page": 24,
+      "price_source_location_ids": {
+        "53100544": 24
+      },
+      "in_store_availability_at_selected_store": {
+        "True": 24
+      },
+      "price_bearing_excerpts": [
+        {
+          "upc": "0088491212971",
+          "title": "Fruity PEBBLES Gluten Free Breakfast Cereal",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$7.49",
+              "expirationDate": {
+                "value": "2026-10-21T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 7.49",
+              "unitPrice": "USD 7.49",
+              "price": "USD 7.49",
+              "equivalizedUnitPrice": {
+                "amount": "68.09",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.68/oz"
+            },
+            "promo": {
+              "defaultDescription": "$2.49",
+              "expirationDate": {
+                "value": "2026-10-21T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 2.49",
+              "unitPrice": "USD 2.49",
+              "price": "USD 2.49",
+              "equivalizedUnitPrice": {
+                "amount": "22.64",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.23/oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "AISLE 17",
+                  "aisleNumber": "17",
+                  "aisleSide": "R",
+                  "areaId": "017",
+                  "areaTypeCode": "AL",
+                  "areaTypeDescription": "Aisle",
+                  "bayNumber": "017",
+                  "bayNumberInAisle": "17",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "GR",
+                  "departmentDescription": "Grocery",
+                  "fixtureNumber": "2",
+                  "itemDepth": "2.20000",
+                  "itemHeight": "10.80",
+                  "itemWidth": "7.21",
+                  "numberOfDepthFacings": "1",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "R",
+                  "orientationDescription": "Right",
+                  "pogName": "D531_L00000_D01_C085_V901_F056_MX",
+                  "position": "2",
+                  "shelfNumber": "2",
+                  "shelfPositionInBay": "2",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-14T09:25:27.872Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-21T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$7.49",
+                    "equivalizedUnitPrice": {
+                      "amount": "68.09",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 7.49"
+                    },
+                    "price": "USD 7.49"
+                  },
+                  "sale": {
+                    "defaultDescription": "$2.49",
+                    "equivalizedUnitPrice": {
+                      "amount": "22.64",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "linkedOfferCode": "112101",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 2.49"
+                    },
+                    "price": "USD 2.49"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 0,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "TEMPORARILY_OUT_OF_STOCK",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0001600012254",
+          "title": "General Mills Cinnamon Toast Crunch™ Cereal",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$5.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 5.99",
+              "unitPrice": "USD 5.99",
+              "price": "USD 5.99",
+              "equivalizedUnitPrice": {
+                "amount": "49.92",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.50/oz"
+            },
+            "promo": {
+              "defaultDescription": "$2.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 2.99",
+              "unitPrice": "USD 2.99",
+              "price": "USD 2.99",
+              "equivalizedUnitPrice": {
+                "amount": "24.92",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.25/oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "AISLE 17",
+                  "aisleNumber": "17",
+                  "aisleSide": "R",
+                  "areaId": "017",
+                  "areaTypeCode": "AL",
+                  "areaTypeDescription": "Aisle",
+                  "bayNumber": "013",
+                  "bayNumberInAisle": "13",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "GR",
+                  "departmentDescription": "Grocery",
+                  "fixtureNumber": "2",
+                  "itemDepth": "2.03000",
+                  "itemHeight": "11.25",
+                  "itemWidth": "7.75",
+                  "numberOfDepthFacings": "10",
+                  "numberOfFacings": "5",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "R",
+                  "orientationDescription": "Right",
+                  "pogName": "D531_L00000_D01_C085_V901_F056_MX",
+                  "position": "1",
+                  "shelfNumber": "2",
+                  "shelfPositionInBay": "1",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:58:45.055Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-28T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$5.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "49.92",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 5.99"
+                    },
+                    "price": "USD 5.99"
+                  },
+                  "sale": {
+                    "defaultDescription": "$2.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "24.92",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "linkedOfferCode": "121072",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 2.99"
+                    },
+                    "price": "USD 2.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 62,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0001600012479",
+          "title": "General Mills® Honey Nut Cheerios™ Cereal",
+          "price.storePrices": {
+            "sourceLocationId": "53100544",
+            "regular": {
+              "defaultDescription": "$5.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 5.99",
+              "unitPrice": "USD 5.99",
+              "price": "USD 5.99",
+              "equivalizedUnitPrice": {
+                "amount": "55.46",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.55/oz"
+            },
+            "promo": {
+              "defaultDescription": "$2.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 2.99",
+              "unitPrice": "USD 2.99",
+              "price": "USD 2.99",
+              "equivalizedUnitPrice": {
+                "amount": "27.69",
+                "denomination": "CENT",
+                "unit": "PER OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.28/oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100544",
+              "itemLocations": [
+                {
+                  "aisleDescription": "AISLE 17",
+                  "aisleNumber": "17",
+                  "aisleSide": "R",
+                  "areaId": "017",
+                  "areaTypeCode": "AL",
+                  "areaTypeDescription": "Aisle",
+                  "bayNumber": "022",
+                  "bayNumberInAisle": "22",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "GR",
+                  "departmentDescription": "Grocery",
+                  "fixtureNumber": "1",
+                  "itemDepth": "2.22000",
+                  "itemHeight": "11.25",
+                  "itemWidth": "7.77",
+                  "numberOfDepthFacings": "11",
+                  "numberOfFacings": "4",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "R",
+                  "orientationDescription": "Right",
+                  "pogName": "D531_L00000_D01_C085_V901_F056_MX",
+                  "position": "1",
+                  "shelfNumber": "1",
+                  "shelfPositionInBay": "1",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                },
+                {
+                  "aisleDescription": "AISLE 17",
+                  "aisleNumber": "17",
+                  "aisleSide": "R",
+                  "areaId": "017",
+                  "areaTypeCode": "AL",
+                  "areaTypeDescription": "Aisle",
+                  "bayNumber": "022",
+                  "bayNumberInAisle": "22",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "GR",
+                  "departmentDescription": "Grocery",
+                  "fixtureNumber": "2",
+                  "itemDepth": "2.22000",
+                  "itemHeight": "11.25",
+                  "itemWidth": "7.77",
+                  "numberOfDepthFacings": "9",
+                  "numberOfFacings": "4",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "R",
+                  "orientationDescription": "Right",
+                  "pogName": "D531_L00000_D01_C085_V901_F056_MX",
+                  "position": "1",
+                  "shelfNumber": "2",
+                  "shelfPositionInBay": "1",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:17.542Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-28T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$5.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "55.46",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 5.99"
+                    },
+                    "price": "USD 5.99"
+                  },
+                  "sale": {
+                    "defaultDescription": "$2.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "27.69",
+                      "denomination": "CENT",
+                      "unit": "PER OUNCE"
+                    },
+                    "linkedOfferCode": "121072",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 2.99"
+                    },
+                    "price": "USD 2.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 81,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "IN_STORE",
+                    "handoffLocation": {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "105 Northwest Hwy"
+                        ],
+                        "cityTown": "Crystal Lake",
+                        "name": "Marianos Crystal Lake",
+                        "postalCode": "60014",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 42.225307,
+                        "lng": -88.324142
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100544",
+                      "facilityId": "15327"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "1e59db37-480f-44bb-bb6b-c4d22e1d836c"
+                  ],
+                  "listingKeys": [
+                    "53100544"
+                  ]
+                }
+              ],
+              "sourceId": "53100544",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "department_meat_store544.html.gz",
+      "sha256_of_file": "7ac44dfa0800aa10144119a9d0a0de44eeefc7cc84bed36d2958a91dbf14b707",
+      "selected_store": {
+        "location_id": "53100544",
+        "name": "Marianos Crystal Lake",
+        "address": "105 Northwest Hwy, Crystal Lake, IL 60014",
+        "zipcode": "60014",
+        "banner": "marianos"
+      },
+      "fulfillment_modalities": [
+        {
+          "modalityType": "IN_STORE",
+          "destination_locationId": "53100544"
+        }
+      ],
+      "search_request_location": "",
+      "products_on_page": 0,
+      "price_source_location_ids": {},
+      "in_store_availability_at_selected_store": {},
+      "price_bearing_excerpts": []
+    },
+    {
+      "file": "coupons_page_store544.html.gz",
+      "sha256_of_file": "4c507072b00c54ef754311b724316c5bbc50347e6a93cfb2c0e45b6fbedefd8d",
+      "selected_store": {
+        "location_id": "53100544",
+        "name": "Marianos Crystal Lake",
+        "address": "105 Northwest Hwy, Crystal Lake, IL 60014",
+        "zipcode": "60014",
+        "banner": "marianos"
+      },
+      "fulfillment_modalities": [
+        {
+          "modalityType": "IN_STORE",
+          "destination_locationId": "53100544"
+        }
+      ],
+      "search_request_location": "",
+      "products_on_page": 0,
+      "price_source_location_ids": {},
+      "in_store_availability_at_selected_store": {},
+      "price_bearing_excerpts": []
+    },
+    {
+      "file": "search_milk_store539.html.gz",
+      "sha256_of_file": "83df10e7f75552638471058568de1c763d8653a2d3ce16b0b69bd5b6dc02556e",
+      "selected_store": {
+        "location_id": "53100539",
+        "name": "Marianos Bronzeville",
+        "address": "3857 S Dr Martin Luther King Jr Dr, Chicago, IL 60653",
+        "zipcode": "60653",
+        "banner": "marianos"
+      },
+      "fulfillment_modalities": [
+        {
+          "modalityType": "PICKUP",
+          "destination_locationId": "53100539"
+        }
+      ],
+      "search_request_location": "53100539",
+      "products_on_page": 24,
+      "price_source_location_ids": {
+        "53100539": 24
+      },
+      "in_store_availability_at_selected_store": {
+        "True": 24
+      },
+      "price_bearing_excerpts": [
+        {
+          "upc": "0001111042852",
+          "title": "Simple Truth Organic® 2% Reduced Fat Milk Half Gallon",
+          "price.storePrices": {
+            "sourceLocationId": "53100539",
+            "regular": {
+              "defaultDescription": "$4.49",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 4.49",
+              "unitPrice": "USD 4.49",
+              "price": "USD 4.49",
+              "equivalizedUnitPrice": {
+                "amount": "7.02",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.07/fl oz"
+            },
+            "promo": {
+              "defaultDescription": "$3.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 3.99",
+              "unitPrice": "USD 3.99",
+              "price": "USD 3.99",
+              "equivalizedUnitPrice": {
+                "amount": "6.23",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.06/fl oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100539",
+              "itemLocations": [
+                {
+                  "aisleDescription": "BACK WALL",
+                  "aisleNumber": "152",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "017",
+                  "bayNumberInAisle": "30",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "DR",
+                  "departmentDescription": "Dairy",
+                  "fixtureNumber": "6",
+                  "itemDepth": "3.90000",
+                  "itemHeight": "9.50",
+                  "itemWidth": "3.90",
+                  "numberOfDepthFacings": "8",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00000_D17_C388_V132_D003_MX",
+                  "position": "4",
+                  "shelfNumber": "6",
+                  "shelfPositionInBay": "4",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:10.095Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-28T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$4.49",
+                    "equivalizedUnitPrice": {
+                      "amount": "7.02",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 4.49"
+                    },
+                    "price": "USD 4.49"
+                  },
+                  "sale": {
+                    "defaultDescription": "$3.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "6.23",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "linkedOfferCode": "121625",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 3.99"
+                    },
+                    "price": "USD 3.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 13,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "PICKUP",
+                    "handoffLocation": {
+                      "storeId": "53100539",
+                      "facilityId": "15301"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "3857 S Dr Martin Luther King Jr Dr"
+                        ],
+                        "cityTown": "Chicago",
+                        "name": "Marianos Bronzeville",
+                        "postalCode": "60653",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 41.8242095,
+                        "lng": -87.6151567
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100539",
+                      "facilityId": "15301"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "fea079b1-d115-4f85-a10b-78ce2c358a0f"
+                  ],
+                  "listingKeys": [
+                    "53100539"
+                  ]
+                }
+              ],
+              "sourceId": "53100539",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0001111042850",
+          "title": "Simple Truth Organic® Vitamin D Whole Milk Half Gallon",
+          "price.storePrices": {
+            "sourceLocationId": "53100539",
+            "regular": {
+              "defaultDescription": "$4.49",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 4.49",
+              "unitPrice": "USD 4.49",
+              "price": "USD 4.49",
+              "equivalizedUnitPrice": {
+                "amount": "7.02",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.07/fl oz"
+            },
+            "promo": {
+              "defaultDescription": "$3.99",
+              "expirationDate": {
+                "value": "2026-10-28T03:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 3.99",
+              "unitPrice": "USD 3.99",
+              "price": "USD 3.99",
+              "equivalizedUnitPrice": {
+                "amount": "6.23",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.06/fl oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100539",
+              "itemLocations": [
+                {
+                  "aisleDescription": "BACK WALL",
+                  "aisleNumber": "152",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "017",
+                  "bayNumberInAisle": "30",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "DR",
+                  "departmentDescription": "Dairy",
+                  "fixtureNumber": "6",
+                  "itemDepth": "3.90000",
+                  "itemHeight": "9.50",
+                  "itemWidth": "3.90",
+                  "numberOfDepthFacings": "8",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00000_D17_C388_V132_D003_MX",
+                  "position": "3",
+                  "shelfNumber": "6",
+                  "shelfPositionInBay": "3",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:10.670Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-28T03:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$4.49",
+                    "equivalizedUnitPrice": {
+                      "amount": "7.02",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 4.49"
+                    },
+                    "price": "USD 4.49"
+                  },
+                  "sale": {
+                    "defaultDescription": "$3.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "6.23",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "linkedOfferCode": "121625",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 3.99"
+                    },
+                    "price": "USD 3.99"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 10,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "PICKUP",
+                    "handoffLocation": {
+                      "storeId": "53100539",
+                      "facilityId": "15301"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "3857 S Dr Martin Luther King Jr Dr"
+                        ],
+                        "cityTown": "Chicago",
+                        "name": "Marianos Bronzeville",
+                        "postalCode": "60653",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 41.8242095,
+                        "lng": -87.6151567
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100539",
+                      "facilityId": "15301"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "fea079b1-d115-4f85-a10b-78ce2c358a0f"
+                  ],
+                  "listingKeys": [
+                    "53100539"
+                  ]
+                }
+              ],
+              "sourceId": "53100539",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        },
+        {
+          "upc": "0009396651300",
+          "title": "Organic Valley® Whole Milk Half Gallon",
+          "price.storePrices": {
+            "sourceLocationId": "53100539",
+            "regular": {
+              "defaultDescription": "$5.99",
+              "expirationDate": {
+                "value": "2026-11-11T04:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 5.99",
+              "unitPrice": "USD 5.99",
+              "price": "USD 5.99",
+              "equivalizedUnitPrice": {
+                "amount": "9.36",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.09/fl oz"
+            },
+            "promo": {
+              "defaultDescription": "$5.79",
+              "expirationDate": {
+                "value": "2026-11-11T04:59:59.999Z",
+                "timezone": "UTC"
+              },
+              "nfor": 1,
+              "nforPrice": "USD 5.79",
+              "unitPrice": "USD 5.79",
+              "price": "USD 5.79",
+              "equivalizedUnitPrice": {
+                "amount": "9.05",
+                "denomination": "CENT",
+                "unit": "PER FLUID OUNCE"
+              },
+              "equivalizedUnitPriceString": "$0.09/fl oz"
+            }
+          },
+          "sourceLocations": [
+            {
+              "id": "53100539",
+              "itemLocations": [
+                {
+                  "aisleDescription": "BACK WALL",
+                  "aisleNumber": "152",
+                  "aisleSide": "R",
+                  "areaId": "XXX",
+                  "areaTypeCode": "BW",
+                  "areaTypeDescription": "Back Wall",
+                  "bayNumber": "017",
+                  "bayNumberInAisle": "30",
+                  "dataSource": "JDA_TRUE_FLOOR_PLAN",
+                  "departmentCode": "DR",
+                  "departmentDescription": "Dairy",
+                  "fixtureNumber": "4",
+                  "itemDepth": "4.00000",
+                  "itemHeight": "9.50",
+                  "itemWidth": "4.00",
+                  "numberOfDepthFacings": "8",
+                  "numberOfFacings": "1",
+                  "numberOfVerticalFacings": "1",
+                  "orientationCode": "X",
+                  "pogName": "D531_L00000_D17_C388_V132_D003_MX",
+                  "position": "3",
+                  "shelfNumber": "4",
+                  "shelfPositionInBay": "3",
+                  "subAreaId": "XXX",
+                  "subAreaTypeCode": "XX",
+                  "subAreaTypeDescription": "XX"
+                }
+              ],
+              "modalityAvailabilities": [
+                {
+                  "availability": true,
+                  "modalityType": "DELIVERY"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "IN_STORE"
+                },
+                {
+                  "availability": true,
+                  "modalityType": "PICKUP"
+                },
+                {
+                  "availability": false,
+                  "modalityType": "SHIP"
+                }
+              ],
+              "prices": [
+                {
+                  "displayTemplate": "YellowTag",
+                  "effectiveDate": {
+                    "timezone": "Z",
+                    "value": "2026-10-07T08:52:11.454Z"
+                  },
+                  "expirationDate": {
+                    "timezone": "Z",
+                    "value": "2026-11-11T04:59:59.999Z"
+                  },
+                  "orderBy": "UNIT",
+                  "regular": {
+                    "defaultDescription": "$5.99",
+                    "equivalizedUnitPrice": {
+                      "amount": "9.36",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 5.99"
+                    },
+                    "price": "USD 5.99"
+                  },
+                  "sale": {
+                    "defaultDescription": "$5.79",
+                    "equivalizedUnitPrice": {
+                      "amount": "9.05",
+                      "denomination": "CENT",
+                      "unit": "PER FLUID OUNCE"
+                    },
+                    "linkedOfferCode": "121208",
+                    "nFor": {
+                      "count": 1,
+                      "price": "USD 5.79"
+                    },
+                    "price": "USD 5.79"
+                  },
+                  "sellBy": "UNIT",
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "womenInfantChildFlg": "N"
+                }
+              ],
+              "restrictions": {
+                "shippable": false
+              },
+              "inventory": [
+                {
+                  "availableToSell": 10,
+                  "sellerId": "KR001",
+                  "sellerName": "Kroger",
+                  "stockLevel": "HIGH",
+                  "included": {
+                    "projections": []
+                  }
+                }
+              ],
+              "laf": [
+                {
+                  "modality": {
+                    "type": "PICKUP",
+                    "handoffLocation": {
+                      "storeId": "53100539",
+                      "facilityId": "15301"
+                    },
+                    "handoffAddress": {
+                      "address": {
+                        "addressLines": [
+                          "3857 S Dr Martin Luther King Jr Dr"
+                        ],
+                        "cityTown": "Chicago",
+                        "name": "Marianos Bronzeville",
+                        "postalCode": "60653",
+                        "stateProvince": "IL",
+                        "residential": false,
+                        "countryCode": "US"
+                      },
+                      "location": {
+                        "lat": 41.8242095,
+                        "lng": -87.6151567
+                      }
+                    }
+                  },
+                  "sources": [
+                    {
+                      "storeId": "53100539",
+                      "facilityId": "15301"
+                    }
+                  ],
+                  "assortmentKeys": [
+                    "fea079b1-d115-4f85-a10b-78ce2c358a0f"
+                  ],
+                  "listingKeys": [
+                    "53100539"
+                  ]
+                }
+              ],
+              "sourceId": "53100539",
+              "sellerId": "KR001",
+              "sellerName": "Kroger"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

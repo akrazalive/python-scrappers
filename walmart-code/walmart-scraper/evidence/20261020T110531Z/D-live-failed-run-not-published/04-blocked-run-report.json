@@ -1,0 +1,496 @@
+{
+  "run_id": "20261020T115229Z-7a5f3b",
+  "scraper": {
+    "version": "1.0.0",
+    "source_sha256": "29492665b7663a59f471e2766ae74e8abec4e7ca05fe56bc9020033ddf26a4bb"
+  },
+  "location": {
+    "key": "walmart-100-bentonville",
+    "store_id": "100",
+    "zipcode": "72712",
+    "fulfillment": "pickup"
+  },
+  "store_verification": {
+    "verified": true,
+    "store_id": "100",
+    "store_name": "Bentonville S Walton Blvd Supercenter",
+    "store_location": "406 S Walton Blvd, Bentonville, AR 72712",
+    "zipcode": "72712",
+    "url": "https://www.walmart.com/store/100",
+    "checked_at": "2026-10-20T11:52:37+00:00",
+    "reason": ""
+  },
+  "fulfillment_context": {
+    "listing_filter": {
+      "stores": "100"
+    },
+    "provider_pinning": {
+      "store_id": "100",
+      "fulfillment_type": "pickup",
+      "delivery_zip": "72712"
+    },
+    "store_mismatch_pages": 0,
+    "pages_with_store_verified": 0
+  },
+  "runtime_seconds": 284.9,
+  "total_unique_records": 0,
+  "duplicate_records_in_output": 0,
+  "duplicates_prevented": 0,
+  "excluded": {},
+  "count_by_category": {},
+  "count_by_subcategory": {},
+  "listings": [
+    {
+      "category": "Food",
+      "sub_category": "Canned beans",
+      "url": "https://www.walmart.com/browse/976759_976794_7433209_4695838",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Household Essentials",
+      "sub_category": "Plastic Cups",
+      "url": "https://www.walmart.com/browse/1115193_1073264_1149388_9920020_6304479",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Personal Care",
+      "sub_category": "Hand Soaps",
+      "url": "https://www.walmart.com/browse/1005862_1071969_1001719",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Beauty",
+      "sub_category": "Face Wash",
+      "url": "https://www.walmart.com/browse/1085666_1007039_1001503_8025533",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Diapering",
+      "sub_category": "Disposable Diapers",
+      "url": "https://www.walmart.com/browse/5427_486190_1101406_1101408",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Feeding",
+      "sub_category": "Baby Food Stages",
+      "url": "https://www.walmart.com/browse/5427_133283_1001448_1224824",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Health & Wellness",
+      "sub_category": "Pain Relief",
+      "url": "https://www.walmart.com/browse/976760_6972993_9385426",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Dry dog food",
+      "url": "https://www.walmart.com/browse/5440_202072_6432755_1636265",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Balloons",
+      "sub_category": "Latex Balloons",
+      "url": "https://www.walmart.com/browse/2637_1042319_1212898_3956207_3818217",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "page 1: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Art Supplies",
+      "sub_category": "Art Supplies",
+      "url": "https://www.walmart.com/browse/1334134_5899871",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "discovery failed: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    },
+    {
+      "category": "Office Supplies",
+      "sub_category": "Office Supplies",
+      "url": "https://www.walmart.com/browse/1229749",
+      "next_page": 1,
+      "max_page": 0,
+      "status": "failed",
+      "error": "discovery failed: request budget of 40 reached (fetch.max_requests_per_run)",
+      "kept": 0,
+      "seen": 0,
+      "capped": 0,
+      "reported_total": 0,
+      "page_size": 0
+    }
+  ],
+  "field_completeness": {
+    "zipcode": 0.0,
+    "store_name": 0.0,
+    "store_location": 0.0,
+    "store_logo": 0.0,
+    "store_brand": 0.0,
+    "category": 0.0,
+    "sub_category": 0.0,
+    "product_title": 0.0,
+    "weight": 0.0,
+    "regular_price": 0.0,
+    "sale_price": 0.0,
+    "volume_deals_description": 0.0,
+    "volume_deals_price": 0.0,
+    "digital_deals_description": 0.0,
+    "digital_deals_price": 0.0,
+    "image_url": 0.0,
+    "url": 0.0,
+    "upc": 0.0,
+    "gupc": 0.0,
+    "ppm": 0.0,
+    "unit_price": 0.0,
+    "crawl_date": 0.0
+  },
+  "category_completeness": {
+    "Food": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Household Essentials": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Personal Care": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Beauty": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Diapering": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Feeding": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Health & Wellness": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Pets": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Balloons": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Art Supplies": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    },
+    "Office Supplies": {
+      "listings": 1,
+      "listings_done": 0,
+      "listings_failed": 1,
+      "walmart_reported": 0,
+      "collected": 0,
+      "kept_records": 0,
+      "fill": {
+        "upc": 0.0,
+        "ppm": 0.0,
+        "weight": 0.0,
+        "image_url": 0.0,
+        "regular_price": 0.0
+      }
+    }
+  },
+  "examples": {
+    "ppm": [],
+    "volume_deals": [],
+    "digital_deals": [],
+    "sale_price": [],
+    "no_deals": [],
+    "private_label": []
+  },
+  "offer_census": {
+    "distinct_labels": 0,
+    "occurrences_by_class": {},
+    "labels": []
+  },
+  "availability": {
+    "by_status": {},
+    "by_price_source": {},
+    "carried_forward": 0,
+    "examples": {}
+  },
+  "product_identity": {
+    "variant_mismatches": 0,
+    "enriched": 0,
+    "listing_data_only": 0,
+    "upc_reused_from_last_verified_run": 0
+  },
+  "fetch_stats": {
+    "requests": 40,
+    "retries": 0,
+    "challenges": 0,
+    "http_errors": 0,
+    "slow": 0
+  },
+  "canary": {
+    "start": {
+      "ok": true,
+      "detail": [],
+      "items": [
+        "10450114",
+        "43436773"
+      ]
+    },
+    "end": {
+      "ok": false,
+      "detail": [
+        "10450114: request budget of 40 reached (fetch.max_requests_per_run)",
+        "43436773: request budget of 40 reached (fetch.max_requests_per_run)"
+      ],
+      "items": [
+        "10450114",
+        "43436773"
+      ]
+    }
+  },
+  "validation": {
+    "ok": false,
+    "errors": [
+      "listing not completed: Food / Canned beans (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Household Essentials / Plastic Cups (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Personal Care / Hand Soaps (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Beauty / Face Wash (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Diapering / Disposable Diapers (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Feeding / Baby Food Stages (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Health & Wellness / Pain Relief (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Pets / Dry dog food (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Balloons / Latex Balloons (failed: page 1: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Art Supplies / Art Supplies (failed: discovery failed: request budget of 40 reached (fetch.max_requests_per_run))",
+      "listing not completed: Office Supplies / Office Supplies (failed: discovery failed: request budget of 40 reached (fetch.max_requests_per_run))",
+      "category returned 0 products (min 1): Food",
+      "category returned 0 products (min 1): Household Essentials",
+      "category returned 0 products (min 1): Personal Care",
+      "category returned 0 products (min 1): Beauty",
+      "category returned 0 products (min 1): Diapering",
+      "category returned 0 products (min 1): Feeding",
+      "category returned 0 products (min 1): Health & Wellness",
+      "category returned 0 products (min 1): Pets",
+      "category returned 0 products (min 1): Balloons",
+      "category returned 0 products (min 1): Art Supplies",
+      "category returned 0 products (min 1): Office Supplies",
+      "yield drop in Art Supplies: 0 vs 111 last good run",
+      "yield drop in Balloons: 0 vs 98 last good run",
+      "yield drop in Beauty: 0 vs 115 last good run",
+      "yield drop in Diapering: 0 vs 122 last good run",
+      "yield drop in Feeding: 0 vs 182 last good run",
+      "yield drop in Food: 0 vs 106 last good run",
+      "yield drop in Health & Wellness: 0 vs 143 last good run",
+      "yield drop in Household Essentials: 0 vs 114 last good run",
+      "yield drop in Office Supplies: 0 vs 107 last good run",
+      "yield drop in Personal Care: 0 vs 103 last good run",
+      "yield drop in Pets: 0 vs 106 last good run",
+      "canary check (end) failed: ['10450114: request budget of 40 reached (fetch.max_requests_per_run)', '43436773: request budget of 40 reached (fetch.max_requests_per_run)']",
+      "field completeness product_title=0.00% below 100%",
+      "field completeness regular_price=0.00% below 100%",
+      "field completeness url=0.00% below 100%",
+      "field completeness image_url=0.00% below 98%",
+      "run produced no records",
+      "run aborted: RuntimeError: all canary items failed at end – likely blocked or wrong store (checkpoint kept – next run resumes)"
+    ],
+    "warnings": []
+  },
+  "events_tail": [
+    {
+      "ts": "2026-10-20 11:57:15",
+      "kind": "run_aborted",
+      "detail": "{\"error\": \"RuntimeError: all canary items failed at end \\u2013 likely blocked or wrong store\"}"
+    }
+  ],
+  "published": null
+}

@@ -1,0 +1,157 @@
+﻿[
+  {
+    "modified": "2026-10-20T11:04:05+00:00",
+    "name": "releases/walmart-scraper-1.0.0-src.zip",
+    "size": 97392
+  },
+  {
+    "modified": "2026-10-20T10:38:59+00:00",
+    "name": "walmart-100-bentonville/.run.lock",
+    "size": 4
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/latest/.staging-records.json",
+    "size": 832704
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/latest/.staging-report.json",
+    "size": 58374
+  },
+  {
+    "modified": "2026-10-20T11:26:15+00:00",
+    "name": "walmart-100-bentonville/latest/availability.json",
+    "size": 230110
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/latest/manifest.json",
+    "size": 232
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/latest/records.json",
+    "size": 832704
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/latest/report.json",
+    "size": 58374
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/availability-log.jsonl",
+    "size": 208283
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/availability.json",
+    "size": 230110
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/checkpoint.sqlite",
+    "size": 1245184
+  },
+  {
+    "modified": "2026-10-20T11:12:24+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/category-01.html.gz",
+    "size": 152536
+  },
+  {
+    "modified": "2026-10-20T11:12:45+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/category-02.html.gz",
+    "size": 301365
+  },
+  {
+    "modified": "2026-10-20T11:13:11+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/category-03.html.gz",
+    "size": 165389
+  },
+  {
+    "modified": "2026-10-20T11:13:29+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/category-04.html.gz",
+    "size": 224846
+  },
+  {
+    "modified": "2026-10-20T11:14:02+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/category-05.html.gz",
+    "size": 113076
+  },
+  {
+    "modified": "2026-10-20T11:17:23+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/index.json",
+    "size": 105122
+  },
+  {
+    "modified": "2026-10-20T11:15:42+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/listing-01.html.gz",
+    "size": 159645
+  },
+  {
+    "modified": "2026-10-20T11:15:46+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/listing-02.html.gz",
+    "size": 166800
+  },
+  {
+    "modified": "2026-10-20T11:15:50+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/listing-03.html.gz",
+    "size": 159211
+  },
+  {
+    "modified": "2026-10-20T11:15:54+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/listing-04.html.gz",
+    "size": 156950
+  },
+  {
+    "modified": "2026-10-20T11:15:58+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/listing-05.html.gz",
+    "size": 169705
+  },
+  {
+    "modified": "2026-10-20T11:17:22+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/product-01.html.gz",
+    "size": 120018
+  },
+  {
+    "modified": "2026-10-20T11:17:22+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/product-02.html.gz",
+    "size": 118721
+  },
+  {
+    "modified": "2026-10-20T11:17:23+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/product-03.html.gz",
+    "size": 119401
+  },
+  {
+    "modified": "2026-10-20T11:17:23+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/product-04.html.gz",
+    "size": 121655
+  },
+  {
+    "modified": "2026-10-20T11:17:23+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/product-05.html.gz",
+    "size": 119565
+  },
+  {
+    "modified": "2026-10-20T11:12:08+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/raw/store-01.html.gz",
+    "size": 78641
+  },
+  {
+    "modified": "2026-10-20T11:26:14+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/records.json",
+    "size": 832704
+  },
+  {
+    "modified": "2026-10-20T11:26:15+00:00",
+    "name": "walmart-100-bentonville/runs/20261020T103859Z-1a8a39/report.json",
+    "size": 58635
+  },
+  {
+    "modified": "2026-10-20T11:26:15+00:00",
+    "name": "walmart-100-bentonville/state.json",
+    "size": 22
+  }
+]

@@ -1,0 +1,26 @@
+Walmart scraper v1.0.0 - automated test results
+source_sha256: b691ba9a2b5afca449193fdf0390049a53b952e4ece0c84c9fcc74fcd62f90bc
+date: 2026-10-19T04:22:24Z
+
+tests/test_detection.py::test_thin_listing_fails_validation PASSED       [  4%]
+tests/test_detection.py::test_yield_drop_against_previous_run_blocks_publication PASSED [  9%]
+tests/test_detection.py::test_category_minimum PASSED                    [ 14%]
+tests/test_detection.py::test_lock_left_by_dead_process_is_taken_over PASSED [ 19%]
+tests/test_detection.py::test_hard_kill_then_resume PASSED               [ 23%]
+tests/test_detection.py::test_location_scope_runs_and_publishes PASSED   [ 28%]
+tests/test_pipeline.py::test_full_run_publishes_valid_data PASSED        [ 33%]
+tests/test_pipeline.py::test_store_mismatch_blocks_publication PASSED    [ 38%]
+tests/test_pipeline.py::test_failed_run_never_replaces_good_data PASSED  [ 42%]
+tests/test_pipeline.py::test_interruption_resumes_without_loss_or_duplicates PASSED [ 47%]
+tests/test_pipeline.py::test_demo_runs_are_never_published PASSED        [ 52%]
+tests/test_rules.py::test_field_order_and_empty_strings PASSED           [ 57%]
+tests/test_rules.py::test_pipeline_fields_forced_empty PASSED            [ 61%]
+tests/test_rules.py::test_price_format PASSED                            [ 66%]
+tests/test_rules.py::test_approx_weight PASSED                           [ 71%]
+tests/test_rules.py::test_weight_extraction PASSED                       [ 76%]
+tests/test_rules.py::test_private_label PASSED                           [ 80%]
+tests/test_rules.py::test_volume_deals_preserve_wording_and_displayed_price_only PASSED [ 85%]
+tests/test_rules.py::test_digital_deals PASSED                           [ 90%]
+tests/test_rules.py::test_rewards_not_treated_as_digital_reduction PASSED [ 95%]
+tests/test_rules.py::test_volume_and_digital_together PASSED             [100%]
+============================= 21 passed in 8.92s ==============================

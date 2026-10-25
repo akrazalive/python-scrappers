@@ -1,0 +1,66 @@
+$ C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe -m wmscraper run --location walmart-100-bentonville --max-requests 1400
+# started 2026-10-19T09:58:56+00:00
+{"ts": "2026-10-19T09:58:56+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "run_start", "run_id": "20261019T095339Z-b55042", "location": "walmart-100-bentonville", "store_id": "100", "fulfillment": "pickup", "resumed": true, "items_already_kept": 255, "version": "1.0.0", "source_sha256": "b2e9302824626631cb3699d049433cfc323c1851be1ec6e2a32de4b1976b6196"}
+{"ts": "2026-10-19T09:59:05+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Beauty", "sub_category": "Face Cleansers", "page": 1, "max_page": 8, "items": 58, "kept_new": 43, "skipped": 9, "total": 298}
+{"ts": "2026-10-19T09:59:13+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Beauty", "sub_category": "Face Cleansers", "page": 2, "max_page": 8, "items": 50, "kept_new": 38, "skipped": 0, "total": 336}
+{"ts": "2026-10-19T09:59:20+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Diapering", "sub_category": "Diapering", "page": 1, "max_page": 12, "items": 60, "kept_new": 49, "skipped": 10, "total": 385}
+{"ts": "2026-10-19T09:59:26+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Diapering", "sub_category": "Diapering", "page": 2, "max_page": 12, "items": 50, "kept_new": 39, "skipped": 0, "total": 424}
+{"ts": "2026-10-19T09:59:35+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Feeding", "sub_category": "Feeding", "page": 1, "max_page": 25, "items": 60, "kept_new": 46, "skipped": 10, "total": 470}
+{"ts": "2026-10-19T09:59:43+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Feeding", "sub_category": "Feeding", "page": 2, "max_page": 25, "items": 50, "kept_new": 39, "skipped": 0, "total": 509}
+{"ts": "2026-10-19T09:59:49+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Health & Wellness", "sub_category": "Pain management", "page": 1, "max_page": 19, "items": 57, "kept_new": 48, "skipped": 8, "total": 557}
+{"ts": "2026-10-19T09:59:56+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Health & Wellness", "sub_category": "Pain management", "page": 2, "max_page": 19, "items": 50, "kept_new": 40, "skipped": 0, "total": 597}
+{"ts": "2026-10-19T10:00:02+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Pets", "sub_category": "Dry dog food", "page": 1, "max_page": 4, "items": 58, "kept_new": 41, "skipped": 9, "total": 638}
+{"ts": "2026-10-19T10:00:16+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Pets", "sub_category": "Dry dog food", "page": 2, "max_page": 4, "items": 50, "kept_new": 35, "skipped": 0, "total": 673}
+{"ts": "2026-10-19T10:00:26+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Balloons", "sub_category": "Balloons", "page": 1, "max_page": 5, "items": 55, "kept_new": 45, "skipped": 9, "total": 718}
+{"ts": "2026-10-19T10:00:32+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Balloons", "sub_category": "Balloons", "page": 2, "max_page": 5, "items": 46, "kept_new": 38, "skipped": 0, "total": 756}
+{"ts": "2026-10-19T10:00:41+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Art Supplies", "sub_category": "Art Supplies", "page": 1, "max_page": 19, "items": 59, "kept_new": 46, "skipped": 10, "total": 802}
+{"ts": "2026-10-19T10:00:48+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Art Supplies", "sub_category": "Art Supplies", "page": 2, "max_page": 19, "items": 49, "kept_new": 36, "skipped": 0, "total": 838}
+{"ts": "2026-10-19T10:00:55+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Office Supplies", "sub_category": "Elementary School Supplies", "page": 1, "max_page": 13, "items": 58, "kept_new": 46, "skipped": 10, "total": 884}
+{"ts": "2026-10-19T10:01:08+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "page", "category": "Office Supplies", "sub_category": "Elementary School Supplies", "page": 2, "max_page": 13, "items": 45, "kept_new": 33, "skipped": 0, "total": 917}
+{"ts": "2026-10-19T10:21:02+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "canary", "phase": "end", "ok": true, "problems": []}
+{"ts": "2026-10-19T10:21:02+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "published", "run_id": "20261019T095339Z-b55042", "location": "walmart-100-bentonville", "record_count": 917, "sha256": "529e67bea27851209eb3758de3087a90dfd35f8ec646dedfa3946fdb81021fb1", "published_at": "2026-10-19T10:21:02+00:00"}
+{"ts": "2026-10-19T10:21:02+00:00", "level": "INFO", "logger": "wmscraper.run", "event": "run_end", "run_id": "20261019T095339Z-b55042", "records": 917, "ok": true, "runtime_s": 1325.8}
+{
+  "run_id": "20261019T095339Z-b55042",
+  "total_unique_records": 917,
+  "runtime_seconds": 1325.8,
+  "count_by_category": {
+    "Art Supplies": 82,
+    "Balloons": 83,
+    "Beauty": 81,
+    "Diapering": 88,
+    "Feeding": 85,
+    "Food": 89,
+    "Health & Wellness": 88,
+    "Household Essentials": 87,
+    "Office Supplies": 79,
+    "Personal Care": 79,
+    "Pets": 76
+  },
+  "validation": {
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "listing hit Walmart's page cap, split further for full depth: Food / Canned beans",
+      "listing hit Walmart's page cap, split further for full depth: Household Essentials / Paper & Plastic",
+      "listing hit Walmart's page cap, split further for full depth: Personal Care / Hand Soaps",
+      "listing hit Walmart's page cap, split further for full depth: Beauty / Face Cleansers",
+      "listing hit Walmart's page cap, split further for full depth: Diapering / Diapering",
+      "listing hit Walmart's page cap, split further for full depth: Feeding / Feeding",
+      "listing hit Walmart's page cap, split further for full depth: Health & Wellness / Pain management",
+      "listing hit Walmart's page cap, split further for full depth: Pets / Dry dog food",
+      "listing hit Walmart's page cap, split further for full depth: Balloons / Balloons",
+      "listing hit Walmart's page cap, split further for full depth: Art Supplies / Art Supplies",
+      "listing hit Walmart's page cap, split further for full depth: Office Supplies / Elementary School Supplies"
+    ]
+  },
+  "published": {
+    "run_id": "20261019T095339Z-b55042",
+    "location": "walmart-100-bentonville",
+    "record_count": 917,
+    "sha256": "529e67bea27851209eb3758de3087a90dfd35f8ec646dedfa3946fdb81021fb1",
+    "published_at": "2026-10-19T10:21:02+00:00"
+  }
+}
+
+# finished 2026-10-19T10:21:02+00:00 exit code 0
