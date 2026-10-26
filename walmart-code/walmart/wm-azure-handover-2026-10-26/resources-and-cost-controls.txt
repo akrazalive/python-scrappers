@@ -1,0 +1,22 @@
+# Walmart #32/#38 – resources deployed 2026-10-26T04:40Z in scraper-contest-asif-test (West US 2), and cost controls
+
+## Resources (this retailer only, prefix wmscraper)
+Name                      Location
+------------------------  ----------
+wmscraper-id              westus2
+wmscraper-logs            westus2
+wmscraper-kv-zwkzlg5qbam  westus2
+wmscraperzwkzlg5qbam5a    westus2
+wmscraper-env             westus2
+
+## Container Apps jobs: 0 (none until the roles and credential exist; then Manual trigger only)
+## Key Vault secrets readable by the developer: none (RBAC vault; my Contributor role is refused: Forbidden)
+
+## Cost controls
+{
+  "dailyIngestionCapGb": 0.03,
+  "retentionDays": 30,
+  "workspace": "wmscraper-logs"
+}
+Shared for both retailers: budget alert 'scraper-test-20usd' on the resource group, USD 20, alerts to Owner/Contributor at 50% and 80% actual and 100% forecast (an alert, not a stop).
+Runtime limits: no job exists yet. Each later test is one manual execution with a hard request cap; no schedule.

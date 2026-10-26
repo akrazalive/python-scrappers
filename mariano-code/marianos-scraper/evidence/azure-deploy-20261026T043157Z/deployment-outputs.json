@@ -1,0 +1,57 @@
+{
+  "containerId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default/containers/marianos-scraper"
+  },
+  "containerName": {
+    "type": "String",
+    "value": "marianos-scraper"
+  },
+  "identityClientId": {
+    "type": "String",
+    "value": "3ab483cb-7fef-4396-a7b8-d2d2e1360af4"
+  },
+  "identityId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mscraper-id"
+  },
+  "identityName": {
+    "type": "String",
+    "value": "mscraper-id"
+  },
+  "identityPrincipalId": {
+    "type": "String",
+    "value": "bb915f14-a28a-4ced-898d-fc3b070548ae"
+  },
+  "jobName": {
+    "type": "String",
+    "value": ""
+  },
+  "keyVault": {
+    "type": "String",
+    "value": "mscraper-kv-zwkzlg5qbam5"
+  },
+  "keyVaultId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/mscraper-kv-zwkzlg5qbam5"
+  },
+  "keyVaultUri": {
+    "type": "String",
+    "value": "https://mscraper-kv-zwkzlg5qbam5.vault.azure.net/"
+  },
+  "secretNames": {
+    "type": "Array",
+    "value": [
+      "oxylabs-username",
+      "oxylabs-password"
+    ]
+  },
+  "storageAccount": {
+    "type": "String",
+    "value": "mscraperzwkzlg5qbam5a"
+  },
+  "storageId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a"
+  }
+}

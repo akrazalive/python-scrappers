@@ -1,0 +1,19 @@
+{
+  "subscription": "febcf465-0d68-44e1-bc04-303bf48bf02d",
+  "resource_group": "scraper-contest-asif-test",
+  "location": "westus2",
+  "tags": {},
+  "my_roles_on_rg": [
+    "Contributor"
+  ],
+  "can_deploy_resources": true,
+  "can_assign_roles": false,
+  "providers": {
+    "Microsoft.App": "Registered",
+    "Microsoft.OperationalInsights": "Registered",
+    "Microsoft.Storage": "Registered",
+    "Microsoft.KeyVault": "Registered",
+    "Microsoft.ManagedIdentity": "Registered"
+  },
+  "existing_resources": []
+}

@@ -11,12 +11,13 @@ The scripts never create resource groups and never need subscription-level right
 
 # 1. infrastructure: Log Analytics, Storage (Blob + Azure Files), Key Vault, managed identity, Container Apps env
 ./deploy/azure/deploy.sh <subscription-id> <resource-group> infra
-#    with resource-group Contributor only: the script writes evidence/azure-deploy-*/admin-role-commands.sh –
-#    the client's administrator runs the two scoped role assignments and stores the Oxylabs key in Key Vault
+#    needs no Oxylabs credential and creates no job. With resource-group Contributor only the script writes
+#    evidence/azure-deploy-*/HANDOVER-azure-ids.txt and admin-role-commands.sh – the client's administrator runs the
+#    two scoped role assignments (blob role on the marianos-scraper container only, secrets role on the vault only) and stores the Oxylabs key in Key Vault
 #    (the key is never sent in chat). With role-assignment rights: ASSIGN_ROLES=true; OXYLABS_WEBAPI_KEY=... optional.
 
-# 2. scheduled job (after the key and roles exist)
-./deploy/azure/deploy.sh <subscription-id> <resource-group> job          # Tue + Fri 07:00 UTC (CRON=... to change)
+# 2. job (after the key and roles exist): Manual trigger, default command budget-status (0 provider requests)
+./deploy/azure/deploy.sh <subscription-id> <resource-group> job          # SCHEDULE=on (Tue + Fri 07:00 UTC) only after approval
 
 # 3. proof of unattended execution: schedule, executions, run logs, published files, checksums (read-only)
 ./deploy/azure/collect_evidence.sh <subscription-id> <resource-group>
@@ -24,11 +25,11 @@ The scripts never create resource groups and never need subscription-level right
 
 | Resource | Purpose |
 |---|---|
-| Container Apps Job `mscraper-job` | scheduled run, 8 h timeout; an unfinished run resumes from its checkpoint next time |
+| Container Apps Job `mscraper-job` | Manual trigger (schedule only after approval), 24 h per execution; an unfinished run resumes from its checkpoint |
 | Storage – Blob container `marianos-scraper` | releases (the exact ZIP the job runs), published output, run history, run lock (blob lease) |
 | Storage – Azure Files share `scraper-state` | checkpoints mounted at `/state` → interrupted runs resume |
 | Key Vault | secret `oxylabs-webapi-key` |
-| User-assigned managed identity | Storage Blob Data Contributor (storage account) + Key Vault Secrets User (vault) |
+| User-assigned managed identity | Storage Blob Data Contributor (container `marianos-scraper` only) + Key Vault Secrets User (vault). No registry, no AcrPull |
 | Log Analytics workspace | JSON logs of every run |
 
 Run on demand: `az containerapp job start -g <rg> -n mscraper-job`

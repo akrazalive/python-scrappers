@@ -35,7 +35,8 @@ OUT=$(az deployment group create -g "$RG" -n "mscraper-$PHASE" -f "$HERE/main.bi
   --query properties.outputs -o json)
 echo "$OUT" > "$OUTDIR/deployment-outputs.json"
 get(){ echo "$OUT" | python -c "import json,sys;print(json.load(sys.stdin)['$1']['value'])"; }
-SA=$(get storageAccount); KV=$(get keyVault); PID=$(get identityPrincipalId); SID=$(get storageId); KID=$(get keyVaultId)
+SA=$(get storageAccount); KV=$(get keyVault); PID=$(get identityPrincipalId); CID=$(get containerId); KID=$(get keyVaultId)
+SECRETS=$(echo "$OUT" | python -c "import json,sys;print(' '.join(json.load(sys.stdin)['secretNames']['value']))")
 
 # upload the exact release the job runs (account key via Contributor; no data-plane role needed)
 KEY=$(az storage account keys list -g "$RG" -n "$SA" --query "[0].value" -o tsv)
@@ -43,10 +44,28 @@ az storage blob upload --account-name "$SA" --account-key "$KEY" -c marianos-scr
 echo "uploaded releases/$NAME" | tee -a "$OUTDIR/package.txt"
 
 if [ "$PHASE" = "infra" ]; then
+  # Handover for the client: every id they need for the scoped role assignments and the Key Vault secret.
+  {
+    echo "# Mariano's scraper - Azure test infrastructure (phase 1, no provider requests, no job, no schedule)"
+    echo "resource group:            $RG"
+    echo "key vault name:            $KV"
+    echo "key vault resource id:     $KID"
+    echo "key vault uri:             $(get keyVaultUri)"
+    echo "secret name(s) to set:     $SECRETS   (provider $PROVIDER)"
+    echo "managed identity:          $(get identityName)"
+    echo "  principal / object id:   $PID"
+    echo "  client id:               $(get identityClientId)"
+    echo "  resource id:             $(get identityId)"
+    echo "storage account:           $SA"
+    echo "storage container:         $(get containerName)"
+    echo "storage container res. id: $CID"
+    echo "container registry:        none (public python:3.12-slim image; AcrPull not needed)"
+  } > "$OUTDIR/HANDOVER-azure-ids.txt"
   if [ "$ASSIGN_ROLES" != "true" ]; then
     cat > "$OUTDIR/admin-role-commands.sh" <<EOF
 # Run by an administrator with role-assignment rights on resource group $RG (two scoped assignments):
-az role assignment create --assignee-object-id $PID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope $SID
+# 1) blob data access limited to the designated test container, 2) secret read access limited to the test vault.
+az role assignment create --assignee-object-id $PID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope $CID
 az role assignment create --assignee-object-id $PID --assignee-principal-type ServicePrincipal --role "Key Vault Secrets User" --scope $KID
 EOF
     if [ "$PROVIDER" = "oxylabs_kroger" ]; then
@@ -63,7 +82,12 @@ az keyvault secret set --vault-name $KV --name oxylabs-username --value "<API-US
 az keyvault secret set --vault-name $KV --name oxylabs-password --value "<API-USER-PASSWORD>"
 EOF
     fi
-    echo "Phase 1 done. Send $OUTDIR/admin-role-commands.sh to the administrator, then run phase 'job'."
+    cat >> "$OUTDIR/admin-role-commands.sh" <<EOF
+# Check (lists the two assignments):
+az role assignment list --assignee $PID --all --query "[].{role:roleDefinitionName,scope:scope}" -o table
+EOF
+    cat "$OUTDIR/HANDOVER-azure-ids.txt"
+    echo "Phase 1 done. Send HANDOVER-azure-ids.txt + admin-role-commands.sh ($OUTDIR) to the client, then run phase 'job'."
   else
     echo "Phase 1 done (roles assigned). Store the key if not given: az keyvault secret set --vault-name $KV --name oxylabs-webapi-key --value <key>"
   fi

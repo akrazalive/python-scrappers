@@ -1,7 +1,7 @@
 # Architecture
 
 ```
- Azure Container Apps Job (cron Mon+Thu 06:00 UTC, parallelism 1)
+ Azure Container Apps Job (Manual trigger; cron Mon+Thu 06:00 UTC only after approval, parallelism 1)
    └─ python -m wmscraper run-all            ── for each enabled location in config/locations.yaml
         1 lock          Blob lease per location → overlapping runs are impossible
         2 store         /store/<id> → id, name, address, ZIP must match config

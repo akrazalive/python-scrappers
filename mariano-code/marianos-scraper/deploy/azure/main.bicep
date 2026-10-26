@@ -4,9 +4,11 @@
 // MANUAL by default: each execution runs MSCRAPER_ARGS (default budget-status = no provider requests).
 //
 // Limited access (resource-group Contributor only): deploy with assignRoles=false. The two role assignments the
-// job identity needs are then printed by deploy.sh for the client's administrator (Contributor cannot assign roles).
+// job identity needs are then printed by deploy.sh for the client's administrator (Contributor cannot assign roles):
+// Storage Blob Data Contributor on the marianos-scraper CONTAINER only, Key Vault Secrets User on the test vault.
+// No container registry is used (public python image + versioned source ZIP from Blob), so no AcrPull.
 // Two phases: deployJob=false creates the infrastructure; after the Key Vault secret and the roles exist,
-// deployJob=true adds the scheduled job (a Key Vault reference to a missing secret would fail the deployment).
+// deployJob=true adds the job (Manual trigger unless scheduleEnabled=true) (a Key Vault reference to a missing secret would fail the deployment).
 
 @description('Short prefix for resource names (lowercase letters/numbers).')
 param prefix string = 'mscraper'
@@ -22,7 +24,7 @@ param cronExpression string = '0 7 * * 2,5'
 param image string = 'docker.io/library/python:3.12-slim'
 
 @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
-param releaseBlob string = 'releases/marianos-scraper-1.1.2-src.zip'
+param releaseBlob string = 'releases/marianos-scraper-1.1.3-src.zip'
 
 @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
 param assignRoles bool = false
@@ -149,9 +151,11 @@ var roles = {
   blobContributor: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
   kvSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
 }
+// scoped to the designated container (release package, output, run locks); checkpoints use the Azure Files share,
+// mounted by the environment with the account key, so the identity needs no account-wide data role
 resource raBlob 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (assignRoles) {
-  scope: storage
-  name: guid(storage.id, identity.id, roles.blobContributor)
+  scope: container
+  name: guid(container.id, identity.id, roles.blobContributor)
   properties: { principalId: identity.properties.principalId, principalType: 'ServicePrincipal', roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roles.blobContributor) }
 }
 resource raKv 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (assignRoles) {
@@ -224,7 +228,14 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
 
 output storageAccount string = storage.name
 output keyVault string = kv.name
+output keyVaultUri string = kv.properties.vaultUri
+output identityName string = identity.name
 output identityPrincipalId string = identity.properties.principalId
+output identityClientId string = identity.properties.clientId
+output identityId string = identity.id
 output storageId string = storage.id
+output containerName string = container.name
+output containerId string = container.id
 output keyVaultId string = kv.id
+output secretNames array = providerSecrets
 output jobName string = deployJob ? job.name : ''

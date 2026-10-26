@@ -11,7 +11,7 @@ Apps Job, and **only publishes a dataset after it passes validation**.
 | Parsing | Walmart's embedded `__NEXT_DATA__` JSON (not fragile CSS selectors) |
 | State | SQLite checkpoint per run (genuine page-level continuation) |
 | Output | JSON in the exact required field order → local disk or Azure Blob Storage |
-| Azure | Container Apps Job (cron), Blob Storage, Key Vault, Log Analytics, managed identity |
+| Azure | Container Apps Job (manual; schedule after approval), Blob Storage, Key Vault, Log Analytics, managed identity |
 | Tests | `pytest` – rules, deals, dedup, store mismatch, failed-run protection, interruption recovery |
 
 ## Quick start (local)

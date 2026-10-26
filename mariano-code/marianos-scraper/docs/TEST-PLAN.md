@@ -1,6 +1,8 @@
-# Live test plan – bounded, store-identified, manual only (v1.1.2)
+# Live test plan – bounded, store-identified, manual only (v1.1.3)
 
-Nothing here has run yet. Each test runs only after the client confirms its prerequisites and window.
+Nothing here has run yet. Each test runs only after the client has approved it and its prerequisites exist. There is
+no fixed test window (client, 26 Oct): an approved test is started as soon as its prerequisites are met; nobody
+needs to watch it.
 
 ## 1. Oxylabs: the exact feature and authentication needed
 
@@ -25,11 +27,11 @@ parameters; it is not needed (the Kroger endpoint with `store_id` is proven) and
 | # | Step | Who | Provider requests | Needs |
 |---|---|---|---|---|
 | 0 | `deploy/azure/preflight.sh <sub> scraper-contest-asif-test` – read-only: roles, providers, policy, existing resources | developer | 0 | RG access (done) |
-| 1 | `deploy.sh <sub> scraper-contest-asif-test infra` – Log Analytics, Storage, Key Vault, identity, Container Apps environment | developer | 0 | client approves deployment/cost plan; providers registered |
-| 2 | `admin-role-commands.sh` – 2 scoped role assignments + Oxylabs secret into Key Vault | client admin | 0 | step 1 |
+| 1 | `deploy.sh <sub> scraper-contest-asif-test infra` – Log Analytics, Storage, **empty** Key Vault, identity, Container Apps environment; no job, no Oxylabs credential needed. Writes `HANDOVER-azure-ids.txt` (vault name/id, secret name, identity principal id, container id) and `admin-role-commands.sh` | developer | 0 | client approves deployment/cost plan (D1) |
+| 2 | `admin-role-commands.sh` – Storage Blob Data Contributor on the `marianos-scraper` **container**, Key Vault Secrets User on the test vault, Oxylabs secret into the vault. No AcrPull (no registry) | client admin | 0 | step 1 |
 | 3 | `deploy.sh … job` – job, trigger **Manual**, default command `budget-status`; `run_test.sh … status` proves it runs | developer | 0 | step 2 |
-| 4 | **Test 1** `run_test.sh <sub> <rg> test1` | developer | **≤ 19** | agreed CT window, Test 1 approved |
-| 5 | **Test 2** `run_test.sh <sub> <rg> test2` | developer | **≤ 300** | Test 1 result reviewed, window |
+| 4 | **Test 1** `run_test.sh <sub> <rg> test1` | developer | **≤ 19** | Test 1 approved (D3) |
+| 5 | **Test 2** `run_test.sh <sub> <rg> test2` | developer | **≤ 300** | Test 1 passed, Test 2 approved (D3) |
 | 6 | Test 3 `run_test.sh <sub> <rg> full <cap>` – fresh full-CSV run; `run_test.sh … stop` once mid-run (forced kill), then the same `full <cap>` resumes from the checkpoint | developer | cap set from Test 2 measurement, approved by client | client approval of the cap |
 | 7 | failed-publication proof; second execution | developer | ≈ 50; second run approved separately | client approval |
 

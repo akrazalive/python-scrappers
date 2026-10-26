@@ -1,0 +1,57 @@
+MARIANO'S #69 → v1.1.3: infrastructure step confirmed, Azure IDs within 2 hours of approval
+
+Hello,
+
+Thank you for checking Azure directly and for setting out the order. This message covers Mariano's only. Walmart follows separately.
+
+YOUR TWO QUESTIONS
+
+1. Can the infrastructure-only step create the resources without the Oxylabs credential?
+Yes. The step creates the following inside scraper-contest-asif-test:
+- the empty Key Vault
+- the managed identity
+- the designated storage (blob container "marianos-scraper")
+- Log Analytics
+- the Container Apps environment
+It does not need, read or store any Oxylabs credential. It creates no job and no schedule, and sends no provider requests. Recurring schedules stay disabled.
+
+2. How soon after deployment approval can I provide the IDs?
+Within 2 hours of your D1 approval. The deployment itself takes about 10 minutes, and the script writes the IDs and the role commands to two files that I send you straight away.
+
+WHAT YOU WILL RECEIVE (your step 3, item by item)
+- Vault name and resource ID: yes, plus the vault URI.
+- Intended secret name: oxylabs-webapi-key (a Web API key, Bearer, as used on 21 Oct). If your plan supplies an API user instead, the names are oxylabs-username and oxylabs-password.
+- Managed-identity principal/object ID: yes, plus its client ID and resource ID.
+- Storage-container resource ID: yes. Its form is
+  /subscriptions/<sub>/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/<account>/blobServices/default/containers/marianos-scraper
+- Exact scoped role-assignment commands: yes, generated with the real IDs:
+  - Storage Blob Data Contributor, scope = the marianos-scraper container only
+  - Key Vault Secrets User, scope = the test vault only
+  - followed by the command to store the credential and a command that lists the assignments
+- ACR resource ID: not applicable. No registry is used (the job runs the public Python image), so AcrPull is not needed.
+
+WAITING ON YOU
+- D1: approval of the deployment/cost plan. While nothing runs, the infrastructure costs about $1-3 per month.
+- After my IDs arrive: the two role assignments and the Oxylabs credential in the vault.
+- Separately: which Oxylabs authentication your plan supplies, and its request allowance.
+- D3: approval of Test 1 (19 requests or fewer) and Test 2 (300 requests or fewer).
+- Later: the Test 3 cap, larger budgets and any schedule.
+- D6: the coupon probe.
+
+WHAT I CAN COMPLETE MYSELF ONCE EACH ITEM IS IN PLACE
+- After D1: deploy the infrastructure and send the IDs (within 2 hours).
+- After the roles and the credential: deploy the manual job and check it with a command that makes no provider requests (within 2 hours).
+- After D3: start Test 1 within 1 hour, and Test 2 as soon as Test 1 passes. v1.1.4 (live evidence and the proposed Test 3 cap) follows within 1 working day.
+- D4 (test windows) is removed, thank you. All timing is now relative to your approvals.
+
+ATTACHED: marianos-v1.1.3.zip (start with 00-INDEX.md)
+- Only the deployment files and docs changed. The storage role is now scoped to the container instead of the whole storage account, and the deployment writes the ID handover file. The scraper code is unchanged.
+- There are 44 offline tests, all passing. No new live data.
+- 01-INFRASTRUCTURE-FIRST-sequence-and-handover.md shows the exact files and commands you will receive.
+
+The Walmart scraper uses the same group as separate resources (prefix wmscraper-), with its own vault, identity, container and role commands. Its details are in the Walmart message.
+
+Execution stays manual. Credentials stay out of chat, code, logs and packages.
+
+Regards,
+Asif Khan

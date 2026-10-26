@@ -1,0 +1,22 @@
+# Mariano's #69 – resources deployed 2026-10-26T04:40Z in scraper-contest-asif-test (West US 2), and cost controls
+
+## Resources (this retailer only, prefix mscraper)
+Name                      Location
+------------------------  ----------
+mscraper-id               westus2
+mscraper-kv-zwkzlg5qbam5  westus2
+mscraper-logs             westus2
+mscraperzwkzlg5qbam5a     westus2
+mscraper-env              westus2
+
+## Container Apps jobs: 0 (none until the roles and credential exist; then Manual trigger only)
+## Key Vault secrets readable by the developer: none (RBAC vault; my Contributor role is refused: Forbidden)
+
+## Cost controls
+{
+  "dailyIngestionCapGb": 0.03,
+  "retentionDays": 30,
+  "workspace": "mscraper-logs"
+}
+Shared for both retailers: budget alert 'scraper-test-20usd' on the resource group, USD 20, alerts to Owner/Contributor at 50% and 80% actual and 100% forecast (an alert, not a stop).
+Runtime limits: no job exists yet. Each later test is one manual execution with a hard request cap; no schedule.

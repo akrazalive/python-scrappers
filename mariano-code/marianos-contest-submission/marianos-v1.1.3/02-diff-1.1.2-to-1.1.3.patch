@@ -1,0 +1,221 @@
+diff --git a/mariano-code/marianos-scraper/CHANGELOG.md b/mariano-code/marianos-scraper/CHANGELOG.md
+index f286df3..1e69d47 100644
+--- a/mariano-code/marianos-scraper/CHANGELOG.md
++++ b/mariano-code/marianos-scraper/CHANGELOG.md
+@@ -57,6 +57,22 @@ Why the code changed between collection and delivery of entry #69:
+ * `tools/reconcile_v100_runs.py` – machine-readable coverage / remaining-gap reconciliation of the delivered entry #69
+   run and the stopped query-expansion run, from their own checkpoints.
+ 
++## 1.1.3 (2026-10-26) – client clarification of 26 Oct (infrastructure first, scoped roles, no test windows)
++
++Deployment files only; `src/mscraper` is unchanged apart from the version number. No live requests.
++1. **Container-scoped storage role** – `main.bicep` / `deploy.sh`: Storage Blob Data Contributor is scoped to the
++   `marianos-scraper` blob container (was the storage account). Everything the identity reads or writes through
++   Blob (release ZIP, output, run history, run lock) is in that container; checkpoints are on the Azure Files share,
++   which the Container Apps environment mounts with the account key, so no account-wide data role is needed.
++2. **Handover file** – phase `infra` writes `HANDOVER-azure-ids.txt`: Key Vault name, resource id and URI, secret
++   name(s), managed-identity principal/object id, client id and resource id, storage account, container name and
++   container resource id, and "no container registry" (AcrPull not needed). `admin-role-commands.sh` uses the
++   container id as scope and ends with a check command.
++3. **New bicep outputs** – `containerId`, `containerName`, `keyVaultUri`, `identityName`, `identityClientId`,
++   `identityId`, `secretNames`.
++4. **Test windows removed** (`docs/TEST-PLAN.md`): approved tests start as soon as their prerequisites exist.
++5. Phase `infra` needs no Oxylabs credential and creates no job and no schedule (unchanged, now stated in the docs).
++
+ ## 1.1.2 (2026-10-25) – client feedback of 24 Oct (bounded tests, Azure sequence, Oxylabs feature)
+ * **Enforced TOTAL request caps** (`src/mscraper/budget.py`): `--budget NAME:TOTAL` / env `MSCRAPER_BUDGET` puts any
+   command under a total that is stored in the state directory (Azure: the Azure Files share) and counted BEFORE each
+diff --git a/mariano-code/marianos-scraper/deploy/azure/deploy.sh b/mariano-code/marianos-scraper/deploy/azure/deploy.sh
+index 84c75e1..6b552f5 100644
+--- a/mariano-code/marianos-scraper/deploy/azure/deploy.sh
++++ b/mariano-code/marianos-scraper/deploy/azure/deploy.sh
+@@ -35,7 +35,8 @@ OUT=$(az deployment group create -g "$RG" -n "mscraper-$PHASE" -f "$HERE/main.bi
+   --query properties.outputs -o json)
+ echo "$OUT" > "$OUTDIR/deployment-outputs.json"
+ get(){ echo "$OUT" | python -c "import json,sys;print(json.load(sys.stdin)['$1']['value'])"; }
+-SA=$(get storageAccount); KV=$(get keyVault); PID=$(get identityPrincipalId); SID=$(get storageId); KID=$(get keyVaultId)
++SA=$(get storageAccount); KV=$(get keyVault); PID=$(get identityPrincipalId); CID=$(get containerId); KID=$(get keyVaultId)
++SECRETS=$(echo "$OUT" | python -c "import json,sys;print(' '.join(json.load(sys.stdin)['secretNames']['value']))")
+ 
+ # upload the exact release the job runs (account key via Contributor; no data-plane role needed)
+ KEY=$(az storage account keys list -g "$RG" -n "$SA" --query "[0].value" -o tsv)
+@@ -43,10 +44,28 @@ az storage blob upload --account-name "$SA" --account-key "$KEY" -c marianos-scr
+ echo "uploaded releases/$NAME" | tee -a "$OUTDIR/package.txt"
+ 
+ if [ "$PHASE" = "infra" ]; then
++  # Handover for the client: every id they need for the scoped role assignments and the Key Vault secret.
++  {
++    echo "# Mariano's scraper - Azure test infrastructure (phase 1, no provider requests, no job, no schedule)"
++    echo "resource group:            $RG"
++    echo "key vault name:            $KV"
++    echo "key vault resource id:     $KID"
++    echo "key vault uri:             $(get keyVaultUri)"
++    echo "secret name(s) to set:     $SECRETS   (provider $PROVIDER)"
++    echo "managed identity:          $(get identityName)"
++    echo "  principal / object id:   $PID"
++    echo "  client id:               $(get identityClientId)"
++    echo "  resource id:             $(get identityId)"
++    echo "storage account:           $SA"
++    echo "storage container:         $(get containerName)"
++    echo "storage container res. id: $CID"
++    echo "container registry:        none (public python:3.12-slim image; AcrPull not needed)"
++  } > "$OUTDIR/HANDOVER-azure-ids.txt"
+   if [ "$ASSIGN_ROLES" != "true" ]; then
+     cat > "$OUTDIR/admin-role-commands.sh" <<EOF
+ # Run by an administrator with role-assignment rights on resource group $RG (two scoped assignments):
+-az role assignment create --assignee-object-id $PID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope $SID
++# 1) blob data access limited to the designated test container, 2) secret read access limited to the test vault.
++az role assignment create --assignee-object-id $PID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope $CID
+ az role assignment create --assignee-object-id $PID --assignee-principal-type ServicePrincipal --role "Key Vault Secrets User" --scope $KID
+ EOF
+     if [ "$PROVIDER" = "oxylabs_kroger" ]; then
+@@ -63,7 +82,12 @@ az keyvault secret set --vault-name $KV --name oxylabs-username --value "<API-US
+ az keyvault secret set --vault-name $KV --name oxylabs-password --value "<API-USER-PASSWORD>"
+ EOF
+     fi
+-    echo "Phase 1 done. Send $OUTDIR/admin-role-commands.sh to the administrator, then run phase 'job'."
++    cat >> "$OUTDIR/admin-role-commands.sh" <<EOF
++# Check (lists the two assignments):
++az role assignment list --assignee $PID --all --query "[].{role:roleDefinitionName,scope:scope}" -o table
++EOF
++    cat "$OUTDIR/HANDOVER-azure-ids.txt"
++    echo "Phase 1 done. Send HANDOVER-azure-ids.txt + admin-role-commands.sh ($OUTDIR) to the client, then run phase 'job'."
+   else
+     echo "Phase 1 done (roles assigned). Store the key if not given: az keyvault secret set --vault-name $KV --name oxylabs-webapi-key --value <key>"
+   fi
+diff --git a/mariano-code/marianos-scraper/deploy/azure/main.bicep b/mariano-code/marianos-scraper/deploy/azure/main.bicep
+index 0b0c7c8..6ff7a31 100644
+--- a/mariano-code/marianos-scraper/deploy/azure/main.bicep
++++ b/mariano-code/marianos-scraper/deploy/azure/main.bicep
+@@ -4,9 +4,11 @@
+ // MANUAL by default: each execution runs MSCRAPER_ARGS (default budget-status = no provider requests).
+ //
+ // Limited access (resource-group Contributor only): deploy with assignRoles=false. The two role assignments the
+-// job identity needs are then printed by deploy.sh for the client's administrator (Contributor cannot assign roles).
++// job identity needs are then printed by deploy.sh for the client's administrator (Contributor cannot assign roles):
++// Storage Blob Data Contributor on the marianos-scraper CONTAINER only, Key Vault Secrets User on the test vault.
++// No container registry is used (public python image + versioned source ZIP from Blob), so no AcrPull.
+ // Two phases: deployJob=false creates the infrastructure; after the Key Vault secret and the roles exist,
+-// deployJob=true adds the scheduled job (a Key Vault reference to a missing secret would fail the deployment).
++// deployJob=true adds the job (Manual trigger unless scheduleEnabled=true) (a Key Vault reference to a missing secret would fail the deployment).
+ 
+ @description('Short prefix for resource names (lowercase letters/numbers).')
+ param prefix string = 'mscraper'
+@@ -22,7 +24,7 @@ param cronExpression string = '0 7 * * 2,5'
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
+-param releaseBlob string = 'releases/marianos-scraper-1.1.2-src.zip'
++param releaseBlob string = 'releases/marianos-scraper-1.1.3-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+@@ -149,9 +151,11 @@ var roles = {
+   blobContributor: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+   kvSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
+ }
++// scoped to the designated container (release package, output, run locks); checkpoints use the Azure Files share,
++// mounted by the environment with the account key, so the identity needs no account-wide data role
+ resource raBlob 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (assignRoles) {
+-  scope: storage
+-  name: guid(storage.id, identity.id, roles.blobContributor)
++  scope: container
++  name: guid(container.id, identity.id, roles.blobContributor)
+   properties: { principalId: identity.properties.principalId, principalType: 'ServicePrincipal', roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roles.blobContributor) }
+ }
+ resource raKv 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (assignRoles) {
+@@ -224,7 +228,14 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
+ 
+ output storageAccount string = storage.name
+ output keyVault string = kv.name
++output keyVaultUri string = kv.properties.vaultUri
++output identityName string = identity.name
+ output identityPrincipalId string = identity.properties.principalId
++output identityClientId string = identity.properties.clientId
++output identityId string = identity.id
+ output storageId string = storage.id
++output containerName string = container.name
++output containerId string = container.id
+ output keyVaultId string = kv.id
++output secretNames array = providerSecrets
+ output jobName string = deployJob ? job.name : ''
+diff --git a/mariano-code/marianos-scraper/docs/OPERATIONS.md b/mariano-code/marianos-scraper/docs/OPERATIONS.md
+index 69e48cf..30df49a 100644
+--- a/mariano-code/marianos-scraper/docs/OPERATIONS.md
++++ b/mariano-code/marianos-scraper/docs/OPERATIONS.md
+@@ -11,12 +11,13 @@ The scripts never create resource groups and never need subscription-level right
+ 
+ # 1. infrastructure: Log Analytics, Storage (Blob + Azure Files), Key Vault, managed identity, Container Apps env
+ ./deploy/azure/deploy.sh <subscription-id> <resource-group> infra
+-#    with resource-group Contributor only: the script writes evidence/azure-deploy-*/admin-role-commands.sh –
+-#    the client's administrator runs the two scoped role assignments and stores the Oxylabs key in Key Vault
++#    needs no Oxylabs credential and creates no job. With resource-group Contributor only the script writes
++#    evidence/azure-deploy-*/HANDOVER-azure-ids.txt and admin-role-commands.sh – the client's administrator runs the
++#    two scoped role assignments (blob role on the marianos-scraper container only, secrets role on the vault only) and stores the Oxylabs key in Key Vault
+ #    (the key is never sent in chat). With role-assignment rights: ASSIGN_ROLES=true; OXYLABS_WEBAPI_KEY=... optional.
+ 
+-# 2. scheduled job (after the key and roles exist)
+-./deploy/azure/deploy.sh <subscription-id> <resource-group> job          # Tue + Fri 07:00 UTC (CRON=... to change)
++# 2. job (after the key and roles exist): Manual trigger, default command budget-status (0 provider requests)
++./deploy/azure/deploy.sh <subscription-id> <resource-group> job          # SCHEDULE=on (Tue + Fri 07:00 UTC) only after approval
+ 
+ # 3. proof of unattended execution: schedule, executions, run logs, published files, checksums (read-only)
+ ./deploy/azure/collect_evidence.sh <subscription-id> <resource-group>
+@@ -24,11 +25,11 @@ The scripts never create resource groups and never need subscription-level right
+ 
+ | Resource | Purpose |
+ |---|---|
+-| Container Apps Job `mscraper-job` | scheduled run, 8 h timeout; an unfinished run resumes from its checkpoint next time |
++| Container Apps Job `mscraper-job` | Manual trigger (schedule only after approval), 24 h per execution; an unfinished run resumes from its checkpoint |
+ | Storage – Blob container `marianos-scraper` | releases (the exact ZIP the job runs), published output, run history, run lock (blob lease) |
+ | Storage – Azure Files share `scraper-state` | checkpoints mounted at `/state` → interrupted runs resume |
+ | Key Vault | secret `oxylabs-webapi-key` |
+-| User-assigned managed identity | Storage Blob Data Contributor (storage account) + Key Vault Secrets User (vault) |
++| User-assigned managed identity | Storage Blob Data Contributor (container `marianos-scraper` only) + Key Vault Secrets User (vault). No registry, no AcrPull |
+ | Log Analytics workspace | JSON logs of every run |
+ 
+ Run on demand: `az containerapp job start -g <rg> -n mscraper-job`
+diff --git a/mariano-code/marianos-scraper/docs/TEST-PLAN.md b/mariano-code/marianos-scraper/docs/TEST-PLAN.md
+index 49eb8c6..170c442 100644
+--- a/mariano-code/marianos-scraper/docs/TEST-PLAN.md
++++ b/mariano-code/marianos-scraper/docs/TEST-PLAN.md
+@@ -1,6 +1,8 @@
+-# Live test plan – bounded, store-identified, manual only (v1.1.2)
++# Live test plan – bounded, store-identified, manual only (v1.1.3)
+ 
+-Nothing here has run yet. Each test runs only after the client confirms its prerequisites and window.
++Nothing here has run yet. Each test runs only after the client has approved it and its prerequisites exist. There is
++no fixed test window (client, 26 Oct): an approved test is started as soon as its prerequisites are met; nobody
++needs to watch it.
+ 
+ ## 1. Oxylabs: the exact feature and authentication needed
+ 
+@@ -25,11 +27,11 @@ parameters; it is not needed (the Kroger endpoint with `store_id` is proven) and
+ | # | Step | Who | Provider requests | Needs |
+ |---|---|---|---|---|
+ | 0 | `deploy/azure/preflight.sh <sub> scraper-contest-asif-test` – read-only: roles, providers, policy, existing resources | developer | 0 | RG access (done) |
+-| 1 | `deploy.sh <sub> scraper-contest-asif-test infra` – Log Analytics, Storage, Key Vault, identity, Container Apps environment | developer | 0 | client approves deployment/cost plan; providers registered |
+-| 2 | `admin-role-commands.sh` – 2 scoped role assignments + Oxylabs secret into Key Vault | client admin | 0 | step 1 |
++| 1 | `deploy.sh <sub> scraper-contest-asif-test infra` – Log Analytics, Storage, **empty** Key Vault, identity, Container Apps environment; no job, no Oxylabs credential needed. Writes `HANDOVER-azure-ids.txt` (vault name/id, secret name, identity principal id, container id) and `admin-role-commands.sh` | developer | 0 | client approves deployment/cost plan (D1) |
++| 2 | `admin-role-commands.sh` – Storage Blob Data Contributor on the `marianos-scraper` **container**, Key Vault Secrets User on the test vault, Oxylabs secret into the vault. No AcrPull (no registry) | client admin | 0 | step 1 |
+ | 3 | `deploy.sh … job` – job, trigger **Manual**, default command `budget-status`; `run_test.sh … status` proves it runs | developer | 0 | step 2 |
+-| 4 | **Test 1** `run_test.sh <sub> <rg> test1` | developer | **≤ 19** | agreed CT window, Test 1 approved |
+-| 5 | **Test 2** `run_test.sh <sub> <rg> test2` | developer | **≤ 300** | Test 1 result reviewed, window |
++| 4 | **Test 1** `run_test.sh <sub> <rg> test1` | developer | **≤ 19** | Test 1 approved (D3) |
++| 5 | **Test 2** `run_test.sh <sub> <rg> test2` | developer | **≤ 300** | Test 1 passed, Test 2 approved (D3) |
+ | 6 | Test 3 `run_test.sh <sub> <rg> full <cap>` – fresh full-CSV run; `run_test.sh … stop` once mid-run (forced kill), then the same `full <cap>` resumes from the checkpoint | developer | cap set from Test 2 measurement, approved by client | client approval of the cap |
+ | 7 | failed-publication proof; second execution | developer | ≈ 50; second run approved separately | client approval |
+ 
+diff --git a/mariano-code/marianos-scraper/src/mscraper/version.py b/mariano-code/marianos-scraper/src/mscraper/version.py
+index 371f10f..e27e204 100644
+--- a/mariano-code/marianos-scraper/src/mscraper/version.py
++++ b/mariano-code/marianos-scraper/src/mscraper/version.py
+@@ -6,7 +6,7 @@ import platform
+ import sys
+ from pathlib import Path
+ 
+-__version__ = "1.1.2"
++__version__ = "1.1.3"
+ _SRC = Path(__file__).resolve().parent
+ 
+ 

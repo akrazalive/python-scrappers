@@ -1,0 +1,14 @@
+# Mariano's scraper - Azure test infrastructure (phase 1, no provider requests, no job, no schedule)
+resource group:            scraper-contest-asif-test
+key vault name:            mscraper-kv-zwkzlg5qbam5
+key vault resource id:     /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/mscraper-kv-zwkzlg5qbam5
+key vault uri:             https://mscraper-kv-zwkzlg5qbam5.vault.azure.net/
+secret name(s) to set:     oxylabs-username oxylabs-password   (provider oxylabs_realtime)
+managed identity:          mscraper-id
+  principal / object id:   bb915f14-a28a-4ced-898d-fc3b070548ae
+  client id:               3ab483cb-7fef-4396-a7b8-d2d2e1360af4
+  resource id:             /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mscraper-id
+storage account:           mscraperzwkzlg5qbam5a
+storage container:         marianos-scraper
+storage container res. id: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default/containers/marianos-scraper
+container registry:        none (public python:3.12-slim image; AcrPull not needed)

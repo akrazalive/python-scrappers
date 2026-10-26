@@ -3,7 +3,8 @@
   python -m wmscraper run --location walmart-100-bentonville              # full production run (resumes automatically)
   python -m wmscraper run --location walmart-100-bentonville --categories "Food,Pets" --limit 600 --demo
   python -m wmscraper run-all                                 # every enabled location (used by the Azure job)
-  python -m wmscraper verify-store --location walmart-100-bentonville      # store + canary check only
+  python -m wmscraper verify-store --location walmart-100-bentonville --max-requests 10   # store + canary check only
+  python -m wmscraper status                                  # version, provider, credentials present, storage (0 requests)
   python -m wmscraper summary --location walmart-100-bentonville [--run-id ID]
   python -m wmscraper retry-failed --location walmart-100-bentonville --run-id ID
 """
@@ -78,6 +79,8 @@ def cmd_run_all(args, s):
 
 def cmd_verify_store(args, s):
     logging_setup.setup(args.log_level)
+    if args.max_requests:
+        s.raw.setdefault("fetch", {})["max_requests_per_run"] = args.max_requests
     loc = s.location(args.location)
     run = Run(s, loc, run_id="verify-" + os.urandom(3).hex(), demo=True)
 
@@ -95,6 +98,31 @@ def cmd_verify_store(args, s):
     asyncio.run(go())
     print(json.dumps({"store": run.store, "canary": run.ck.get("canary")}, indent=2))
     return 0
+
+
+PROVIDER_ENV = {"oxylabs_webapi": ("OXYLABS_WEBAPI_KEY",), "oxylabs": ("OXYLABS_USERNAME", "OXYLABS_PASSWORD"),
+                "zyte": ("ZYTE_API_KEY",), "playwright": ()}
+
+
+def cmd_status(args, s):
+    """Deployment check without any provider request: the default command of the manual Azure job."""
+    from .version import version_info
+
+    provider = s.get("fetch.provider", "oxylabs")
+    out = {**version_info(), "provider": provider,
+           # names only: whether each credential variable is present, never its value
+           "credentials_present": {k: bool(os.getenv(k)) for k in PROVIDER_ENV.get(provider, ())},
+           "max_requests_per_run": s.get("fetch.max_requests_per_run", 0),
+           "output_backend": os.getenv("WMSCRAPER_OUTPUT_BACKEND") or s.get("output.backend", "local"),
+           "enabled_locations": [loc.key for loc in s.locations if loc.enabled], "provider_requests": 0}
+    try:
+        st = build_storage(s)
+        out["storage"] = {loc: bool(st.get_json(f"{loc}/latest/report.json")) for loc in out["enabled_locations"]}
+        out["storage_ok"] = True
+    except Exception as exc:  # e.g. role assignment not applied yet
+        out["storage_ok"], out["storage_error"] = False, f"{type(exc).__name__}: {exc}"[:300]
+    print(json.dumps(out, indent=2))
+    return 0 if out["storage_ok"] else 1
 
 
 def cmd_summary(args, s):
@@ -153,6 +181,8 @@ def main(argv=None):
     sub.add_parser("run-all")
     v = sub.add_parser("verify-store")
     v.add_argument("--location", required=True)
+    v.add_argument("--max-requests", type=int, default=0, help="safety cap on paid provider requests, retries included")
+    sub.add_parser("status")
     sm = sub.add_parser("summary")
     sm.add_argument("--location", required=True)
     sm.add_argument("--run-id")
@@ -166,11 +196,13 @@ def main(argv=None):
     rf.add_argument("--run-id", required=True)
     args = ap.parse_args(argv)
     s = load_settings(args.config)
+    if os.getenv("WMSCRAPER_FETCH_PROVIDER"):  # chosen at deployment (Key Vault holds the matching credential)
+        s.raw.setdefault("fetch", {})["provider"] = os.environ["WMSCRAPER_FETCH_PROVIDER"]
     from .fetch import FetchError
     from .lock import LockError
 
     handlers = {"run": cmd_run, "run-all": cmd_run_all, "verify-store": cmd_verify_store,
-            "summary": cmd_summary, "retry-failed": cmd_retry_failed, "validate": cmd_validate}
+            "summary": cmd_summary, "status": cmd_status, "retry-failed": cmd_retry_failed, "validate": cmd_validate}
     try:
         return handlers[args.cmd](args, s)
     except (FetchError, LockError, KeyError, RuntimeError) as exc:

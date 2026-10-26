@@ -1,0 +1,64 @@
+WALMART #32/#38 — Azure infrastructure created: handover IDs and role commands
+
+Hello Darren,
+
+Thank you for the approval. I acknowledge its scope: infrastructure now; then the store-verification probe (10 requests or fewer) after your credential and roles are in place; USD $20 Azure in total across both scrapers for 30 days; USD $1 Oxylabs for the three initial tests combined. The coverage exception is not accepted, and unresolved coverage stays blocked. E1/E2, further tests, the full repeat, the UPC pass and schedules remain pending.
+
+The infrastructure-only step is done (26 Oct, 04:35-04:37 UTC), in scraper-contest-asif-test, West US 2:
+- walmart-scraper 1.1.6; the release in Azure is byte-identical to the package you approved (source_sha256 8763a212…)
+- 0 provider requests, no credential, no job, no schedule
+- the Key Vault is empty, and my Contributor role is refused when I try to read its secrets
+
+WALMART HANDOVER (prefix wmscraper)
+- Key Vault name: wmscraper-kv-zwkzlg5qbam
+- Key Vault URI: https://wmscraper-kv-zwkzlg5qbam.vault.azure.net/
+- Key Vault resource ID: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/wmscraper-kv-zwkzlg5qbam
+- Secret names: oxylabs-username, oxylabs-password (Classic Web Scraper API, realtime.oxylabs.io/v1/queries; the adapter is configured as PROVIDER=oxylabs)
+- Managed identity wmscraper-id:
+  - principal/object ID: 3705145d-855c-4330-978f-be6e229c49ac
+  - client ID: 3d8368b7-d819-43d1-af24-8bec48389fb7
+  - resource ID: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wmscraper-id
+- Storage container resource ID: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/wmscraperzwkzlg5qbam5a/blobServices/default/containers/walmart-scraper
+- Container registry: none (no AcrPull)
+
+EXACT SCOPED ROLE COMMANDS (also in admin-role-commands.sh)
+az role assignment create --assignee-object-id 3705145d-855c-4330-978f-be6e229c49ac --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/wmscraperzwkzlg5qbam5a/blobServices/default/containers/walmart-scraper
+az role assignment create --assignee-object-id 3705145d-855c-4330-978f-be6e229c49ac --assignee-principal-type ServicePrincipal --role "Key Vault Secrets User" --scope /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/wmscraper-kv-zwkzlg5qbam
+
+To store the credential, your administrator needs Key Vault Secrets Officer on this vault (Owner alone does not grant secret access in an RBAC vault):
+az keyvault secret set --vault-name wmscraper-kv-zwkzlg5qbam --name oxylabs-username --value "<API-USER-NAME>"
+az keyvault secret set --vault-name wmscraper-kv-zwkzlg5qbam --name oxylabs-password --value "<API-USER-PASSWORD>"
+
+COST CONTROLS
+- Allowance window: the first deployment was 26 Oct 2026 04:31 UTC, so the USD $20 Azure allowance covers both scrapers up to 25 Nov 2026 04:31 UTC.
+- Log Analytics daily ingestion cap: 0.03 GB per day, 30-day retention.
+- Budget alert "scraper-test-20usd" on the resource group: USD 20, shared with Mariano's, at 50% and 80% actual and 100% forecast. This is an alert only, not a stop.
+- The actual limits are the request caps and manual executions. There is no schedule.
+- I will notify you before anything could exceed the $20 Azure allowance.
+
+ONE CHANGE BEFORE THE PROBE
+You asked that the 10-request total hold across retries, restarts and repeated executions.
+- In 1.1.6 it holds across retries, and Azure never restarts an execution (retry limit 0).
+- A second execution of the probe, however, would start a new count of 10.
+- Before the probe I will add a persistent request ledger on the job's storage, as Mariano's already has, so the total of 10 can never be exceeded however often the probe is started.
+- That small code change becomes walmart-scraper 1.1.7. The diff and offline tests come with the probe results, and nothing else changes.
+- The exception rule and the UPC-queue fix I mentioned earlier are not part of 1.1.7.
+
+NEXT, ONCE YOU CONFIRM THE ROLES AND CREDENTIAL
+1. Deploy the job (Manual) and run its check, which makes no provider requests.
+2. Store probe: 10 requests or fewer in total, retries included.
+   - It verifies store #100, ZIP 72712, fulfillment and store-sourced prices from Walmart's own response content (pageMetadata.location and the store offer), not from configured labels or cookies.
+   - Even at the JS-rendered rate of $1.35 per 1,000, 10 requests cost about $0.01.
+   - This is the first live use of the username/password adapter for Walmart, and its store pinning has not been proven yet. Any authentication, compatibility or store-context failure is reported, and nothing further runs.
+For the probe you will get: version/hash, start/end times, request count, cost/usage and source evidence. Pass or fail.
+
+Attached: wm-azure-handover-2026-10-26.zip:
+- HANDOVER-azure-ids.txt
+- admin-role-commands.sh
+- deployment outputs
+- preflight before deploy
+- resources-and-cost-controls.txt
+- SHA256SUMS
+
+Best regards,
+Asif Khan

@@ -8,10 +8,9 @@ for UPC. About 9 runs per month.
 | Data-access API (Oxylabs Web API, Walmart endpoint) | listing + product pages per run × 9 runs; see observed figures below | **$80 – $250** |
 | Azure Container Apps Job | ~3–6 h × 1 vCPU / 2 GiB × 9 runs (consumption plan, free grant applies) | $0 – $10 |
 | Azure Blob Storage | < 5 GB incl. versions | ~$1 |
-| Azure Container Registry | Basic | ~$5 |
 | Key Vault | a few hundred operations | < $1 |
 | Log Analytics | < 1 GB ingestion | $0 – $3 |
-| **Total** | | **≈ $90 – $270** |
+| **Total** | | **≈ $85 – $265** |
 
 Cost levers: `crawl.enrich_product_pages: false` removes most product-page requests (UPC then only when listed),
 cutting provider cost by roughly 60–70 %. Each extra location adds roughly the same provider cost again.

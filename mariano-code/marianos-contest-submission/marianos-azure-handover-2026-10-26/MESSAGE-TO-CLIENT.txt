@@ -1,0 +1,59 @@
+MARIANO'S #69 — Azure infrastructure created: handover IDs and role commands
+
+Hello,
+
+Thank you for the approval. I acknowledge its scope: infrastructure now; then Test 1 (19 requests or fewer) and Test 2 (300 or fewer) after your credential and roles are in place; USD $20 Azure in total across both scrapers for 30 days; USD $1 Oxylabs for the three initial tests combined. Nothing else.
+
+The infrastructure-only step is done (26 Oct, 04:31-04:33 UTC), in scraper-contest-asif-test, West US 2:
+- v1.1.3; the release in Azure is byte-identical to the package you approved (code_sha256 f0badef5…)
+- 0 provider requests, no credential, no job, no schedule
+- the Key Vault is empty, and my Contributor role is refused when I try to read its secrets
+
+MARIANO'S HANDOVER (prefix mscraper)
+- Key Vault name: mscraper-kv-zwkzlg5qbam5
+- Key Vault URI: https://mscraper-kv-zwkzlg5qbam5.vault.azure.net/
+- Key Vault resource ID: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/mscraper-kv-zwkzlg5qbam5
+- Secret names: oxylabs-username, oxylabs-password (Classic Web Scraper API, realtime.oxylabs.io/v1/queries; the adapter is configured as PROVIDER=oxylabs_realtime)
+- Managed identity mscraper-id:
+  - principal/object ID: bb915f14-a28a-4ced-898d-fc3b070548ae
+  - client ID: 3ab483cb-7fef-4396-a7b8-d2d2e1360af4
+  - resource ID: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mscraper-id
+- Storage container resource ID: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default/containers/marianos-scraper
+- Container registry: none (no AcrPull)
+
+EXACT SCOPED ROLE COMMANDS (also in admin-role-commands.sh)
+az role assignment create --assignee-object-id bb915f14-a28a-4ced-898d-fc3b070548ae --assignee-principal-type ServicePrincipal --role "Storage Blob Data Contributor" --scope /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/mscraperzwkzlg5qbam5a/blobServices/default/containers/marianos-scraper
+az role assignment create --assignee-object-id bb915f14-a28a-4ced-898d-fc3b070548ae --assignee-principal-type ServicePrincipal --role "Key Vault Secrets User" --scope /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/mscraper-kv-zwkzlg5qbam5
+
+To store the credential, your administrator needs Key Vault Secrets Officer on this vault (Owner alone does not grant secret access in an RBAC vault):
+az keyvault secret set --vault-name mscraper-kv-zwkzlg5qbam5 --name oxylabs-username --value "<API-USER-NAME>"
+az keyvault secret set --vault-name mscraper-kv-zwkzlg5qbam5 --name oxylabs-password --value "<API-USER-PASSWORD>"
+
+COST CONTROLS
+- Allowance window: the first deployment was 26 Oct 2026 04:31 UTC, so the USD $20 Azure allowance covers both scrapers up to 25 Nov 2026 04:31 UTC.
+- Log Analytics daily ingestion cap: 0.03 GB per day, 30-day retention.
+- Budget alert "scraper-test-20usd" on the resource group: USD 20, shared with Walmart, at 50% and 80% actual and 100% forecast. This is an alert only, not a stop.
+- The actual limits are the request caps and manual executions. There is no schedule.
+- I will notify you before anything could exceed the $20 Azure allowance.
+
+NEXT, ONCE YOU CONFIRM THE ROLES AND CREDENTIAL
+1. Deploy the job (Manual) and run its check, which makes no provider requests.
+2. Test 1: 19 requests or fewer in total.
+3. Test 2: 300 requests or fewer, Batteries + Light Bulbs at Crystal Lake, no publication. Only if Test 1 passes.
+How the limits hold:
+- The totals are counted before each request is sent, retries included, in a budget file on the job's storage. They hold across restarts and repeated executions.
+- 319 requests at most, even all at the JS-rendered rate of $1.35 per 1,000, is about $0.43. With Walmart's 10, that stays inside the $1 Oxylabs allowance.
+- Store context is verified from Mariano's own response content.
+- This is the first live use of the username/password adapter. Any authentication, compatibility or store-context failure stops the sequence, and I report it before Test 2.
+For each test you will get: version/hash, start/end times, request counts, cost/usage and source evidence. Pass or fail. v1.1.4 follows within 1 working day of the tests.
+
+Attached: marianos-azure-handover-2026-10-26.zip:
+- HANDOVER-azure-ids.txt
+- admin-role-commands.sh
+- deployment outputs
+- preflight before deploy
+- resources-and-cost-controls.txt
+- SHA256SUMS
+
+Regards,
+Asif Khan

@@ -1,0 +1,2 @@
+D:\PROJECTS\python-scrappers\mariano-code\marianos-scraper\dist\marianos-scraper-1.1.3-src.zip 2b562742bd7288379773163fa07600dd85ccf8ff870b7a2d1a3f6f43b0f76ec8
+uploaded releases/marianos-scraper-1.1.3-src.zip

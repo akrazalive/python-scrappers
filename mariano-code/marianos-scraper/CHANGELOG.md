@@ -57,6 +57,22 @@ Why the code changed between collection and delivery of entry #69:
 * `tools/reconcile_v100_runs.py` – machine-readable coverage / remaining-gap reconciliation of the delivered entry #69
   run and the stopped query-expansion run, from their own checkpoints.
 
+## 1.1.3 (2026-10-26) – client clarification of 26 Oct (infrastructure first, scoped roles, no test windows)
+
+Deployment files only; `src/mscraper` is unchanged apart from the version number. No live requests.
+1. **Container-scoped storage role** – `main.bicep` / `deploy.sh`: Storage Blob Data Contributor is scoped to the
+   `marianos-scraper` blob container (was the storage account). Everything the identity reads or writes through
+   Blob (release ZIP, output, run history, run lock) is in that container; checkpoints are on the Azure Files share,
+   which the Container Apps environment mounts with the account key, so no account-wide data role is needed.
+2. **Handover file** – phase `infra` writes `HANDOVER-azure-ids.txt`: Key Vault name, resource id and URI, secret
+   name(s), managed-identity principal/object id, client id and resource id, storage account, container name and
+   container resource id, and "no container registry" (AcrPull not needed). `admin-role-commands.sh` uses the
+   container id as scope and ends with a check command.
+3. **New bicep outputs** – `containerId`, `containerName`, `keyVaultUri`, `identityName`, `identityClientId`,
+   `identityId`, `secretNames`.
+4. **Test windows removed** (`docs/TEST-PLAN.md`): approved tests start as soon as their prerequisites exist.
+5. Phase `infra` needs no Oxylabs credential and creates no job and no schedule (unchanged, now stated in the docs).
+
 ## 1.1.2 (2026-10-25) – client feedback of 24 Oct (bounded tests, Azure sequence, Oxylabs feature)
 * **Enforced TOTAL request caps** (`src/mscraper/budget.py`): `--budget NAME:TOTAL` / env `MSCRAPER_BUDGET` puts any
   command under a total that is stored in the state directory (Azure: the Azure Files share) and counted BEFORE each

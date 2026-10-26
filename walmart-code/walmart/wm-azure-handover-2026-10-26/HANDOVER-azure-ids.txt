@@ -1,0 +1,14 @@
+# Walmart scraper - Azure test infrastructure (phase 1, no provider requests, no job, no schedule)
+resource group:            scraper-contest-asif-test
+key vault name:            wmscraper-kv-zwkzlg5qbam
+key vault resource id:     /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/wmscraper-kv-zwkzlg5qbam
+key vault uri:             https://wmscraper-kv-zwkzlg5qbam.vault.azure.net/
+secret name(s) to set:     oxylabs-username oxylabs-password   (provider oxylabs)
+managed identity:          wmscraper-id
+  principal / object id:   3705145d-855c-4330-978f-be6e229c49ac
+  client id:               3d8368b7-d819-43d1-af24-8bec48389fb7
+  resource id:             /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wmscraper-id
+storage account:           wmscraperzwkzlg5qbam5a
+storage container:         walmart-scraper
+storage container res. id: /subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/wmscraperzwkzlg5qbam5a/blobServices/default/containers/walmart-scraper
+container registry:        none (public python:3.12-slim image; AcrPull not needed)

@@ -1,1 +1,1 @@
-3250d981bb4e94ad83b821d75a79899a13ad6def43d8266a267e22566c69fd20  walmart-scraper-1.1.5-src.zip
+24ad61040fcf2efcc39aa0272cccd5587f6d84dde2a2ffee76f133b6a176fb3e  walmart-scraper-1.1.6-src.zip
