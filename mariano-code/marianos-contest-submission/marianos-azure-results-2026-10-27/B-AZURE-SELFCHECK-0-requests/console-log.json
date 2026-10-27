@@ -1,0 +1,212 @@
+[
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:50.705877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:50.705877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:50.705877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:50.705877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "release releases/marianos-scraper-1.1.4-src.zip version=1.1.4 code_sha256=8df0e6e154418404c6ab5d04c44baf93a6c000d489548c8cb63479358442658f config_sha256[settings.yaml]=f66e96c95178b117ac9f58e93921e13699ddc06c544e510d80e8523d879b22f8 config_sha256[categories.csv]=606133cb12548d3f7f437ea9e0a056d88d0dd7f621ec0e1c210bb2fc20044da4 config_sha256[locations.yaml]=fc3ce2f2c9ebf2f6df0b15bc83b5e59eb3194bed55057a595318926931904a8b config_sha256[private_label_brands.txt]=ca0b9c21dcc312f35539a209ffaa357150ba8bd78edee612845ee18689b4b9d7 requirements_sha256=fbc7939ad79b9ccc7266ec4485abc1873e900aedba70e6282037244d1b712812 ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:52.6395909Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "mscraper ['selfcheck'] budget ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:57.9537848Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:57.9537848Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:57.9537848Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:57.9537848Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:57.9537848Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"ok\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"version\": \"1.1.4\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  },",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  },",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"read_back_matches\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"provider_requests\": 0,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  },",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"OXYLABS_USERNAME\": true,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"credentials_present\": {",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"platform\": \"Linux-6.6.150.1-1.azl3-x86_64-with-glibc2.41\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"key\": \"_selfcheck/20261027T040357Z.txt\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"backend\": \"BlobStorage\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"name\": \"marianos-scraper\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"write\": true,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"provider\": \"oxylabs_realtime\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"state_dir\": {",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"OXYLABS_PASSWORD\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"path\": \"/state/_selfcheck/20261027T040357Z.txt\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"write\": true,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"python\": \"3.12.16\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"code_sha256\": \"8df0e6e154418404c6ab5d04c44baf93a6c000d489548c8cb63479358442658f\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "  \"blob\": {",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "    \"read_back_matches\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-hu2268z-wjnkb",
+    "Log_s": "{",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:03:58.7298095Z"
+  }
+]

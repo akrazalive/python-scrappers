@@ -1,0 +1,86 @@
+[
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:23.7937174Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:23.7937174Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:23.7937174Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:23.7937174Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "release releases/walmart-scraper-1.1.7-src.zip version 1.1.7 source_sha256 91b8113d5d1feb9655f51368e453be7f26e1e5f282ffbc85c9322fd41aec8c59 ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:24.9078191Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:28.6622643Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:28.6622643Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:28.6622643Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "wmscraper ['--budget', 'probe:10', 'verify-store', '--location', 'walmart-100-bentonville', '--max-requests', '10']",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:28.6622643Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:28.6622643Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "{\"ts\": \"2026-10-27T04:11:12+00:00\", \"level\": \"INFO\", \"logger\": \"wmscraper.run\", \"event\": \"store_verified\", \"verified\": true, \"store_id\": \"100\", \"store_name\": \"Bentonville S Walton Blvd Supercenter\", \"store_location\": \"406 S Walton Blvd, Bentonville, AR 72712\", \"zipcode\": \"72712\", \"url\": \"https://www.walmart.com/store/100\", \"checked_at\": \"2026-10-27T04:11:12+00:00\", \"reason\": \"\"}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:13.4170554Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "{\"ts\": \"2026-10-27T04:12:25+00:00\", \"level\": \"WARNING\", \"logger\": \"wmscraper.fetch\", \"event\": \"slow_response\", \"url\": \"https://www.walmart.com/ip/43436773\", \"seconds\": 48.9}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:12:26.7899239Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "{\"ts\": \"2026-10-27T04:12:25+00:00\", \"level\": \"INFO\", \"logger\": \"wmscraper.run\", \"event\": \"canary\", \"phase\": \"start\", \"ok\": false, \"problems\": [\"10450114: selected pickup store {'storeIds': ['4376'], 'pickupStoreId': '4376', 'intent': 'PICKUP', 'postalCode': '72712'}\", \"43436773: selected pickup store {'storeIds': ['4376'], 'pickupStoreId': '4376', 'intent': 'PICKUP', 'postalCode': '72712'}\"]}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:12:26.7899239Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-y3w7c4j-gcsjw",
+    "Log_s": "ERROR: all canary items failed at start – likely blocked or wrong store",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:12:26.7899239Z"
+  }
+]

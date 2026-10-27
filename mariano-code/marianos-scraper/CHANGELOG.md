@@ -57,6 +57,21 @@ Why the code changed between collection and delivery of entry #69:
 * `tools/reconcile_v100_runs.py` – machine-readable coverage / remaining-gap reconciliation of the delivered entry #69
   run and the stopped query-expansion run, from their own checkpoints.
 
+## 1.1.4 (2026-10-27) – zero-request deployment check before the live tests
+
+1. **`selfcheck`** (`cli.py`, `run_test.sh selfcheck`): 0 provider requests. Reports whether the Key Vault-backed
+   credentials reached the process (by name only, never values), writes a random test blob into the
+   `marianos-scraper` container with the managed identity and reads it back, and writes/reads a file on the state
+   share that holds the persistent request budgets. Exit 0 only if all three succeed.
+2. **Log Analytics daily cap in the template** (`main.bicep`: `workspaceCapping.dailyQuotaGb 0.03`), so the job
+   deployment cannot reset the cap that was set after the infrastructure step.
+3. Tests: `tests/test_v114_selfcheck.py` (2 offline tests; 46 in total).
+4. **Proposed, not yet deployed – SQLite on the state share** (`main.bicep`: volume `mountOptions: 'nobrl'`). Live Test 1
+   on 27 Oct failed before any provider request with `sqlite3.OperationalError: database is locked`: the checkpoint
+   database is on the Azure Files (SMB) share, where SQLite's byte-range locks fail. `nobrl` turns those locks off;
+   one execution at a time (parallelism 1 + run lock) means there are no concurrent writers. Template only –
+   `code_sha256` unchanged. Deployed and Test 1 re-run only after the client's confirmation.
+
 ## 1.1.3 (2026-10-26) – client clarification of 26 Oct (infrastructure first, scoped roles, no test windows)
 
 Deployment files only; `src/mscraper` is unchanged apart from the version number. No live requests.

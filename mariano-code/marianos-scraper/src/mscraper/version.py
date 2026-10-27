@@ -6,7 +6,7 @@ import platform
 import sys
 from pathlib import Path
 
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 _SRC = Path(__file__).resolve().parent
 
 

@@ -3,16 +3,20 @@
 # Every start returns at once: the execution runs in Azure, independent of the machine that started it.
 #
 #   run_test.sh <sub> <rg> check              # job runs `status`: release, credential present, storage (0 requests)
-#   run_test.sh <sub> <rg> probe              # store #100 + canary check, <= 10 provider requests (retries included)
-#   run_test.sh <sub> <rg> run <cap> [args]   # `run --location walmart-100-bentonville --max-requests <cap> [args]`;
-#                                             # <cap> is the client-approved request total for this execution
+#   run_test.sh <sub> <rg> selfcheck          # credentials present + test-blob write/read with the identity (0 requests)
+#   run_test.sh <sub> <rg> probe              # store #100 + canary check, persistent total `probe` <= 10 requests
+#   run_test.sh <sub> <rg> run <name> <cap> [args]   # `run --location walmart-100-bentonville` under the persistent
+#                                             # total <name>:<cap> (client-approved); repeating it never adds requests
+#   run_test.sh <sub> <rg> budget <name>      # used / remaining of a persistent total (0 provider requests)
 #   run_test.sh <sub> <rg> stop               # forced interruption of the running execution (hard-stop/resume test)
 #   run_test.sh <sub> <rg> status             # executions of the job (0 provider requests)
 #   run_test.sh <sub> <rg> collect [exec]     # execution record, console log, run files, checksums; sets the job
 #                                             # back to `status` (an accidental start sends no provider request)
 #
-# Caps are enforced by the fetcher (--max-requests counts every attempt, retries included). The job has
-# replicaRetryLimit 0, so Azure never restarts an execution on its own. Starts are refused unless the job is Manual.
+# Totals are enforced by the fetcher with a persistent ledger in the walmart-scraper container (budget.py): every
+# attempt, retries included, is counted and saved before it is sent, across restarts and repeated executions. The
+# job also has replicaRetryLimit 0, so Azure never restarts an execution on its own. Starts are refused unless the
+# job is Manual.
 set -euo pipefail
 export MSYS_NO_PATHCONV=1   # Git Bash on Windows: keep /subscriptions/... resource ids unchanged
 SUB=${1:?subscription id}; RG=${2:?resource group}; WHAT=${3:?check|probe|run|stop|status|collect}
@@ -34,11 +38,13 @@ start(){  # $1 = wmscraper arguments
 
 case "$WHAT" in
   check) start "status" ;;
-  probe) start "verify-store --location $STORE --max-requests 10" ;;
+  selfcheck) start "selfcheck" ;;
+  probe) start "--budget probe:10 verify-store --location $STORE --max-requests 10" ;;
+  budget) start "budget-status --name ${4:?budget name}" ;;
   run)
-    CAP=${4:?client-approved request cap for this execution}
+    NAME=${4:?budget name for this approved test}; CAP=${5:?client-approved total request cap}
     [[ "$CAP" =~ ^[1-9][0-9]*$ ]] || { echo "cap must be a positive integer"; exit 1; }
-    shift 4; start "run --location $STORE --max-requests $CAP $*" ;;
+    shift 5; start "--budget $NAME:$CAP run --location $STORE --max-requests $CAP $*" ;;
   stop)
     EXEC=$(last_exec)
     az containerapp job stop -g "$RG" -n "$JOB" --job-execution-name "$EXEC" -o none

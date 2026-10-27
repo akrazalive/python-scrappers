@@ -1,0 +1,69 @@
+{
+  "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.App/jobs/wmscraper-job/executions/wmscraper-job-azj258k",
+  "name": "wmscraper-job-azj258k",
+  "properties": {
+    "endTime": "2026-10-27T04:04:37+00:00",
+    "startTime": "2026-10-27T04:03:55+00:00",
+    "status": "Succeeded",
+    "template": {
+      "containers": [
+        {
+          "command": [
+            "python",
+            "-c",
+            "import io, os, shlex, subprocess, sys, zipfile\r\nsubprocess.run([sys.executable, \"-m\", \"pip\", \"install\", \"-q\", \"--no-cache-dir\", \"azure-storage-blob==12.31.0\", \"azure-identity==1.26.0\"], check=True)\r\nfrom azure.identity import DefaultAzureCredential\r\nfrom azure.storage.blob import BlobServiceClient\r\ncc = BlobServiceClient(os.environ[\"AZURE_STORAGE_ACCOUNT_URL\"], credential=DefaultAzureCredential()).get_container_client(\"walmart-scraper\")\r\nzipfile.ZipFile(io.BytesIO(cc.download_blob(os.environ[\"RELEASE_BLOB\"]).readall())).extractall(\"/tmp/app\")\r\nroot = \"/tmp/app/walmart-scraper\"\r\nprint(\"release\", os.environ[\"RELEASE_BLOB\"], open(root + \"/SOURCE_FINGERPRINT.txt\").read().replace(chr(10), \" \"), flush=True)\r\nsubprocess.run([sys.executable, \"-m\", \"pip\", \"install\", \"-q\", \"--no-cache-dir\", \"-r\", root + \"/requirements.txt\"], check=True)\r\nos.chdir(root)\r\nargs = shlex.split(os.environ.get(\"WMSCRAPER_ARGS\") or \"status\")\r\nprint(\"wmscraper\", args, flush=True)\r\nsys.exit(subprocess.run([sys.executable, \"-m\", \"wmscraper\", *args], env={**os.environ, \"PYTHONPATH\": root + \"/src\"}).returncode)\r\n"
+          ],
+          "env": [
+            {
+              "name": "OXYLABS_USERNAME",
+              "secretRef": "cappjob-wmscraper-job"
+            },
+            {
+              "name": "OXYLABS_PASSWORD",
+              "secretRef": "cappjob-wmscraper-job"
+            },
+            {
+              "name": "WMSCRAPER_FETCH_PROVIDER",
+              "value": "oxylabs"
+            },
+            {
+              "name": "WMSCRAPER_ARGS",
+              "value": "selfcheck"
+            },
+            {
+              "name": "WMSCRAPER_OUTPUT_BACKEND",
+              "value": "azure_blob"
+            },
+            {
+              "name": "AZURE_STORAGE_ACCOUNT_URL",
+              "value": "https://wmscraperzwkzlg5qbam5a.blob.core.windows.net/"
+            },
+            {
+              "name": "AZURE_CLIENT_ID",
+              "value": "3d8368b7-d819-43d1-af24-8bec48389fb7"
+            },
+            {
+              "name": "LOG_LEVEL",
+              "value": "INFO"
+            },
+            {
+              "name": "RELEASE_BLOB",
+              "value": "releases/walmart-scraper-1.1.7-src.zip"
+            }
+          ],
+          "image": "docker.io/library/python:3.12-slim",
+          "imageType": "ContainerImage",
+          "name": "scraper",
+          "resources": {
+            "cpu": 1.0,
+            "ephemeralStorage": "",
+            "memory": "2Gi"
+          }
+        }
+      ],
+      "initContainers": []
+    }
+  },
+  "resourceGroup": "scraper-contest-asif-test",
+  "type": "Microsoft.App/jobs/executions"
+}

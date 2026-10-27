@@ -1,0 +1,164 @@
+[
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:27.5597444Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:27.5597444Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:27.5597444Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:27.5597444Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "release releases/walmart-scraper-1.1.7-src.zip version 1.1.7 source_sha256 91b8113d5d1feb9655f51368e453be7f26e1e5f282ffbc85c9322fd41aec8c59 ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:28.3012982Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:32.2963984Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "wmscraper ['selfcheck']",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:32.2963984Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:32.2963984Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:32.2963984Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:32.2963984Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  },",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "    \"OXYLABS_PASSWORD\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "    \"OXYLABS_USERNAME\": true,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"version\": \"1.1.7\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"ok\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  },",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"provider\": \"oxylabs\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"source_sha256\": \"91b8113d5d1feb9655f51368e453be7f26e1e5f282ffbc85c9322fd41aec8c59\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"credentials_present\": {",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "    \"key\": \"_selfcheck/20261027T040431Z.txt\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "    \"write\": true,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"provider_requests\": 0,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "    \"read_back_matches\": true",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "    \"backend\": \"BlobStorage\",",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "  \"blob\": {",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  },
+  {
+    "ContainerGroupName_s": "wmscraper-job-azj258k-zjdkt",
+    "Log_s": "{",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:04:33.2665551Z"
+  }
+]

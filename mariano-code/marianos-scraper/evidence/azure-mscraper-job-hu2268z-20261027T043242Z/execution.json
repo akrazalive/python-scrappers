@@ -1,0 +1,73 @@
+{
+  "id": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.App/jobs/mscraper-job/executions/mscraper-job-hu2268z",
+  "name": "mscraper-job-hu2268z",
+  "properties": {
+    "endTime": "2026-10-27T04:04:03+00:00",
+    "startTime": "2026-10-27T04:03:15+00:00",
+    "status": "Succeeded",
+    "template": {
+      "containers": [
+        {
+          "command": [
+            "python",
+            "-c",
+            "import io, os, subprocess, sys, zipfile\r\nsubprocess.run([sys.executable, \"-m\", \"pip\", \"install\", \"-q\", \"--no-cache-dir\", \"azure-storage-blob==12.31.0\", \"azure-identity==1.26.0\"], check=True)\r\nfrom azure.identity import DefaultAzureCredential\r\nfrom azure.storage.blob import BlobServiceClient\r\ncc = BlobServiceClient(os.environ[\"AZURE_STORAGE_ACCOUNT_URL\"], credential=DefaultAzureCredential()).get_container_client(\"marianos-scraper\")\r\nzipfile.ZipFile(io.BytesIO(cc.download_blob(os.environ[\"RELEASE_BLOB\"]).readall())).extractall(\"/tmp/app\")\r\nroot = \"/tmp/app/marianos-scraper\"\r\nprint(\"release\", os.environ[\"RELEASE_BLOB\"], open(root + \"/SOURCE_FINGERPRINT.txt\").read().replace(chr(10), \" \"), flush=True)\r\nsubprocess.run([sys.executable, \"-m\", \"pip\", \"install\", \"-q\", \"--no-cache-dir\", \"-r\", root + \"/requirements.lock\"], check=True)\r\nos.chdir(root)\r\nimport shlex\r\nargs = shlex.split(os.environ.get(\"MSCRAPER_ARGS\") or \"budget-status\")\r\nprint(\"mscraper\", args, \"budget\", os.environ.get(\"MSCRAPER_BUDGET\", \"\"), flush=True)\r\nsys.exit(subprocess.run([sys.executable, \"-m\", \"mscraper\", *args], env={**os.environ, \"PYTHONPATH\": root + \"/src\"}).returncode)\r\n"
+          ],
+          "env": [
+            {
+              "name": "OXYLABS_USERNAME",
+              "secretRef": "cappjob-mscraper-job"
+            },
+            {
+              "name": "OXYLABS_PASSWORD",
+              "secretRef": "cappjob-mscraper-job"
+            },
+            {
+              "name": "MSCRAPER_FETCH_PROVIDER",
+              "value": "oxylabs_realtime"
+            },
+            {
+              "name": "MSCRAPER_CONCURRENCY",
+              "value": "4"
+            },
+            {
+              "name": "MSCRAPER_ARGS",
+              "value": "selfcheck"
+            },
+            {
+              "name": "MSCRAPER_OUTPUT_BACKEND",
+              "value": "azure_blob"
+            },
+            {
+              "name": "MSCRAPER_STATE_DIR",
+              "value": "/state"
+            },
+            {
+              "name": "AZURE_STORAGE_ACCOUNT_URL",
+              "value": "https://mscraperzwkzlg5qbam5a.blob.core.windows.net/"
+            },
+            {
+              "name": "AZURE_CLIENT_ID",
+              "value": "3ab483cb-7fef-4396-a7b8-d2d2e1360af4"
+            },
+            {
+              "name": "RELEASE_BLOB",
+              "value": "releases/marianos-scraper-1.1.4-src.zip"
+            }
+          ],
+          "image": "docker.io/library/python:3.12-slim",
+          "imageType": "ContainerImage",
+          "name": "scraper",
+          "resources": {
+            "cpu": 0.5,
+            "ephemeralStorage": "",
+            "memory": "1Gi"
+          }
+        }
+      ],
+      "initContainers": []
+    }
+  },
+  "resourceGroup": "scraper-contest-asif-test",
+  "type": "Microsoft.App/jobs/executions"
+}

@@ -2,6 +2,7 @@
 # Starts / stops / collects the agreed live runs as MANUAL executions of the deployed job. Creates no schedule.
 # Every start returns at once: the execution runs in Azure, independent of the machine that started it.
 #
+#   run_test.sh <sub> <rg> selfcheck         # 0 provider requests: Key Vault credentials present, blob + state write/read
 #   run_test.sh <sub> <rg> test1             # <= 19 provider requests in total (both stores + probe)
 #   run_test.sh <sub> <rg> test2             # <= 300 in total (Batteries + Light Bulbs, Crystal Lake, no publish)
 #   run_test.sh <sub> <rg> full <cap>        # Test 3: all CSV rows, Crystal Lake, total <= <cap> (client-approved);
@@ -33,6 +34,7 @@ start(){  # $1 = mscraper arguments
 }
 
 case "$WHAT" in
+  selfcheck) start "selfcheck" ;;
   test1|test2) start "bounded-test $WHAT" ;;
   full) CAP=${4:?client-approved total request cap}; start "--budget test3:$CAP run --location $STORE --resume" ;;
   stop)
@@ -60,6 +62,7 @@ ContainerAppConsoleLogs_CL | where ContainerJobName_s == '$JOB' and ContainerGro
 | project TimeGenerated, ContainerGroupName_s, Log_s | order by TimeGenerated asc" -o json > "$OUT/console-log.json"
     SA=$(az storage account list -g "$RG" --query "[?starts_with(name,'mscraper')].name | [0]" -o tsv)
     KEY=$(az storage account keys list -g "$RG" -n "$SA" --query "[0].value" -o tsv)
+    mkdir -p "$OUT/state"
     az storage file download-batch --account-name "$SA" --account-key "$KEY" -s scraper-state -d "$OUT/state" -o none
     cp evidence/executions.log "$OUT/" 2>/dev/null || true
     ( cd "$OUT" && find . -type f ! -name SHA256SUMS.txt | sort | xargs sha256sum > SHA256SUMS.txt )

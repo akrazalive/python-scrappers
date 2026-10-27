@@ -7,6 +7,7 @@
   python -m mscraper probe --location <key> [--query Batteries]   # live paging / brand-filter probe with evidence
   python -m mscraper bounded-test test1|test2      # the agreed bounded live tests, total request cap enforced
   python -m mscraper budget-status [--name test1]  # requests used / remaining per bounded test
+  python -m mscraper selfcheck                     # 0 provider requests: credentials present, blob + state write/read
 
   --budget NAME:TOTAL (or env MSCRAPER_BUDGET) puts any command under a TOTAL request cap that persists in the state
   directory across commands, retries, resumes and job executions (see budget.py).
@@ -55,6 +56,42 @@ def _total_budget(args, settings, command: str):
         return None
     name, total = parse_spec(spec)
     return TotalBudget(_state_dir(settings) / "_budgets", name, total, command=command)
+
+
+PROVIDER_ENV = {"oxylabs_kroger": ("OXYLABS_WEBAPI_KEY",), "oxylabs_realtime": ("OXYLABS_USERNAME", "OXYLABS_PASSWORD")}
+
+
+def cmd_selfcheck(settings) -> dict:
+    """Deployment check without any provider request: Key Vault-backed credentials reached the process (names
+    only, never values), and the managed identity can write and read back a blob in the designated container; the
+    state share (persistent request budgets) is writable."""
+    import secrets
+    from datetime import datetime, timezone
+
+    from .version import version_info
+
+    provider = os.getenv("MSCRAPER_FETCH_PROVIDER") or settings.get("fetch.provider", "oxylabs_kroger")
+    out = {**version_info(), "provider": provider, "provider_requests": 0,
+           "credentials_present": {k: bool(os.getenv(k)) for k in PROVIDER_ENV.get(provider, ())}}
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    token = secrets.token_hex(16).encode()
+    try:
+        st = build_storage(settings)
+        key = f"_selfcheck/{ts}.txt"
+        st.put_bytes(key, token)
+        out["blob"] = {"backend": type(st).__name__, "key": key, "write": True, "read_back_matches": st.get_bytes(key) == token}
+    except Exception as exc:  # e.g. role assignment missing or not yet propagated
+        out["blob"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+    try:
+        f = _state_dir(settings) / "_selfcheck" / f"{ts}.txt"
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_bytes(token)
+        out["state_dir"] = {"path": str(f), "write": True, "read_back_matches": f.read_bytes() == token}
+    except Exception as exc:
+        out["state_dir"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+    out["ok"] = (all(out["credentials_present"].values()) and out["blob"].get("read_back_matches") is True
+                 and out["state_dir"].get("read_back_matches") is True)
+    return out
 
 
 # The bounded live tests proposed to the client. Each step has its own cap; the test's total cap is enforced on top
@@ -110,6 +147,7 @@ def main(argv=None) -> int:
     pr.add_argument("--max-requests", type=int, default=15, help="hard cap on provider requests for this probe")
     bt = sub.add_parser("bounded-test", help="run an agreed bounded live test under its enforced total request cap")
     bt.add_argument("test", choices=sorted(BOUNDED_TESTS))
+    sub.add_parser("selfcheck", help="0 provider requests: credentials present, blob + state write/read")
     bs = sub.add_parser("budget-status")
     bs.add_argument("--name", default=None)
     s = sub.add_parser("summary")
@@ -211,6 +249,11 @@ def main(argv=None) -> int:
         b = _total_budget(argparse.Namespace(budget=spec), settings, "")
         print(json.dumps({"test": args.test, "exit_code": rc, "budget": b.summary()}, indent=2))
         return rc
+
+    if args.cmd == "selfcheck":
+        res = cmd_selfcheck(settings)
+        print(json.dumps(res, indent=2))
+        return 0 if res["ok"] else 1
 
     if args.cmd == "budget-status":
         d = _state_dir(settings) / "_budgets"

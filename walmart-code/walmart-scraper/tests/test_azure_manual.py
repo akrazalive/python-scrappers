@@ -50,3 +50,59 @@ def test_infrastructure_template_is_manual_and_needs_no_role_rights_or_credentia
         assert ra == "if (assignRoles)"
     assert re.search(r"resource job 'Microsoft.App/jobs@[^']+' = if \(deployJob\)", BICEP)
     assert "scope: container" in BICEP             # blob role limited to the designated container
+
+
+# ---- 1.1.7: persistent total request ledger -------------------------------------------------------------------
+def _budget(site):
+    from wmscraper.config import load_settings
+    from wmscraper.storage import build_storage
+
+    s = load_settings(str(site))
+    return s, build_storage(s)
+
+
+def test_probe_total_holds_across_repeated_executions(site, capsys):
+    from wmscraper.budget import TotalBudget
+
+    for _ in range(3):  # the probe started three times: still never more than 3 requests in total
+        main(["--config", str(site), "--budget", "probe:3", "verify-store", "--location", "test-store", "--max-requests", "10"])
+    s, st = _budget(site)
+    state = st.get_json("_budgets/probe.json")
+    assert state["used"] == 3 and state["total"] == 3
+    ledger = st.get_bytes("_budgets/probe.jsonl").decode().splitlines()
+    assert len(ledger) == 3 and [json.loads(x)["n"] for x in ledger] == [1, 2, 3]
+    assert TotalBudget(st, "probe", 3).remaining == 0
+    capsys.readouterr()
+
+
+def test_retries_count_against_the_total_and_the_cap_cannot_be_raised(site):
+    import asyncio
+
+    import pytest
+
+    from wmscraper.budget import TotalBudget
+    from wmscraper.fetch import FetchError
+    from wmscraper.fetch.base import Fetcher
+
+    s, st = _budget(site)
+    s.raw["fetch"].update(max_retries=10, backoff_base_seconds=0)
+
+    class AlwaysFails(Fetcher):
+        sent = 0
+
+        async def _fetch_once(self, url):
+            AlwaysFails.sent += 1
+            raise FetchError("HTTP 500", "http")
+
+    f = AlwaysFails(s, s.location("test-store"))
+    f.total_budget = TotalBudget(st, "retrytest", 4)
+    with pytest.raises(FetchError, match="total budget 'retrytest' of 4"):
+        asyncio.run(f.get("https://www.walmart.com/ip/1"))
+    assert AlwaysFails.sent == 4                                   # 1 attempt + 3 retries, then refused
+    f2 = AlwaysFails(s, s.location("test-store"))                  # a restarted process: nothing left
+    f2.total_budget = TotalBudget(st, "retrytest", 4)
+    with pytest.raises(FetchError, match="used up"):
+        asyncio.run(f2.get("https://www.walmart.com/ip/1"))
+    assert AlwaysFails.sent == 4
+    with pytest.raises(ValueError, match="never raised"):
+        TotalBudget(st, "retrytest", 40)

@@ -1,0 +1,214 @@
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/CHANGELOG.md b/marianos-scraper/CHANGELOG.md
+--- marianos-scraper/CHANGELOG.md
++++ marianos-scraper/CHANGELOG.md
+@@ -57,6 +57,21 @@
+ * `tools/reconcile_v100_runs.py` – machine-readable coverage / remaining-gap reconciliation of the delivered entry #69
+   run and the stopped query-expansion run, from their own checkpoints.
+ 
++## 1.1.4 (2026-10-27) – zero-request deployment check before the live tests
++
++1. **`selfcheck`** (`cli.py`, `run_test.sh selfcheck`): 0 provider requests. Reports whether the Key Vault-backed
++   credentials reached the process (by name only, never values), writes a random test blob into the
++   `marianos-scraper` container with the managed identity and reads it back, and writes/reads a file on the state
++   share that holds the persistent request budgets. Exit 0 only if all three succeed.
++2. **Log Analytics daily cap in the template** (`main.bicep`: `workspaceCapping.dailyQuotaGb 0.03`), so the job
++   deployment cannot reset the cap that was set after the infrastructure step.
++3. Tests: `tests/test_v114_selfcheck.py` (2 offline tests; 46 in total).
++4. **Proposed, not yet deployed – SQLite on the state share** (`main.bicep`: volume `mountOptions: 'nobrl'`). Live Test 1
++   on 27 Oct failed before any provider request with `sqlite3.OperationalError: database is locked`: the checkpoint
++   database is on the Azure Files (SMB) share, where SQLite's byte-range locks fail. `nobrl` turns those locks off;
++   one execution at a time (parallelism 1 + run lock) means there are no concurrent writers. Template only –
++   `code_sha256` unchanged. Deployed and Test 1 re-run only after the client's confirmation.
++
+ ## 1.1.3 (2026-10-26) – client clarification of 26 Oct (infrastructure first, scoped roles, no test windows)
+ 
+ Deployment files only; `src/mscraper` is unchanged apart from the version number. No live requests.
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/deploy/azure/main.bicep b/marianos-scraper/deploy/azure/main.bicep
+--- marianos-scraper/deploy/azure/main.bicep
++++ marianos-scraper/deploy/azure/main.bicep
+@@ -24,7 +24,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
+-param releaseBlob string = 'releases/marianos-scraper-1.1.3-src.zip'
++param releaseBlob string = 'releases/marianos-scraper-1.1.4-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+@@ -89,7 +89,8 @@
+   name: '${prefix}-logs'
+   location: location
+   tags: tags
+-  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30 }
++  // daily ingestion cap (client spending allowance): logs stop being collected for the day instead of costing more
++  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30, workspaceCapping: { dailyQuotaGb: json('0.03') } }
+ }
+ 
+ resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+@@ -202,7 +203,9 @@
+       secrets: [for n in providerSecrets: { name: n, keyVaultUrl: '${kv.properties.vaultUri}secrets/${n}', identity: identity.id }]
+     }
+     template: {
+-      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name } ]
++      // nobrl: SQLite checkpoints on the SMB share fail with 'database is locked' unless byte-range locks are off
++      // (one execution at a time: parallelism 1 + the run lock, so no concurrent writers)
++      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name, mountOptions: 'nobrl' } ]
+       containers: [
+         {
+           name: 'scraper'
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/deploy/azure/run_test.sh b/marianos-scraper/deploy/azure/run_test.sh
+--- marianos-scraper/deploy/azure/run_test.sh
++++ marianos-scraper/deploy/azure/run_test.sh
+@@ -2,6 +2,7 @@
+ # Starts / stops / collects the agreed live runs as MANUAL executions of the deployed job. Creates no schedule.
+ # Every start returns at once: the execution runs in Azure, independent of the machine that started it.
+ #
++#   run_test.sh <sub> <rg> selfcheck         # 0 provider requests: Key Vault credentials present, blob + state write/read
+ #   run_test.sh <sub> <rg> test1             # <= 19 provider requests in total (both stores + probe)
+ #   run_test.sh <sub> <rg> test2             # <= 300 in total (Batteries + Light Bulbs, Crystal Lake, no publish)
+ #   run_test.sh <sub> <rg> full <cap>        # Test 3: all CSV rows, Crystal Lake, total <= <cap> (client-approved);
+@@ -33,6 +34,7 @@
+ }
+ 
+ case "$WHAT" in
++  selfcheck) start "selfcheck" ;;
+   test1|test2) start "bounded-test $WHAT" ;;
+   full) CAP=${4:?client-approved total request cap}; start "--budget test3:$CAP run --location $STORE --resume" ;;
+   stop)
+@@ -60,6 +62,7 @@
+ | project TimeGenerated, ContainerGroupName_s, Log_s | order by TimeGenerated asc" -o json > "$OUT/console-log.json"
+     SA=$(az storage account list -g "$RG" --query "[?starts_with(name,'mscraper')].name | [0]" -o tsv)
+     KEY=$(az storage account keys list -g "$RG" -n "$SA" --query "[0].value" -o tsv)
++    mkdir -p "$OUT/state"
+     az storage file download-batch --account-name "$SA" --account-key "$KEY" -s scraper-state -d "$OUT/state" -o none
+     cp evidence/executions.log "$OUT/" 2>/dev/null || true
+     ( cd "$OUT" && find . -type f ! -name SHA256SUMS.txt | sort | xargs sha256sum > SHA256SUMS.txt )
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/cli.py b/marianos-scraper/src/mscraper/cli.py
+--- marianos-scraper/src/mscraper/cli.py
++++ marianos-scraper/src/mscraper/cli.py
+@@ -7,6 +7,7 @@
+   python -m mscraper probe --location <key> [--query Batteries]   # live paging / brand-filter probe with evidence
+   python -m mscraper bounded-test test1|test2      # the agreed bounded live tests, total request cap enforced
+   python -m mscraper budget-status [--name test1]  # requests used / remaining per bounded test
++  python -m mscraper selfcheck                     # 0 provider requests: credentials present, blob + state write/read
+ 
+   --budget NAME:TOTAL (or env MSCRAPER_BUDGET) puts any command under a TOTAL request cap that persists in the state
+   directory across commands, retries, resumes and job executions (see budget.py).
+@@ -57,6 +58,42 @@
+     return TotalBudget(_state_dir(settings) / "_budgets", name, total, command=command)
+ 
+ 
++PROVIDER_ENV = {"oxylabs_kroger": ("OXYLABS_WEBAPI_KEY",), "oxylabs_realtime": ("OXYLABS_USERNAME", "OXYLABS_PASSWORD")}
++
++
++def cmd_selfcheck(settings) -> dict:
++    """Deployment check without any provider request: Key Vault-backed credentials reached the process (names
++    only, never values), and the managed identity can write and read back a blob in the designated container; the
++    state share (persistent request budgets) is writable."""
++    import secrets
++    from datetime import datetime, timezone
++
++    from .version import version_info
++
++    provider = os.getenv("MSCRAPER_FETCH_PROVIDER") or settings.get("fetch.provider", "oxylabs_kroger")
++    out = {**version_info(), "provider": provider, "provider_requests": 0,
++           "credentials_present": {k: bool(os.getenv(k)) for k in PROVIDER_ENV.get(provider, ())}}
++    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
++    token = secrets.token_hex(16).encode()
++    try:
++        st = build_storage(settings)
++        key = f"_selfcheck/{ts}.txt"
++        st.put_bytes(key, token)
++        out["blob"] = {"backend": type(st).__name__, "key": key, "write": True, "read_back_matches": st.get_bytes(key) == token}
++    except Exception as exc:  # e.g. role assignment missing or not yet propagated
++        out["blob"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
++    try:
++        f = _state_dir(settings) / "_selfcheck" / f"{ts}.txt"
++        f.parent.mkdir(parents=True, exist_ok=True)
++        f.write_bytes(token)
++        out["state_dir"] = {"path": str(f), "write": True, "read_back_matches": f.read_bytes() == token}
++    except Exception as exc:
++        out["state_dir"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
++    out["ok"] = (all(out["credentials_present"].values()) and out["blob"].get("read_back_matches") is True
++                 and out["state_dir"].get("read_back_matches") is True)
++    return out
++
++
+ # The bounded live tests proposed to the client. Each step has its own cap; the test's total cap is enforced on top
+ # of them by a persistent TotalBudget, so re-running a test can never exceed its total.
+ BOUNDED_TESTS = {
+@@ -110,6 +147,7 @@
+     pr.add_argument("--max-requests", type=int, default=15, help="hard cap on provider requests for this probe")
+     bt = sub.add_parser("bounded-test", help="run an agreed bounded live test under its enforced total request cap")
+     bt.add_argument("test", choices=sorted(BOUNDED_TESTS))
++    sub.add_parser("selfcheck", help="0 provider requests: credentials present, blob + state write/read")
+     bs = sub.add_parser("budget-status")
+     bs.add_argument("--name", default=None)
+     s = sub.add_parser("summary")
+@@ -212,6 +250,11 @@
+         print(json.dumps({"test": args.test, "exit_code": rc, "budget": b.summary()}, indent=2))
+         return rc
+ 
++    if args.cmd == "selfcheck":
++        res = cmd_selfcheck(settings)
++        print(json.dumps(res, indent=2))
++        return 0 if res["ok"] else 1
++
+     if args.cmd == "budget-status":
+         d = _state_dir(settings) / "_budgets"
+         rows = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(d.glob("*.json"))] if d.exists() else []
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/version.py b/marianos-scraper/src/mscraper/version.py
+--- marianos-scraper/src/mscraper/version.py
++++ marianos-scraper/src/mscraper/version.py
+@@ -6,7 +6,7 @@
+ import sys
+ from pathlib import Path
+ 
+-__version__ = "1.1.3"
++__version__ = "1.1.4"
+ _SRC = Path(__file__).resolve().parent
+ 
+ 
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/tests/test_v114_selfcheck.py b/marianos-scraper/tests/test_v114_selfcheck.py
+--- marianos-scraper/tests/test_v114_selfcheck.py
++++ marianos-scraper/tests/test_v114_selfcheck.py
+@@ -0,0 +1,39 @@
++"""v1.1.4: `selfcheck` – the zero-request deployment check run by the manual Azure job before any live test."""
++import json
++from pathlib import Path
++
++from mscraper import cli
++from mscraper.config import load_settings
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def _settings(tmp_path):
++    s = load_settings(ROOT / "config" / "settings.yaml")
++    s.raw["output"]["backend"] = "local"
++    s.raw["output"]["local_dir"] = str(tmp_path / "output")
++    return s
++
++
++def test_selfcheck_writes_and_reads_back_and_never_prints_credentials(tmp_path, monkeypatch):
++    monkeypatch.delenv("MSCRAPER_OUTPUT_BACKEND", raising=False)
++    monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
++    monkeypatch.setenv("MSCRAPER_FETCH_PROVIDER", "oxylabs_realtime")
++    monkeypatch.setenv("OXYLABS_USERNAME", "user-value-not-printed")
++    monkeypatch.setenv("OXYLABS_PASSWORD", "password-value-not-printed")
++    res = cli.cmd_selfcheck(_settings(tmp_path))
++    raw = json.dumps(res)
++    assert res["ok"] is True and res["provider_requests"] == 0
++    assert res["credentials_present"] == {"OXYLABS_USERNAME": True, "OXYLABS_PASSWORD": True}
++    assert res["blob"]["read_back_matches"] is True and res["state_dir"]["read_back_matches"] is True
++    assert "value-not-printed" not in raw
++
++
++def test_selfcheck_fails_when_a_credential_is_missing(tmp_path, monkeypatch):
++    monkeypatch.delenv("MSCRAPER_OUTPUT_BACKEND", raising=False)
++    monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
++    monkeypatch.setenv("MSCRAPER_FETCH_PROVIDER", "oxylabs_realtime")
++    monkeypatch.setenv("OXYLABS_USERNAME", "u")
++    monkeypatch.delenv("OXYLABS_PASSWORD", raising=False)
++    res = cli.cmd_selfcheck(_settings(tmp_path))
++    assert res["ok"] is False and res["credentials_present"]["OXYLABS_PASSWORD"] is False

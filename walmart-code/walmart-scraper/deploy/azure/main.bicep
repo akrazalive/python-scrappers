@@ -25,7 +25,7 @@ param cronExpression string = '0 6 * * 1,4'
 param image string = 'docker.io/library/python:3.12-slim'
 
 @description('Blob (in the walmart-scraper container) holding the delivered source package that the job runs.')
-param releaseBlob string = 'releases/walmart-scraper-1.1.6-src.zip'
+param releaseBlob string = 'releases/walmart-scraper-1.1.7-src.zip'
 
 @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
 param assignRoles bool = false
@@ -82,7 +82,8 @@ resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: '${prefix}-logs'
   location: location
   tags: tags
-  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30 }
+  // daily ingestion cap (client spending allowance): logs stop being collected for the day instead of costing more
+  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30, workspaceCapping: { dailyQuotaGb: json('0.03') } }
 }
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {

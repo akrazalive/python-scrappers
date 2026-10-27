@@ -1,0 +1,392 @@
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/deploy/azure/main.bicep b/walmart-scraper/deploy/azure/main.bicep
+--- walmart-scraper/deploy/azure/main.bicep
++++ walmart-scraper/deploy/azure/main.bicep
+@@ -25,7 +25,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the walmart-scraper container) holding the delivered source package that the job runs.')
+-param releaseBlob string = 'releases/walmart-scraper-1.1.6-src.zip'
++param releaseBlob string = 'releases/walmart-scraper-1.1.7-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+@@ -82,7 +82,8 @@
+   name: '${prefix}-logs'
+   location: location
+   tags: tags
+-  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30 }
++  // daily ingestion cap (client spending allowance): logs stop being collected for the day instead of costing more
++  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30, workspaceCapping: { dailyQuotaGb: json('0.03') } }
+ }
+ 
+ resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/deploy/azure/run_test.sh b/walmart-scraper/deploy/azure/run_test.sh
+--- walmart-scraper/deploy/azure/run_test.sh
++++ walmart-scraper/deploy/azure/run_test.sh
+@@ -3,16 +3,20 @@
+ # Every start returns at once: the execution runs in Azure, independent of the machine that started it.
+ #
+ #   run_test.sh <sub> <rg> check              # job runs `status`: release, credential present, storage (0 requests)
+-#   run_test.sh <sub> <rg> probe              # store #100 + canary check, <= 10 provider requests (retries included)
+-#   run_test.sh <sub> <rg> run <cap> [args]   # `run --location walmart-100-bentonville --max-requests <cap> [args]`;
+-#                                             # <cap> is the client-approved request total for this execution
++#   run_test.sh <sub> <rg> selfcheck          # credentials present + test-blob write/read with the identity (0 requests)
++#   run_test.sh <sub> <rg> probe              # store #100 + canary check, persistent total `probe` <= 10 requests
++#   run_test.sh <sub> <rg> run <name> <cap> [args]   # `run --location walmart-100-bentonville` under the persistent
++#                                             # total <name>:<cap> (client-approved); repeating it never adds requests
++#   run_test.sh <sub> <rg> budget <name>      # used / remaining of a persistent total (0 provider requests)
+ #   run_test.sh <sub> <rg> stop               # forced interruption of the running execution (hard-stop/resume test)
+ #   run_test.sh <sub> <rg> status             # executions of the job (0 provider requests)
+ #   run_test.sh <sub> <rg> collect [exec]     # execution record, console log, run files, checksums; sets the job
+ #                                             # back to `status` (an accidental start sends no provider request)
+ #
+-# Caps are enforced by the fetcher (--max-requests counts every attempt, retries included). The job has
+-# replicaRetryLimit 0, so Azure never restarts an execution on its own. Starts are refused unless the job is Manual.
++# Totals are enforced by the fetcher with a persistent ledger in the walmart-scraper container (budget.py): every
++# attempt, retries included, is counted and saved before it is sent, across restarts and repeated executions. The
++# job also has replicaRetryLimit 0, so Azure never restarts an execution on its own. Starts are refused unless the
++# job is Manual.
+ set -euo pipefail
+ export MSYS_NO_PATHCONV=1   # Git Bash on Windows: keep /subscriptions/... resource ids unchanged
+ SUB=${1:?subscription id}; RG=${2:?resource group}; WHAT=${3:?check|probe|run|stop|status|collect}
+@@ -34,11 +38,13 @@
+ 
+ case "$WHAT" in
+   check) start "status" ;;
+-  probe) start "verify-store --location $STORE --max-requests 10" ;;
++  selfcheck) start "selfcheck" ;;
++  probe) start "--budget probe:10 verify-store --location $STORE --max-requests 10" ;;
++  budget) start "budget-status --name ${4:?budget name}" ;;
+   run)
+-    CAP=${4:?client-approved request cap for this execution}
++    NAME=${4:?budget name for this approved test}; CAP=${5:?client-approved total request cap}
+     [[ "$CAP" =~ ^[1-9][0-9]*$ ]] || { echo "cap must be a positive integer"; exit 1; }
+-    shift 4; start "run --location $STORE --max-requests $CAP $*" ;;
++    shift 5; start "--budget $NAME:$CAP run --location $STORE --max-requests $CAP $*" ;;
+   stop)
+     EXEC=$(last_exec)
+     az containerapp job stop -g "$RG" -n "$JOB" --job-execution-name "$EXEC" -o none
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/docs/CHANGES.md b/walmart-scraper/docs/CHANGES.md
+--- walmart-scraper/docs/CHANGES.md
++++ walmart-scraper/docs/CHANGES.md
+@@ -1,5 +1,20 @@
+ # Changes
+ 
++## 1.1.7 (2026-10-27) – persistent request ledger and zero-request selfcheck
++
++1. **Persistent total request budget** (`src/wmscraper/budget.py`, hooked into `fetch/base.py`): `--budget NAME:TOTAL`
++   (or `WMSCRAPER_BUDGET`). Every provider attempt, retries included, is counted and saved in the run storage
++   (Azure: `_budgets/<name>.json` in the walmart-scraper container) BEFORE it is sent, with one ledger line per
++   request (`_budgets/<name>.jsonl`: time, n, command, store, URL). The total holds across retries, restarts and
++   repeated executions, and cannot be raised under the same name.
++2. `run_test.sh probe` runs `--budget probe:10 verify-store … --max-requests 10`; `run_test.sh run <name> <cap>`
++   puts any approved run under a persistent total; `run_test.sh budget <name>` shows used / remaining.
++3. **`selfcheck`**: credentials present (names only) + test-blob write/read-back with the managed identity, 0 provider
++   requests. `budget-status --name <name>`.
++4. Log Analytics daily cap (0.03 GB) in the template, so redeploying cannot reset it.
++5. Tests: 2 new offline tests (probe repeated three times never exceeds its total; retries count, a restarted process
++   is refused, a cap cannot be raised); 49 in total. Collection, parsing, validation and publication are unchanged.
++
+ ## 1.1.6 (2026-10-26) – Azure: infrastructure first, manual only, scoped roles
+ 
+ Deployment and CLI only. Collection, parsing, validation and publication logic are unchanged from 1.1.5
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/__init__.py b/walmart-scraper/src/wmscraper/__init__.py
+--- walmart-scraper/src/wmscraper/__init__.py
++++ walmart-scraper/src/wmscraper/__init__.py
+@@ -1,3 +1,3 @@
+ """Walmart location-specific product scraper for Microsoft Azure."""
+ 
+-__version__ = "1.1.6"
++__version__ = "1.1.7"
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/budget.py b/walmart-scraper/src/wmscraper/budget.py
+--- walmart-scraper/src/wmscraper/budget.py
++++ walmart-scraper/src/wmscraper/budget.py
+@@ -0,0 +1,98 @@
++"""Persistent total request budget (1.1.7): one approved test = one named total that no process can exceed.
++
++`--max-requests` is a per-process cap and restarts with each process. This budget does not: its state lives in the
++run storage (Azure: the walmart-scraper blob container; locally: the output directory), so it holds across retries,
++resumed runs, container restarts and repeated job executions:
++
++    _budgets/<name>.json     {"name", "total", "used", "created_at", "updated_at"}
++    _budgets/<name>.jsonl    one line per provider request: ts, n, command, store, url
++
++A request is counted and saved BEFORE it is sent; once `used == total` every further request is refused
++(FetchError "budget"). The total is fixed when the budget is created – opening it again with a different total is
++an error, so a cap can only be raised by a new, separately named budget (i.e. a new approval).
++"""
++from __future__ import annotations
++
++import atexit
++import json
++import re
++from datetime import datetime, timezone
++
++_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
++JS_RATE_USD_PER_1000 = 1.35   # client's dashboard rate for JS-rendered results (the higher of the two rates)
++
++
++def _now() -> str:
++    return datetime.now(timezone.utc).isoformat(timespec="seconds")
++
++
++def parse_spec(spec: str) -> tuple[str, int]:
++    name, _, total = spec.partition(":")
++    if not total.isdigit():
++        raise ValueError(f"budget must be NAME:TOTAL, got {spec!r}")
++    return name, int(total)
++
++
++class TotalBudget:
++    def __init__(self, storage, name: str, total: int, command: str = ""):
++        from .fetch import FetchError  # noqa: F401  (import check: budget errors are FetchErrors)
++
++        if not _NAME_RE.match(name):
++            raise ValueError(f"budget name must be lowercase letters/digits/-/_: {name!r}")
++        if total <= 0:
++            raise ValueError("budget total must be > 0")
++        self.st, self.name, self.command = storage, name, command
++        self.key, self.log_key = f"_budgets/{name}.json", f"_budgets/{name}.jsonl"
++        state = storage.get_json(self.key)
++        if state:
++            if int(state["total"]) != total:
++                raise ValueError(f"budget {name!r} already exists with total {state['total']} (asked {total}); "
++                                 f"a cap is never raised – use a new budget name")
++            self.state = state
++        else:
++            self.state = {"name": name, "total": total, "used": 0, "created_at": _now(), "updated_at": _now()}
++            self._save()
++        old = storage.get_bytes(self.log_key)
++        self._lines = old.decode("utf-8").splitlines() if old else []
++        self._unflushed = 0
++        atexit.register(self.flush)
++
++    @property
++    def total(self) -> int:
++        return int(self.state["total"])
++
++    @property
++    def used(self) -> int:
++        return int(self.state["used"])
++
++    @property
++    def remaining(self) -> int:
++        return self.total - self.used
++
++    def _save(self):
++        self.st.put_json(self.key, self.state)
++
++    def flush(self):
++        if self._unflushed:
++            self.st.put_bytes(self.log_key, ("\n".join(self._lines) + "\n").encode("utf-8"))
++            self._unflushed = 0
++
++    def take(self, url: str, store_id: str = "") -> int:
++        """Count one provider request and persist the count before it is sent; refuse when the total is used up."""
++        from .fetch import FetchError
++
++        if self.used >= self.total:
++            raise FetchError(f"total budget {self.name!r} of {self.total} requests used up", "budget")
++        self.state["used"] = self.used + 1
++        self.state["updated_at"] = _now()
++        self._save()
++        self._lines.append(json.dumps({"ts": self.state["updated_at"], "n": self.used, "command": self.command,
++                                       "store": store_id, "url": url}))
++        self._unflushed += 1
++        if self.total <= 1000 or self._unflushed >= 50:   # small tests: every line saved at once
++            self.flush()
++        return self.used
++
++    def summary(self) -> dict:
++        return {**self.state, "remaining": self.remaining, "ledger": self.log_key,
++                "max_cost_usd_at_js_rate": round(self.used * JS_RATE_USD_PER_1000 / 1000, 4)}
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/cli.py b/walmart-scraper/src/wmscraper/cli.py
+--- walmart-scraper/src/wmscraper/cli.py
++++ walmart-scraper/src/wmscraper/cli.py
+@@ -5,6 +5,11 @@
+   python -m wmscraper run-all                                 # every enabled location (used by the Azure job)
+   python -m wmscraper verify-store --location walmart-100-bentonville --max-requests 10   # store + canary check only
+   python -m wmscraper status                                  # version, provider, credentials present, storage (0 requests)
++  python -m wmscraper selfcheck                               # status + test-blob write/read in the container (0 requests)
++  python -m wmscraper budget-status [--name probe]            # persistent request totals: used / remaining
++
++  --budget NAME:TOTAL (or env WMSCRAPER_BUDGET) puts a command under a TOTAL request cap that persists in the run
++  storage across retries, resumes, restarts and repeated job executions (see budget.py).
+   python -m wmscraper summary --location walmart-100-bentonville [--run-id ID]
+   python -m wmscraper retry-failed --location walmart-100-bentonville --run-id ID
+ """
+@@ -125,6 +130,40 @@
+     return 0 if out["storage_ok"] else 1
+ 
+ 
++def cmd_selfcheck(args, s):
++    """`status` plus a test-blob write and read-back with the job's identity. 0 provider requests."""
++    import secrets
++    from datetime import datetime, timezone
++
++    from .version import version_info
++
++    provider = s.get("fetch.provider", "oxylabs")
++    out = {**version_info(), "provider": provider, "provider_requests": 0,
++           "credentials_present": {k: bool(os.getenv(k)) for k in PROVIDER_ENV.get(provider, ())}}
++    key = f"_selfcheck/{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.txt"
++    token = secrets.token_hex(16).encode()
++    try:
++        st = build_storage(s)
++        st.put_bytes(key, token)
++        out["blob"] = {"backend": type(st).__name__, "key": key, "write": True, "read_back_matches": st.get_bytes(key) == token}
++    except Exception as exc:  # e.g. role assignment missing or not yet propagated
++        out["blob"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
++    out["ok"] = all(out["credentials_present"].values()) and out["blob"].get("read_back_matches") is True
++    print(json.dumps(out, indent=2))
++    return 0 if out["ok"] else 1
++
++
++def cmd_budget_status(args, s):
++    st = build_storage(s)
++    rows = []
++    for name in ([args.name] if args.name else []):
++        state = st.get_json(f"_budgets/{name}.json")
++        if state:
++            rows.append({**state, "remaining": int(state["total"]) - int(state["used"])})
++    print(json.dumps(rows, indent=2))
++    return 0
++
++
+ def cmd_summary(args, s):
+     st = build_storage(s)
+     key = f"{args.location}/runs/{args.run_id}/report.json" if args.run_id else f"{args.location}/latest/report.json"
+@@ -168,6 +207,7 @@
+     ap = argparse.ArgumentParser(prog="wmscraper", description="Walmart location-specific scraper")
+     ap.add_argument("--config", default=os.getenv("WMSCRAPER_CONFIG"))
+     ap.add_argument("--log-level", default=os.getenv("LOG_LEVEL", "INFO"))
++    ap.add_argument("--budget", default=os.getenv("WMSCRAPER_BUDGET"), help="NAME:TOTAL persistent total request cap")
+     sub = ap.add_subparsers(dest="cmd", required=True)
+     r = sub.add_parser("run")
+     r.add_argument("--location", required=True)
+@@ -183,6 +223,9 @@
+     v.add_argument("--location", required=True)
+     v.add_argument("--max-requests", type=int, default=0, help="safety cap on paid provider requests, retries included")
+     sub.add_parser("status")
++    sub.add_parser("selfcheck")
++    bs = sub.add_parser("budget-status")
++    bs.add_argument("--name", required=True)
+     sm = sub.add_parser("summary")
+     sm.add_argument("--location", required=True)
+     sm.add_argument("--run-id")
+@@ -198,11 +241,17 @@
+     s = load_settings(args.config)
+     if os.getenv("WMSCRAPER_FETCH_PROVIDER"):  # chosen at deployment (Key Vault holds the matching credential)
+         s.raw.setdefault("fetch", {})["provider"] = os.environ["WMSCRAPER_FETCH_PROVIDER"]
++    if args.budget:
++        from .budget import parse_spec
++
++        parse_spec(args.budget)  # validate early
++        s.raw.setdefault("fetch", {})["total_budget"] = args.budget
+     from .fetch import FetchError
+     from .lock import LockError
+ 
+     handlers = {"run": cmd_run, "run-all": cmd_run_all, "verify-store": cmd_verify_store,
+-            "summary": cmd_summary, "status": cmd_status, "retry-failed": cmd_retry_failed, "validate": cmd_validate}
++            "summary": cmd_summary, "status": cmd_status, "selfcheck": cmd_selfcheck,
++            "budget-status": cmd_budget_status, "retry-failed": cmd_retry_failed, "validate": cmd_validate}
+     try:
+         return handlers[args.cmd](args, s)
+     except (FetchError, LockError, KeyError, RuntimeError) as exc:
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/fetch/base.py b/walmart-scraper/src/wmscraper/fetch/base.py
+--- walmart-scraper/src/wmscraper/fetch/base.py
++++ walmart-scraper/src/wmscraper/fetch/base.py
+@@ -64,6 +64,7 @@
+         self._last = 0.0
+         self._lock = asyncio.Lock()
+         self.budget = int(settings.get("fetch.max_requests_per_run", 0))  # 0 = unlimited
++        self.total_budget = None  # persistent TotalBudget (budget.py), shared by every process of one approved test
+         self.stats = {"requests": 0, "retries": 0, "challenges": 0, "http_errors": 0, "slow": 0}
+ 
+     async def start(self):  # pragma: no cover - overridden where needed
+@@ -87,6 +88,8 @@
+         for attempt in range(1, self.retries + 2):
+             if self.budget and self.stats["requests"] >= self.budget:
+                 raise FetchError(f"request budget of {self.budget} reached (fetch.max_requests_per_run)", "budget")
++            if self.total_budget is not None:  # counted and saved before the request is sent, retries included
++                self.total_budget.take(url, self.loc.store_id)
+             await self._pace()
+             self.stats["requests"] += 1
+             try:
+@@ -270,4 +273,12 @@
+     name = settings.get("fetch.provider", "oxylabs")
+     if name not in PROVIDERS:
+         raise ValueError(f"unknown fetch.provider '{name}', choose one of {sorted(PROVIDERS)}")
+-    return PROVIDERS[name](settings, location)
++    fetcher = PROVIDERS[name](settings, location)
++    spec = settings.get("fetch.total_budget")  # NAME:TOTAL from --budget / WMSCRAPER_BUDGET (cli.py)
++    if spec:
++        from ..budget import TotalBudget, parse_spec
++        from ..storage import build_storage
++
++        bname, total = parse_spec(spec)
++        fetcher.total_budget = TotalBudget(build_storage(settings), bname, total, command=f"{name} {location.key}")
++    return fetcher
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/tests/test_azure_manual.py b/walmart-scraper/tests/test_azure_manual.py
+--- walmart-scraper/tests/test_azure_manual.py
++++ walmart-scraper/tests/test_azure_manual.py
+@@ -50,3 +50,59 @@
+         assert ra == "if (assignRoles)"
+     assert re.search(r"resource job 'Microsoft.App/jobs@[^']+' = if \(deployJob\)", BICEP)
+     assert "scope: container" in BICEP             # blob role limited to the designated container
++
++
++# ---- 1.1.7: persistent total request ledger -------------------------------------------------------------------
++def _budget(site):
++    from wmscraper.config import load_settings
++    from wmscraper.storage import build_storage
++
++    s = load_settings(str(site))
++    return s, build_storage(s)
++
++
++def test_probe_total_holds_across_repeated_executions(site, capsys):
++    from wmscraper.budget import TotalBudget
++
++    for _ in range(3):  # the probe started three times: still never more than 3 requests in total
++        main(["--config", str(site), "--budget", "probe:3", "verify-store", "--location", "test-store", "--max-requests", "10"])
++    s, st = _budget(site)
++    state = st.get_json("_budgets/probe.json")
++    assert state["used"] == 3 and state["total"] == 3
++    ledger = st.get_bytes("_budgets/probe.jsonl").decode().splitlines()
++    assert len(ledger) == 3 and [json.loads(x)["n"] for x in ledger] == [1, 2, 3]
++    assert TotalBudget(st, "probe", 3).remaining == 0
++    capsys.readouterr()
++
++
++def test_retries_count_against_the_total_and_the_cap_cannot_be_raised(site):
++    import asyncio
++
++    import pytest
++
++    from wmscraper.budget import TotalBudget
++    from wmscraper.fetch import FetchError
++    from wmscraper.fetch.base import Fetcher
++
++    s, st = _budget(site)
++    s.raw["fetch"].update(max_retries=10, backoff_base_seconds=0)
++
++    class AlwaysFails(Fetcher):
++        sent = 0
++
++        async def _fetch_once(self, url):
++            AlwaysFails.sent += 1
++            raise FetchError("HTTP 500", "http")
++
++    f = AlwaysFails(s, s.location("test-store"))
++    f.total_budget = TotalBudget(st, "retrytest", 4)
++    with pytest.raises(FetchError, match="total budget 'retrytest' of 4"):
++        asyncio.run(f.get("https://www.walmart.com/ip/1"))
++    assert AlwaysFails.sent == 4                                   # 1 attempt + 3 retries, then refused
++    f2 = AlwaysFails(s, s.location("test-store"))                  # a restarted process: nothing left
++    f2.total_budget = TotalBudget(st, "retrytest", 4)
++    with pytest.raises(FetchError, match="used up"):
++        asyncio.run(f2.get("https://www.walmart.com/ip/1"))
++    assert AlwaysFails.sent == 4
++    with pytest.raises(ValueError, match="never raised"):
++        TotalBudget(st, "retrytest", 40)

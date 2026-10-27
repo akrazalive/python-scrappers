@@ -1,0 +1,47 @@
+MARIANO'S #69 — Azure check PASSED; Test 1 FAILED before any provider request (0 requests, $0); fix ready, awaiting your OK
+
+Hello,
+
+Thank you for completing the credential and role setup. Results below; the evidence is in marianos-azure-results-2026-10-27.zip (start with 00-INDEX.md). As you asked, I stopped at the failure. Test 2 has not been started.
+
+Version: marianos-scraper 1.1.4, code_sha256 8df0e6e154418404c6ab5d04c44baf93a6c000d489548c8cb63479358442658f
+- 1.1.4 adds only a "selfcheck" command (0 provider requests).
+- The diff against 1.1.3 and 46 offline tests (all passed) are in folder A-OFFLINE.
+
+1. AZURE CHECK, 0 PROVIDER REQUESTS: PASSED (folder B)
+- Execution mscraper-job-hu2268z, 27 Oct 04:02:43-04:05 UTC (Mon 26 Oct 23:02-23:05 CDT). Job trigger: Manual. No schedule.
+- The managed identity mscraper-id retrieved both Key Vault secrets: oxylabs-username and oxylabs-password are present. They are reported by name only; no values are logged.
+- Blob write/read: the identity wrote _selfcheck/20261027T040357Z.txt into the marianos-scraper container and read it back. Match: true.
+- State share (where the persistent request budgets live): write/read match: true.
+
+2. TEST 1: FAILED, 0 OF 19 REQUESTS USED, $0 (folder C)
+- Execution mscraper-job-k972pfi, started 04:09:14 UTC, last attempt failed 04:11:35 UTC (23:09-23:11 CDT).
+- Persistent budget test1: used 0 / total 19 (state/_budgets/test1.json).
+- Cause: the error came before any request to Oxylabs: sqlite3.OperationalError: database is locked.
+  - The scraper keeps its checkpoint (an SQLite file) on the Azure Files share.
+  - SQLite's file locking does not work on that SMB share in Container Apps with the default mount.
+  - Azure retried the execution twice (configured retry limit 2), each time with the same error and 0 requests.
+- This is a compatibility fault in my deployment template. It is not an Oxylabs or credential problem.
+- What remains untested: Oxylabs authentication and store context for Mariano's. No request was sent.
+
+3. THE FIX (included in the attached 1.1.4 source, NOT deployed)
+- Mount the state share with the option "nobrl" (one line in deploy/azure/main.bicep). This switches off the byte-range locks that fail on SMB.
+- Only one execution runs at a time (parallelism 1 plus the run lock), so there are no concurrent writers.
+- code_sha256 is unchanged; only the template changes.
+
+4. WHAT I NEED FROM YOU
+Please confirm I may:
+a) redeploy the job with this template fix (0 provider requests), and
+b) re-run Test 1 under the SAME persistent budget: 19 requests in total, with all 19 still unused. This is not a new allowance.
+Test 2 still starts only after Test 1 passes.
+- Oxylabs spend so far: $0 for Mariano's. Combined with Walmart's 3 requests, about $0.004 of the $1.
+- Azure: only the short check and test executions, within the free monthly Container Apps grant. Log ingestion is capped at 0.03 GB per day.
+
+TIMING (US Central)
+- After your OK: Test 1 result within 2 hours.
+- If Test 1 passes: Test 2 result within 3 hours after that.
+- v1.1.4 evidence package within 1 working day of Test 2.
+- If Test 1 then shows an authentication or store-context failure, I stop and report again.
+
+Regards,
+Asif Khan

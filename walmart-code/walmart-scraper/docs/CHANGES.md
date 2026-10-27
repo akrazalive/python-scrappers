@@ -1,5 +1,20 @@
 # Changes
 
+## 1.1.7 (2026-10-27) – persistent request ledger and zero-request selfcheck
+
+1. **Persistent total request budget** (`src/wmscraper/budget.py`, hooked into `fetch/base.py`): `--budget NAME:TOTAL`
+   (or `WMSCRAPER_BUDGET`). Every provider attempt, retries included, is counted and saved in the run storage
+   (Azure: `_budgets/<name>.json` in the walmart-scraper container) BEFORE it is sent, with one ledger line per
+   request (`_budgets/<name>.jsonl`: time, n, command, store, URL). The total holds across retries, restarts and
+   repeated executions, and cannot be raised under the same name.
+2. `run_test.sh probe` runs `--budget probe:10 verify-store … --max-requests 10`; `run_test.sh run <name> <cap>`
+   puts any approved run under a persistent total; `run_test.sh budget <name>` shows used / remaining.
+3. **`selfcheck`**: credentials present (names only) + test-blob write/read-back with the managed identity, 0 provider
+   requests. `budget-status --name <name>`.
+4. Log Analytics daily cap (0.03 GB) in the template, so redeploying cannot reset it.
+5. Tests: 2 new offline tests (probe repeated three times never exceeds its total; retries count, a restarted process
+   is refused, a cap cannot be raised); 49 in total. Collection, parsing, validation and publication are unchanged.
+
 ## 1.1.6 (2026-10-26) – Azure: infrastructure first, manual only, scoped roles
 
 Deployment and CLI only. Collection, parsing, validation and publication logic are unchanged from 1.1.5

@@ -1,0 +1,57 @@
+{
+  "containerId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/wmscraperzwkzlg5qbam5a/blobServices/default/containers/walmart-scraper"
+  },
+  "containerName": {
+    "type": "String",
+    "value": "walmart-scraper"
+  },
+  "identityClientId": {
+    "type": "String",
+    "value": "3d8368b7-d819-43d1-af24-8bec48389fb7"
+  },
+  "identityId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wmscraper-id"
+  },
+  "identityName": {
+    "type": "String",
+    "value": "wmscraper-id"
+  },
+  "identityPrincipalId": {
+    "type": "String",
+    "value": "3705145d-855c-4330-978f-be6e229c49ac"
+  },
+  "jobName": {
+    "type": "String",
+    "value": "wmscraper-job"
+  },
+  "keyVault": {
+    "type": "String",
+    "value": "wmscraper-kv-zwkzlg5qbam"
+  },
+  "keyVaultId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.KeyVault/vaults/wmscraper-kv-zwkzlg5qbam"
+  },
+  "keyVaultUri": {
+    "type": "String",
+    "value": "https://wmscraper-kv-zwkzlg5qbam.vault.azure.net/"
+  },
+  "secretNames": {
+    "type": "Array",
+    "value": [
+      "oxylabs-username",
+      "oxylabs-password"
+    ]
+  },
+  "storageAccount": {
+    "type": "String",
+    "value": "wmscraperzwkzlg5qbam5a"
+  },
+  "storageId": {
+    "type": "String",
+    "value": "/subscriptions/febcf465-0d68-44e1-bc04-303bf48bf02d/resourceGroups/scraper-contest-asif-test/providers/Microsoft.Storage/storageAccounts/wmscraperzwkzlg5qbam5a"
+  }
+}

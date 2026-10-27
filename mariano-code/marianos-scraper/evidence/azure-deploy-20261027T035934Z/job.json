@@ -1,0 +1,5 @@
+{
+  "cron": null,
+  "name": "mscraper-job",
+  "trigger": "Manual"
+}

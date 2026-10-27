@@ -1,0 +1,5 @@
+{
+  "cron": null,
+  "name": "wmscraper-job",
+  "trigger": "Manual"
+}

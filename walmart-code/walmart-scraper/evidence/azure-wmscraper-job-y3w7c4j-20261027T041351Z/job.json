@@ -1,0 +1,6 @@
+{
+  "image": "docker.io/library/python:3.12-slim",
+  "name": "wmscraper-job",
+  "retryLimit": 0,
+  "trigger": "Manual"
+}

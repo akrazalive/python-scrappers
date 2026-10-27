@@ -64,6 +64,7 @@ class Fetcher:
         self._last = 0.0
         self._lock = asyncio.Lock()
         self.budget = int(settings.get("fetch.max_requests_per_run", 0))  # 0 = unlimited
+        self.total_budget = None  # persistent TotalBudget (budget.py), shared by every process of one approved test
         self.stats = {"requests": 0, "retries": 0, "challenges": 0, "http_errors": 0, "slow": 0}
 
     async def start(self):  # pragma: no cover - overridden where needed
@@ -87,6 +88,8 @@ class Fetcher:
         for attempt in range(1, self.retries + 2):
             if self.budget and self.stats["requests"] >= self.budget:
                 raise FetchError(f"request budget of {self.budget} reached (fetch.max_requests_per_run)", "budget")
+            if self.total_budget is not None:  # counted and saved before the request is sent, retries included
+                self.total_budget.take(url, self.loc.store_id)
             await self._pace()
             self.stats["requests"] += 1
             try:
@@ -270,4 +273,12 @@ def build_fetcher(settings: Settings, location: Location) -> Fetcher:
     name = settings.get("fetch.provider", "oxylabs")
     if name not in PROVIDERS:
         raise ValueError(f"unknown fetch.provider '{name}', choose one of {sorted(PROVIDERS)}")
-    return PROVIDERS[name](settings, location)
+    fetcher = PROVIDERS[name](settings, location)
+    spec = settings.get("fetch.total_budget")  # NAME:TOTAL from --budget / WMSCRAPER_BUDGET (cli.py)
+    if spec:
+        from ..budget import TotalBudget, parse_spec
+        from ..storage import build_storage
+
+        bname, total = parse_spec(spec)
+        fetcher.total_budget = TotalBudget(build_storage(settings), bname, total, command=f"{name} {location.key}")
+    return fetcher

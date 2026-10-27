@@ -24,7 +24,7 @@ param cronExpression string = '0 7 * * 2,5'
 param image string = 'docker.io/library/python:3.12-slim'
 
 @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
-param releaseBlob string = 'releases/marianos-scraper-1.1.3-src.zip'
+param releaseBlob string = 'releases/marianos-scraper-1.1.4-src.zip'
 
 @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
 param assignRoles bool = false
@@ -89,7 +89,8 @@ resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: '${prefix}-logs'
   location: location
   tags: tags
-  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30 }
+  // daily ingestion cap (client spending allowance): logs stop being collected for the day instead of costing more
+  properties: { sku: { name: 'PerGB2018' }, retentionInDays: 30, workspaceCapping: { dailyQuotaGb: json('0.03') } }
 }
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -202,7 +203,9 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
       secrets: [for n in providerSecrets: { name: n, keyVaultUrl: '${kv.properties.vaultUri}secrets/${n}', identity: identity.id }]
     }
     template: {
-      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name } ]
+      // nobrl: SQLite checkpoints on the SMB share fail with 'database is locked' unless byte-range locks are off
+      // (one execution at a time: parallelism 1 + the run lock, so no concurrent writers)
+      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name, mountOptions: 'nobrl' } ]
       containers: [
         {
           name: 'scraper'

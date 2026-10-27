@@ -1,0 +1,524 @@
+[
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:48.6502564Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:48.6502564Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:48.6502564Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:48.6502564Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "release releases/marianos-scraper-1.1.4-src.zip version=1.1.4 code_sha256=8df0e6e154418404c6ab5d04c44baf93a6c000d489548c8cb63479358442658f config_sha256[settings.yaml]=f66e96c95178b117ac9f58e93921e13699ddc06c544e510d80e8523d879b22f8 config_sha256[categories.csv]=606133cb12548d3f7f437ea9e0a056d88d0dd7f621ec0e1c210bb2fc20044da4 config_sha256[locations.yaml]=fc3ce2f2c9ebf2f6df0b15bc83b5e59eb3194bed55057a595318926931904a8b config_sha256[private_label_brands.txt]=ca0b9c21dcc312f35539a209ffaa357150ba8bd78edee612845ee18689b4b9d7 requirements_sha256=fbc7939ad79b9ccc7266ec4485abc1873e900aedba70e6282037244d1b712812 ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:49.4413359Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:54.4546422Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:54.4546422Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:54.4546422Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:54.4546422Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "mscraper ['bounded-test', 'test1'] budget ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:55.3351951Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "test1: verify-store --location marianos-544-crystal-lake --max-requests 2  (total used 0/19)",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:09:55.3351951Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/checkpoint.py\", line 56, in __init__",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "    rc = main(([\"--config\", args.config] if args.config else []) + [\"--log-level\", args.log_level,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "    self.db.executescript(SCHEMA)",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "    self.ck = Checkpoint(self.dir / \"checkpoint.sqlite\")",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/cli.py\", line 244, in main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/__main__.py\", line 5, in <module>",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "             ^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "    sys.exit(main())",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "sqlite3.OperationalError: database is locked",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "    runner = Runner(settings, loc, build_storage(settings), _state_dir(settings) / \"_verify\")",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/cli.py\", line 168, in main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "Traceback (most recent call last):",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"<frozen runpy>\", line 198, in _run_module_as_main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/runner.py\", line 52, in __init__",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-gtlbl",
+    "Log_s": "  File \"<frozen runpy>\", line 88, in _run_code",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:01.3426851Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:36.5790431Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:36.5790431Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:36.5790431Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:36.5790431Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "release releases/marianos-scraper-1.1.4-src.zip version=1.1.4 code_sha256=8df0e6e154418404c6ab5d04c44baf93a6c000d489548c8cb63479358442658f config_sha256[settings.yaml]=f66e96c95178b117ac9f58e93921e13699ddc06c544e510d80e8523d879b22f8 config_sha256[categories.csv]=606133cb12548d3f7f437ea9e0a056d88d0dd7f621ec0e1c210bb2fc20044da4 config_sha256[locations.yaml]=fc3ce2f2c9ebf2f6df0b15bc83b5e59eb3194bed55057a595318926931904a8b config_sha256[private_label_brands.txt]=ca0b9c21dcc312f35539a209ffaa357150ba8bd78edee612845ee18689b4b9d7 requirements_sha256=fbc7939ad79b9ccc7266ec4485abc1873e900aedba70e6282037244d1b712812 ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:36.9343872Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:42.8095877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:42.8095877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:42.8095877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:42.8095877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "mscraper ['bounded-test', 'test1'] budget ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:42.8095877Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "test1: verify-store --location marianos-544-crystal-lake --max-requests 2  (total used 0/19)",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:43.9646236Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "Traceback (most recent call last):",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.802294Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"<frozen runpy>\", line 198, in _run_module_as_main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.802294Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"<frozen runpy>\", line 88, in _run_code",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.802294Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "             ^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/runner.py\", line 52, in __init__",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/cli.py\", line 244, in main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "    self.ck = Checkpoint(self.dir / \"checkpoint.sqlite\")",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "    self.db.executescript(SCHEMA)",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/__main__.py\", line 5, in <module>",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "    runner = Runner(settings, loc, build_storage(settings), _state_dir(settings) / \"_verify\")",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "sqlite3.OperationalError: database is locked",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "    sys.exit(main())",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "    rc = main(([\"--config\", args.config] if args.config else []) + [\"--log-level\", args.log_level,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/checkpoint.py\", line 56, in __init__",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-mvc6d",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/cli.py\", line 168, in main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:10:48.8179201Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:20.6464159Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:20.6464159Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:20.6464159Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:20.6464159Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "release releases/marianos-scraper-1.1.4-src.zip version=1.1.4 code_sha256=8df0e6e154418404c6ab5d04c44baf93a6c000d489548c8cb63479358442658f config_sha256[settings.yaml]=f66e96c95178b117ac9f58e93921e13699ddc06c544e510d80e8523d879b22f8 config_sha256[categories.csv]=606133cb12548d3f7f437ea9e0a056d88d0dd7f621ec0e1c210bb2fc20044da4 config_sha256[locations.yaml]=fc3ce2f2c9ebf2f6df0b15bc83b5e59eb3194bed55057a595318926931904a8b config_sha256[private_label_brands.txt]=ca0b9c21dcc312f35539a209ffaa357150ba8bd78edee612845ee18689b4b9d7 requirements_sha256=fbc7939ad79b9ccc7266ec4485abc1873e900aedba70e6282037244d1b712812 ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:22.626916Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "mscraper ['bounded-test', 'test1'] budget ",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:28.6571812Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:28.6571812Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "[notice] To update, run: pip install --upgrade pip",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:28.6571812Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:28.6571812Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:28.6571812Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "test1: verify-store --location marianos-544-crystal-lake --max-requests 2  (total used 0/19)",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:29.8927778Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/__main__.py\", line 5, in <module>",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "    sys.exit(main())",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/runner.py\", line 52, in __init__",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "    rc = main(([\"--config\", args.config] if args.config else []) + [\"--log-level\", args.log_level,",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "sqlite3.OperationalError: database is locked",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/cli.py\", line 244, in main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "             ^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "Traceback (most recent call last):",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "    self.ck = Checkpoint(self.dir / \"checkpoint.sqlite\")",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/cli.py\", line 168, in main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"<frozen runpy>\", line 88, in _run_code",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"/tmp/app/marianos-scraper/src/mscraper/checkpoint.py\", line 56, in __init__",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "  File \"<frozen runpy>\", line 198, in _run_module_as_main",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "    self.db.executescript(SCHEMA)",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  },
+  {
+    "ContainerGroupName_s": "mscraper-job-k972pfi-jbs9k",
+    "Log_s": "    runner = Runner(settings, loc, build_storage(settings), _state_dir(settings) / \"_verify\")",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-27T04:11:35.991372Z"
+  }
+]

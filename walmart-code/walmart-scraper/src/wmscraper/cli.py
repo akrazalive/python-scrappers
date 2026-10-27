@@ -5,6 +5,11 @@
   python -m wmscraper run-all                                 # every enabled location (used by the Azure job)
   python -m wmscraper verify-store --location walmart-100-bentonville --max-requests 10   # store + canary check only
   python -m wmscraper status                                  # version, provider, credentials present, storage (0 requests)
+  python -m wmscraper selfcheck                               # status + test-blob write/read in the container (0 requests)
+  python -m wmscraper budget-status [--name probe]            # persistent request totals: used / remaining
+
+  --budget NAME:TOTAL (or env WMSCRAPER_BUDGET) puts a command under a TOTAL request cap that persists in the run
+  storage across retries, resumes, restarts and repeated job executions (see budget.py).
   python -m wmscraper summary --location walmart-100-bentonville [--run-id ID]
   python -m wmscraper retry-failed --location walmart-100-bentonville --run-id ID
 """
@@ -125,6 +130,40 @@ def cmd_status(args, s):
     return 0 if out["storage_ok"] else 1
 
 
+def cmd_selfcheck(args, s):
+    """`status` plus a test-blob write and read-back with the job's identity. 0 provider requests."""
+    import secrets
+    from datetime import datetime, timezone
+
+    from .version import version_info
+
+    provider = s.get("fetch.provider", "oxylabs")
+    out = {**version_info(), "provider": provider, "provider_requests": 0,
+           "credentials_present": {k: bool(os.getenv(k)) for k in PROVIDER_ENV.get(provider, ())}}
+    key = f"_selfcheck/{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.txt"
+    token = secrets.token_hex(16).encode()
+    try:
+        st = build_storage(s)
+        st.put_bytes(key, token)
+        out["blob"] = {"backend": type(st).__name__, "key": key, "write": True, "read_back_matches": st.get_bytes(key) == token}
+    except Exception as exc:  # e.g. role assignment missing or not yet propagated
+        out["blob"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+    out["ok"] = all(out["credentials_present"].values()) and out["blob"].get("read_back_matches") is True
+    print(json.dumps(out, indent=2))
+    return 0 if out["ok"] else 1
+
+
+def cmd_budget_status(args, s):
+    st = build_storage(s)
+    rows = []
+    for name in ([args.name] if args.name else []):
+        state = st.get_json(f"_budgets/{name}.json")
+        if state:
+            rows.append({**state, "remaining": int(state["total"]) - int(state["used"])})
+    print(json.dumps(rows, indent=2))
+    return 0
+
+
 def cmd_summary(args, s):
     st = build_storage(s)
     key = f"{args.location}/runs/{args.run_id}/report.json" if args.run_id else f"{args.location}/latest/report.json"
@@ -168,6 +207,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="wmscraper", description="Walmart location-specific scraper")
     ap.add_argument("--config", default=os.getenv("WMSCRAPER_CONFIG"))
     ap.add_argument("--log-level", default=os.getenv("LOG_LEVEL", "INFO"))
+    ap.add_argument("--budget", default=os.getenv("WMSCRAPER_BUDGET"), help="NAME:TOTAL persistent total request cap")
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run")
     r.add_argument("--location", required=True)
@@ -183,6 +223,9 @@ def main(argv=None):
     v.add_argument("--location", required=True)
     v.add_argument("--max-requests", type=int, default=0, help="safety cap on paid provider requests, retries included")
     sub.add_parser("status")
+    sub.add_parser("selfcheck")
+    bs = sub.add_parser("budget-status")
+    bs.add_argument("--name", required=True)
     sm = sub.add_parser("summary")
     sm.add_argument("--location", required=True)
     sm.add_argument("--run-id")
@@ -198,11 +241,17 @@ def main(argv=None):
     s = load_settings(args.config)
     if os.getenv("WMSCRAPER_FETCH_PROVIDER"):  # chosen at deployment (Key Vault holds the matching credential)
         s.raw.setdefault("fetch", {})["provider"] = os.environ["WMSCRAPER_FETCH_PROVIDER"]
+    if args.budget:
+        from .budget import parse_spec
+
+        parse_spec(args.budget)  # validate early
+        s.raw.setdefault("fetch", {})["total_budget"] = args.budget
     from .fetch import FetchError
     from .lock import LockError
 
     handlers = {"run": cmd_run, "run-all": cmd_run_all, "verify-store": cmd_verify_store,
-            "summary": cmd_summary, "status": cmd_status, "retry-failed": cmd_retry_failed, "validate": cmd_validate}
+            "summary": cmd_summary, "status": cmd_status, "selfcheck": cmd_selfcheck,
+            "budget-status": cmd_budget_status, "retry-failed": cmd_retry_failed, "validate": cmd_validate}
     try:
         return handlers[args.cmd](args, s)
     except (FetchError, LockError, KeyError, RuntimeError) as exc:

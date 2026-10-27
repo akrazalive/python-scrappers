@@ -1,0 +1,49 @@
+WALMART #32/#38 — Azure check PASSED, 1.1.7 ledger delivered; store probe FAILED on store context (3 requests); stopped
+
+Hello Darren,
+
+Thank you for completing the credential and role setup. Results below; the evidence is in wm-azure-results-2026-10-27.zip (start with 00-INDEX.md). As you asked, I stopped at the store-context failure.
+
+Version: walmart-scraper 1.1.7, source_sha256 91b8113d5d1feb9655f51368e453be7f26e1e5f282ffbc85c9322fd41aec8c59
+
+1. 1.1.7 PERSISTENT REQUEST LEDGER (folder A, offline)
+- Every provider attempt, retries included, is counted and saved in the walmart-scraper container BEFORE it is sent (_budgets/<name>.json), with one ledger line per request (_budgets/<name>.jsonl: time, number, store, URL).
+- The total holds across retries, restarts and repeated executions, and cannot be raised under the same name.
+- Offline tests (49, all passed), including:
+  - a probe started three times that never exceeds its total
+  - retries counted against the total
+  - a restarted process being refused
+  - a cap that cannot be raised
+- The diff against 1.1.6 is included. Collection, parsing and validation are unchanged.
+
+2. AZURE CHECK, 0 PROVIDER REQUESTS: PASSED (folder B)
+- Execution wmscraper-job-azj258k, 27 Oct 04:03:22-04:05 UTC (Mon 26 Oct 23:03-23:05 CDT). Job trigger: Manual. No schedule.
+- The managed identity wmscraper-id retrieved both Key Vault secrets: oxylabs-username and oxylabs-password are present. They are reported by name only; no values are logged.
+- Blob write/read: the identity wrote _selfcheck/20261027T040431Z.txt into the walmart-scraper container and read it back. Match: true.
+
+3. STORE-VERIFICATION PROBE: FAILED ON STORE CONTEXT, 3 OF 10 REQUESTS (folder C)
+- Execution wmscraper-job-y3w7c4j, 04:09:52-04:12:26 UTC (23:09-23:12 CDT).
+- Persistent ledger "probe": 3 used of 10, all 3 logged with time and URL.
+- Cost: at most 3 x $1.35/1000 = about $0.004.
+- Authentication: OK. The Classic Web Scraper API accepted your username/password at realtime.oxylabs.io/v1/queries.
+- Request 1, walmart.com/store/100: the page is store #100, Bentonville S Walton Blvd Supercenter, 406 S Walton Blvd, ZIP 72712. The raw response and its SHA-256 are included.
+- Requests 2-3, the canary products 10450114 and 43436773: Walmart's own response (pageMetadata.location) shows the selected pickup store as 4376, not 100 (storeIds ['4376'], pickupStoreId 4376, intent PICKUP, postalCode 72712).
+- Evidence limit: the store page is archived as a full raw response. For the two product pages, only Walmart's store-context excerpt quoted above was kept (in the console log). The verification mode archives raw pages for the store page only; the next probe will archive every response.
+- Result: FAIL. With the current payload (source "universal", geo_location 72712), Walmart chooses a store for the ZIP itself; the request does not pin store #100. Product prices would therefore come from store 4376.
+- The scraper detected this from the response content and stopped. No listing or product data was collected, and publication stays blocked.
+- 7 requests of the probe budget remain unused.
+
+4. WHAT I NEED FROM YOU (a decision; nothing will run until then)
+My earlier verified run pinned store #100 through Oxylabs' dedicated Walmart parameters (store_id=100, delivery_zip=72712, fulfillment pickup), on the newer Web API.
+I propose to switch the Classic adapter to Oxylabs' dedicated Walmart source with those same store parameters, and re-run the probe inside the REMAINING 7 requests of the same ledger (store page + 2 canaries; no new allowance).
+Before that, please confirm in your Oxylabs dashboard:
+a) that your Classic plan supports the dedicated Walmart source with store_id / delivery_zip / fulfillment_type, and
+b) its rate per 1,000 results, since it may not be billed as "Other results".
+If it is not supported, Walmart cannot be pinned to store #100 through this plan, and I would report the alternatives rather than collect data from the wrong store.
+
+TIMING (US Central): the probe result within 2 hours of your decision. The payload change is configuration only; its diff and offline tests come with that result.
+
+Spend so far, all three tests combined: 3 Oxylabs requests (about $0.004 of the $1). Azure: only short check and test executions, within the free monthly Container Apps grant, with log ingestion capped.
+
+Best regards,
+Asif Khan

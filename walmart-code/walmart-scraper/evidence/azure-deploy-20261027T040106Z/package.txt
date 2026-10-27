@@ -1,0 +1,5 @@
+D:\PROJECTS\python-scrappers\walmart-code\walmart-scraper\dist\walmart-scraper-1.1.7-src.zip
+  files: 49
+  source_sha256: 91b8113d5d1feb9655f51368e453be7f26e1e5f282ffbc85c9322fd41aec8c59
+  zip_sha256: 576a4fac70ebce3a8dae105211e711289082ed81d2f46ef26c6b8df3867002ba
+uploaded releases/walmart-scraper-1.1.7-src.zip
