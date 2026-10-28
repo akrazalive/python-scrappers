@@ -1,0 +1,1306 @@
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/config/settings.yaml b/walmart-scraper/config/settings.yaml
+--- walmart-scraper/config/settings.yaml
++++ walmart-scraper/config/settings.yaml
+@@ -23,12 +23,25 @@
+   # Store / fulfillment parameters are provider-specific: confirm them against the
+   # provider's Walmart documentation. Whatever is sent, every page is still checked
+   # for the configured store id and fails the run on mismatch.
+-  oxylabs:
++  oxylabs:                     # Classic Web Scraper API, realtime.oxylabs.io/v1/queries, API user + password
++    # Any non-product Walmart page (store page, listings): "url" alone. Oxylabs documents NO store parameters for this
++    # route; the 27-Oct probe showed product pages served this way select Walmart's own store for the ZIP (4376).
+     payload:
+       source: universal
+       url: "{url}"
+       render: html
+       geo_location: "{zipcode}"
++    # PROPOSED for the next probe – NOT yet approved by the client, not yet run (1.1.8). Product pages (/ip/<id>) via
++    # the documented dedicated source with store localisation (developers.oxylabs.io > Web Scraper API > Walmart >
++    # Product > "Localization and Filtering": source walmart_product, product_id, store_id, delivery_zip,
++    # fulfillment_type pickup|delivery|shipping; without "parse" the response "content" is the page HTML, which the
++    # scraper verifies itself). Delete this block to fall back to the universal payload above.
++    product_payload:
++      source: walmart_product
++      product_id: "{product_id}"
++      store_id: "{store_id}"
++      delivery_zip: "{zipcode}"
++      fulfillment_type: pickup
+   zyte:
+     payload:
+       url: "{url}"
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/deploy/azure/main.bicep b/walmart-scraper/deploy/azure/main.bicep
+--- walmart-scraper/deploy/azure/main.bicep
++++ walmart-scraper/deploy/azure/main.bicep
+@@ -25,7 +25,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the walmart-scraper container) holding the delivered source package that the job runs.')
+-param releaseBlob string = 'releases/walmart-scraper-1.1.7-src.zip'
++param releaseBlob string = 'releases/walmart-scraper-1.1.8-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/docs/CHANGES.md b/walmart-scraper/docs/CHANGES.md
+--- walmart-scraper/docs/CHANGES.md
++++ walmart-scraper/docs/CHANGES.md
+@@ -1,5 +1,32 @@
+ # Changes
+ 
++## 1.1.8 (2026-10-28) – client review of 28 Oct (budget safety, canary rules, fulfillment, evidence, --categories)
++
++Offline only; no live or Azure request. Tests: `tests/test_v118_safety.py` (22 new, 71 in total).
++1. **Budget: exclusive and atomic** (`budget.py`, `lock.py`, `storage.py`). A budget is used only while the process
++   holds the live lock (one Blob lease for every request path: `run`, `run-all`, `verify-store`). An overlapping
++   execution exits 3 before any request. Every reservation re-reads the state with its ETag and writes it
++   conditionally (If-Match / create-if-absent), so a second holder can never also reserve. The ledger line is
++   written before the counter. A deleted state next to an existing ledger, an invalid state, used > total, or a
++   ledger shorter than `used` all fail closed. They never reset to 0. The existing `probe` budget (3 of 10) keeps
++   its identity and 7 remaining. Ledger chunks of 200 lines keep each write bounded.
++2. **Canary stops at the first failure** (`runner.canary`). The first failing item raises a store error, and later
++   canary items are not requested. `verify-store` returns non-zero unless the store and every canary pass (the
++   unconditional success return is removed). Provider 401/403 (auth) and 400/404/422 (compatibility) are terminal
++   and never retried. 429/5xx/timeouts/challenges stay retryable. Real adapters refuse to start without the live
++   lock.
++3. **Fulfillment and price verified, not only a store id** (`runner.canary_problems`). All of these come from the
++   returned product: `location.pickupLocation.storeId` = store, `location.storeIds` contains it,
++   `location.intent` = PICKUP, a PICKUP option for the store in `fulfillmentSummary`, `fulfillmentType` = STORE
++   (store-sourced offer), a current price > 0, and a matching postal code.
++4. **Every canary response archived before validation**, including failures (`_archive(..., always=True)`): raw
++   gzip, SHA-256 and the returned store/fulfillment context in `raw/index.json`.
++5. **`--categories` fixed** (`cli.cmd_run`): regression tests run the exact README command (`--categories "Food,Pets" --limit 600`) against the delivered config, and the demo form on the test site.
++6. **Lease loss** stops requests, checkpoint commits/uploads and every publication step (`lock.check_active`).
++7. **Proposed Classic product payload** (`config/settings.yaml` `fetch.oxylabs.product_payload`, NOT yet approved
++   or run): documented source `walmart_product` with `product_id`, `store_id`, `delivery_zip`,
++   `fulfillment_type: pickup`. All other pages keep the `universal` payload. Delete the block to revert.
++
+ ## 1.1.7 (2026-10-27) – persistent request ledger and zero-request selfcheck
+ 
+ 1. **Persistent total request budget** (`src/wmscraper/budget.py`, hooked into `fetch/base.py`): `--budget NAME:TOTAL`
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/__init__.py b/walmart-scraper/src/wmscraper/__init__.py
+--- walmart-scraper/src/wmscraper/__init__.py
++++ walmart-scraper/src/wmscraper/__init__.py
+@@ -1,3 +1,3 @@
+ """Walmart location-specific product scraper for Microsoft Azure."""
+ 
+-__version__ = "1.1.7"
++__version__ = "1.1.8"
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/budget.py b/walmart-scraper/src/wmscraper/budget.py
+--- walmart-scraper/src/wmscraper/budget.py
++++ walmart-scraper/src/wmscraper/budget.py
+@@ -1,25 +1,36 @@
+-"""Persistent total request budget (1.1.7): one approved test = one named total that no process can exceed.
++"""Persistent total request budget: one approved test = one named total that no process can exceed.
+ 
+-`--max-requests` is a per-process cap and restarts with each process. This budget does not: its state lives in the
+-run storage (Azure: the walmart-scraper blob container; locally: the output directory), so it holds across retries,
+-resumed runs, container restarts and repeated job executions:
+-
+-    _budgets/<name>.json     {"name", "total", "used", "created_at", "updated_at"}
+-    _budgets/<name>.jsonl    one line per provider request: ts, n, command, store, url
+-
+-A request is counted and saved BEFORE it is sent; once `used == total` every further request is refused
+-(FetchError "budget"). The total is fixed when the budget is created – opening it again with a different total is
+-an error, so a cap can only be raised by a new, separately named budget (i.e. a new approval).
++State lives in the run storage (Azure: the walmart-scraper blob container; locally: the output directory):
++
++    _budgets/<name>.json          {"name", "total", "used", "created_at", "updated_at"}
++    _budgets/<name>.jsonl         ledger lines 1-200 (one per provider request: ts, n, command, store, url)
++    _budgets/<name>.jsonl.<k>     ledger lines 200*(k-1)+1 .. 200*k for k >= 2 (bounded rewrite cost per request)
++
++Safety rules (1.1.8, client review of 27 Oct):
++* Exclusive ownership – a budget is only opened and used while this process holds the live lock (lock.live_lock,
++  a Blob lease in Azure), and every reservation re-checks it.
++* Atomic reservation – each take() re-reads the state with its ETag and writes the new count with a conditional
++  write (If-Match / create-if-absent). If anything else changed the state in between, the write fails
++  (ConflictError -> BudgetError): two holders can never both reserve the same request.
++* Order per request: ledger line first, then the conditional state write, then the request is sent. A crash
++  between the two writes leaves exactly one extra ledger line; the next open counts that request as used.
++* Fail closed (BudgetError, nothing sent): state missing while ledger lines exist (never reset to zero), state
++  unreadable/invalid/misnamed, used outside 0..total, ledger lines fewer than used or more than used+1.
++* A total cannot be raised under the same name.
+ """
+ from __future__ import annotations
+ 
+-import atexit
+ import json
+ import re
+ from datetime import datetime, timezone
+ 
+ _NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
+ JS_RATE_USD_PER_1000 = 1.35   # client's dashboard rate for JS-rendered results (the higher of the two rates)
++CHUNK = 200
++
++
++class BudgetError(RuntimeError):
++    """The persistent budget is missing, inconsistent, contended or not exclusively owned: no request may be sent."""
+ 
+ 
+ def _now() -> str:
+@@ -34,28 +45,79 @@
+ 
+ 
+ class TotalBudget:
+-    def __init__(self, storage, name: str, total: int, command: str = ""):
+-        from .fetch import FetchError  # noqa: F401  (import check: budget errors are FetchErrors)
+-
++    def __init__(self, storage, name: str, total: int, command: str = "", require_lock: bool = True):
+         if not _NAME_RE.match(name):
+             raise ValueError(f"budget name must be lowercase letters/digits/-/_: {name!r}")
+         if total <= 0:
+             raise ValueError("budget total must be > 0")
+-        self.st, self.name, self.command = storage, name, command
+-        self.key, self.log_key = f"_budgets/{name}.json", f"_budgets/{name}.jsonl"
+-        state = storage.get_json(self.key)
+-        if state:
+-            if int(state["total"]) != total:
+-                raise ValueError(f"budget {name!r} already exists with total {state['total']} (asked {total}); "
+-                                 f"a cap is never raised – use a new budget name")
+-            self.state = state
+-        else:
+-            self.state = {"name": name, "total": total, "used": 0, "created_at": _now(), "updated_at": _now()}
+-            self._save()
+-        old = storage.get_bytes(self.log_key)
+-        self._lines = old.decode("utf-8").splitlines() if old else []
+-        self._unflushed = 0
+-        atexit.register(self.flush)
++        self.st, self.name, self.command, self.want_total = storage, name, command, total
++        self.require_lock = require_lock
++        self.key = f"_budgets/{name}.json"
++        self._owned()
++        raw, etag = storage.get_bytes_etag(self.key)
++        if raw is None:
++            if self._ledger_lines():
++                raise BudgetError(f"budget {name!r}: ledger exists but state is missing – refusing to reset to 0")
++            self._write({"name": name, "total": total, "used": 0, "created_at": _now(), "updated_at": _now()}, None)
++        self.state, self._etag = self._load()
++
++    # ------------------------------------------------------------------ helpers
++    def _owned(self) -> None:
++        from . import lock
++
++        if self.require_lock and not lock.live_held():
++            raise BudgetError("a persistent request budget may only be used while holding the live lock")
++        lock.check_active()
++
++    def _chunk_key(self, k: int) -> str:
++        return f"_budgets/{self.name}.jsonl" if k == 1 else f"_budgets/{self.name}.jsonl.{k}"
++
++    def _chunk(self, k: int) -> list[str]:
++        raw = self.st.get_bytes(self._chunk_key(k))
++        return [ln for ln in raw.decode("utf-8").splitlines() if ln.strip()] if raw else []
++
++    def _ledger_lines(self) -> int:
++        n, k = 0, 1
++        while True:
++            lines = self._chunk(k)
++            n += len(lines)
++            if len(lines) < CHUNK:
++                return n
++            k += 1
++
++    def _write(self, state: dict, etag) -> None:
++        from .storage import ConflictError
++
++        try:
++            self.st.put_bytes_if(self.key, json.dumps(state, indent=2).encode("utf-8"), etag)
++        except ConflictError as exc:
++            raise BudgetError(f"budget {self.name!r}: concurrent change detected ({exc}) – no request sent") from exc
++
++    def _load(self) -> tuple[dict, str]:
++        """Read + validate the state from storage; repair only the single crash window described above."""
++        raw, etag = self.st.get_bytes_etag(self.key)
++        if raw is None:
++            raise BudgetError(f"budget {self.name!r}: state disappeared")
++        try:
++            st = json.loads(raw)
++            total, used = int(st["total"]), int(st["used"])
++        except Exception as exc:
++            raise BudgetError(f"budget {self.name!r}: state unreadable/invalid ({exc})") from exc
++        if st.get("name") != self.name:
++            raise BudgetError(f"budget {self.name!r}: state names {st.get('name')!r}")
++        if total != self.want_total:
++            raise ValueError(f"budget {self.name!r} already exists with total {total} (asked {self.want_total}); "
++                             f"a cap is never raised – use a new budget name")
++        if not 0 <= used <= total:
++            raise BudgetError(f"budget {self.name!r}: used {used} outside 0..{total}")
++        lines = self._ledger_lines()
++        if lines == used + 1 and lines <= total:          # ledger written, state not: count it as used
++            st = {**st, "used": lines, "updated_at": _now(), "repaired_at": _now()}
++            self._write(st, etag)
++            return self._load()
++        if lines != used:
++            raise BudgetError(f"budget {self.name!r}: ledger has {lines} lines but state says used={used}")
++        return st, etag
+ 
+     @property
+     def total(self) -> int:
+@@ -69,30 +131,27 @@
+     def remaining(self) -> int:
+         return self.total - self.used
+ 
+-    def _save(self):
+-        self.st.put_json(self.key, self.state)
+-
+-    def flush(self):
+-        if self._unflushed:
+-            self.st.put_bytes(self.log_key, ("\n".join(self._lines) + "\n").encode("utf-8"))
+-            self._unflushed = 0
++    def flush(self) -> None:          # kept for callers of 1.1.7; every line is written before its request now
++        return None
+ 
+     def take(self, url: str, store_id: str = "") -> int:
+-        """Count one provider request and persist the count before it is sent; refuse when the total is used up."""
++        """Reserve one provider request (ledger, then conditional state write) before it is sent."""
+         from .fetch import FetchError
+ 
++        self._owned()
++        self.state, self._etag = self._load()             # never trust an in-memory counter
+         if self.used >= self.total:
+             raise FetchError(f"total budget {self.name!r} of {self.total} requests used up", "budget")
+-        self.state["used"] = self.used + 1
+-        self.state["updated_at"] = _now()
+-        self._save()
+-        self._lines.append(json.dumps({"ts": self.state["updated_at"], "n": self.used, "command": self.command,
+-                                       "store": store_id, "url": url}))
+-        self._unflushed += 1
+-        if self.total <= 1000 or self._unflushed >= 50:   # small tests: every line saved at once
+-            self.flush()
+-        return self.used
++        n = self.used + 1
++        k = (n - 1) // CHUNK + 1
++        lines = self._chunk(k) + [json.dumps({"ts": _now(), "n": n, "command": self.command, "store": store_id,
++                                              "url": url})]
++        self.st.put_bytes(self._chunk_key(k), ("\n".join(lines) + "\n").encode("utf-8"))   # (1) ledger
++        new = {**self.state, "used": n, "updated_at": _now()}
++        self._write(new, self._etag)                                                    # (2) conditional count
++        self.state, self._etag = self._load()
++        return n
+ 
+     def summary(self) -> dict:
+-        return {**self.state, "remaining": self.remaining, "ledger": self.log_key,
++        return {**self.state, "remaining": self.remaining, "ledger": self._chunk_key(1),
+                 "max_cost_usd_at_js_rate": round(self.used * JS_RATE_USD_PER_1000 / 1000, 4)}
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/checkpoint.py b/walmart-scraper/src/wmscraper/checkpoint.py
+--- walmart-scraper/src/wmscraper/checkpoint.py
++++ walmart-scraper/src/wmscraper/checkpoint.py
+@@ -58,8 +58,10 @@
+ 
+     @contextmanager
+     def tx(self):
++        from .lock import check_active
+         try:
+             yield self.db
++            check_active()                  # lease lost -> roll back instead of committing
+             self.db.commit()
+         except Exception:
+             self.db.rollback()
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/cli.py b/walmart-scraper/src/wmscraper/cli.py
+--- walmart-scraper/src/wmscraper/cli.py
++++ walmart-scraper/src/wmscraper/cli.py
+@@ -43,7 +43,7 @@
+     cats = None  # None -> the location's configured scope (or all categories)
+     if args.categories:
+         wanted = {c.strip().lower() for c in args.categories.split(",")}
+-        cats = [c for c in cats if c.name.lower() in wanted]
++        cats = [c for c in s.categories if c.name.lower() in wanted]
+         missing = wanted - {c.name.lower() for c in cats}
+         if missing:
+             sys.exit(f"unknown categories: {sorted(missing)}")
+@@ -100,9 +100,14 @@
+         finally:
+             await run.fetcher.close()
+ 
+-    asyncio.run(go())
+-    print(json.dumps({"store": run.store, "canary": run.ck.get("canary")}, indent=2))
+-    return 0
++    try:
++        asyncio.run(go())
++    finally:
++        run._sync_checkpoint()
++    canary = (run.ck.get("canary") or {}).get("start") or {}
++    ok = bool(run.store.get("verified")) and (canary.get("ok") or not run.loc.canary_items)
++    print(json.dumps({"verified": ok, "store": run.store, "canary": run.ck.get("canary")}, indent=2))
++    return 0 if ok else 2
+ 
+ 
+ PROVIDER_ENV = {"oxylabs_webapi": ("OXYLABS_WEBAPI_KEY",), "oxylabs": ("OXYLABS_USERNAME", "OXYLABS_PASSWORD"),
+@@ -202,6 +207,9 @@
+     return 0
+ 
+ 
++LIVE_COMMANDS = {"run", "run-all", "verify-store"}
++
++
+ def main(argv=None):
+     _load_env()
+     ap = argparse.ArgumentParser(prog="wmscraper", description="Walmart location-specific scraper")
+@@ -239,6 +247,15 @@
+     rf.add_argument("--run-id", required=True)
+     args = ap.parse_args(argv)
+     s = load_settings(args.config)
++    from . import lock
++    if args.cmd in LIVE_COMMANDS and not lock.live_held():
++        # Exclusive ownership: one requester at a time for every command that can send provider requests
++        try:
++            with lock.live_lock(build_storage(s)):
++                return main(argv)
++        except lock.LockError as exc:
++            print(f"refused: {exc}", file=sys.stderr)
++            return 3
+     if os.getenv("WMSCRAPER_FETCH_PROVIDER"):  # chosen at deployment (Key Vault holds the matching credential)
+         s.raw.setdefault("fetch", {})["provider"] = os.environ["WMSCRAPER_FETCH_PROVIDER"]
+     if args.budget:
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/fetch/__init__.py b/walmart-scraper/src/wmscraper/fetch/__init__.py
+--- walmart-scraper/src/wmscraper/fetch/__init__.py
++++ walmart-scraper/src/wmscraper/fetch/__init__.py
+@@ -1,3 +1,3 @@
+-from .base import FetchError, FetchResult, Fetcher, build_fetcher
++from .base import TERMINAL_KINDS, FetchError, FetchResult, Fetcher, build_fetcher, classic_payload, provider_error
+ 
+-__all__ = ["FetchError", "FetchResult", "Fetcher", "build_fetcher"]
++__all__ = ["TERMINAL_KINDS", "FetchError", "FetchResult", "Fetcher", "build_fetcher", "classic_payload", "provider_error"]
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/fetch/base.py b/walmart-scraper/src/wmscraper/fetch/base.py
+--- walmart-scraper/src/wmscraper/fetch/base.py
++++ walmart-scraper/src/wmscraper/fetch/base.py
+@@ -10,6 +10,7 @@
+ import json
+ import logging
+ import os
++import re
+ import random
+ import time
+ from dataclasses import dataclass
+@@ -49,6 +50,42 @@
+     return template
+ 
+ 
++# Never retried: a rejected credential (401/403) or an unsupported request (400/404/422) cannot be fixed by retrying;
++# store/budget/lock failures stop the work. 429 / 5xx / timeouts / challenges stay retryable.
++TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
++
++
++def provider_error(status: int, text: str) -> "FetchError":
++    if status in (401, 403):
++        return FetchError(f"provider authentication failed (HTTP {status})", "auth")
++    if status in (400, 404, 422):
++        return FetchError(f"provider rejected the request (HTTP {status}): {text[:200]}", "compat")
++    return FetchError(f"provider HTTP {status}: {text[:200]}", "http")
++
++
++def require_live_lock(fetcher) -> None:
++    """Real provider adapters may only start inside lock.live_lock (one requester at a time)."""
++    from .. import lock
++
++    if not lock.live_held():
++        raise FetchError(f"{fetcher.name}: provider requests need the live lock (exclusive ownership)", "lock")
++
++
++_IP_RE = re.compile(r"walmart\.com/ip/(?:[^/?#]+/)?(\d+)")
++
++
++def classic_payload(settings, location, url: str) -> dict:
++    """Classic Web Scraper API body (realtime.oxylabs.io/v1/queries).
++    Product pages: the documented `walmart_product` source with store localisation (store_id, delivery_zip,
++    fulfillment_type) when `fetch.oxylabs.product_payload` is configured; everything else: `fetch.oxylabs.payload`."""
++    m = _IP_RE.search(url)
++    tpl = settings.get("fetch.oxylabs.product_payload") if m else None
++    if tpl:
++        return fill(tpl, url=url, product_id=m.group(1), store_id=location.store_id, zipcode=location.zipcode)
++    tpl = settings.get("fetch.oxylabs.payload", {"source": "universal", "url": "{url}", "render": "html", "geo_location": "{zipcode}"})
++    return fill(tpl, url=url, store_id=location.store_id, zipcode=location.zipcode)
++
++
+ class Fetcher:
+     name = "base"
+ 
+@@ -85,7 +122,12 @@
+ 
+     async def get(self, url: str) -> FetchResult:
+         last_exc: FetchError | None = None
++        from .. import lock
+         for attempt in range(1, self.retries + 2):
++            try:
++                lock.check_active()                 # a lost lease stops every further request
++            except lock.LockLost as exc:
++                raise FetchError(str(exc), "lock") from exc
+             if self.budget and self.stats["requests"] >= self.budget:
+                 raise FetchError(f"request budget of {self.budget} reached (fetch.max_requests_per_run)", "budget")
+             if self.total_budget is not None:  # counted and saved before the request is sent, retries included
+@@ -95,6 +137,8 @@
+             try:
+                 res = await self._fetch_once(url)
+             except FetchError as exc:
++                if exc.kind in TERMINAL_KINDS:     # auth / compatibility: retrying cannot help, never retried
++                    raise
+                 last_exc = exc
+             except Exception as exc:  # network, provider errors
+                 last_exc = FetchError(f"{type(exc).__name__}: {exc}", "error")
+@@ -131,6 +175,8 @@
+     async def start(self):
+         import httpx
+ 
++        require_live_lock(self)
++
+         user, pwd = os.getenv("OXYLABS_USERNAME"), os.getenv("OXYLABS_PASSWORD")
+         if not user or not pwd:
+             raise FetchError("OXYLABS_USERNAME / OXYLABS_PASSWORD are not set", "error")
+@@ -140,14 +186,15 @@
+         await self.client.aclose()
+ 
+     async def _fetch_once(self, url: str) -> FetchResult:
+-        tpl = self.s.get("fetch.oxylabs.payload", {"source": "universal", "url": "{url}", "render": "html", "geo_location": "{zipcode}"})
+-        body = fill(tpl, url=url, store_id=self.loc.store_id, zipcode=self.loc.zipcode)
++        body = classic_payload(self.s, self.loc, url)
+         t0 = time.monotonic()
+         r = await self.client.post(self.endpoint, json=body)
+         if r.status_code >= 400:
+-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
++            raise provider_error(r.status_code, r.text)
+         res = (r.json().get("results") or [{}])[0]
+-        return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200), res.get("content") or "", time.monotonic() - t0)
++        content = res.get("content") or ""
++        return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200),
++                           content if isinstance(content, str) else "", time.monotonic() - t0)
+ 
+ 
+ class OxylabsWebApiFetcher(Fetcher):
+@@ -161,6 +208,8 @@
+     async def start(self):
+         import httpx
+ 
++        require_live_lock(self)
++
+         key = os.getenv("OXYLABS_WEBAPI_KEY")
+         if not key:
+             raise FetchError("OXYLABS_WEBAPI_KEY is not set", "error")
+@@ -182,7 +231,7 @@
+         t0 = time.monotonic()
+         r = await self.client.post(endpoint, json=body)
+         if r.status_code >= 400:
+-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
++            raise provider_error(r.status_code, r.text)
+         res = (r.json().get("results") or [{}])[0]
+         meta = res.get("metadata") or {}
+         status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
+@@ -196,6 +245,8 @@
+     async def start(self):
+         import httpx
+ 
++        require_live_lock(self)
++
+         key = os.getenv("ZYTE_API_KEY")
+         if not key:
+             raise FetchError("ZYTE_API_KEY is not set", "error")
+@@ -210,7 +261,7 @@
+         t0 = time.monotonic()
+         r = await self.client.post(self.endpoint, json=body)
+         if r.status_code >= 400:
+-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
++            raise provider_error(r.status_code, r.text)
+         data = r.json()
+         return FetchResult(url, data.get("url") or url, int(data.get("statusCode") or 200), data.get("browserHtml") or "", time.monotonic() - t0)
+ 
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/lock.py b/walmart-scraper/src/wmscraper/lock.py
+--- walmart-scraper/src/wmscraper/lock.py
++++ walmart-scraper/src/wmscraper/lock.py
+@@ -1,12 +1,23 @@
+-"""Prevents overlapping runs for the same location.
++"""Exclusive locks.
+ 
+-* Local: an exclusive lock file (atomic create) with stale-lock recovery.
+-* Azure: a Blob lease, renewed while the run is alive; a crashed run's lease expires
+-  automatically, so the next scheduled run can continue from its checkpoint.
++* `run_lock(storage, location)` – one run per location (unchanged purpose).
++* `live_lock(storage)` – ONE process at a time may send provider requests at all, whatever the command or location
++  (verify-store, run, run-all). It is held around every use of a persistent request budget. Re-entrant.
++
++Backends:
++* Local: an exclusive lock file (atomic create) holding a random owner token; stale-lock recovery only when the
++  holder process on this host is gone.
++* Azure: a Blob lease (60 s), renewed every 20 s by a background thread. A crashed holder's lease expires on its own,
++  so a restarted execution can take over and resume.
++
++Lease loss fails closed: when a renewal fails (or the local lock file is no longer ours), the lock is marked LOST and
++`check_active()` raises `LockLost`. It is called before every provider request (fetch/base.py), every checkpoint write
++(checkpoint.py / runner sync) and every publication step (storage.py), so nothing more is sent, written or published.
+ """
+ from __future__ import annotations
+ 
+ import os
++import secrets
+ import socket
+ import threading
+ import time
+@@ -17,6 +28,23 @@
+     pass
+ 
+ 
++class LockLost(LockError):
++    """The exclusive lock was lost while work was in progress: stop requests, checkpoint writes and publication."""
++
++
++_ACTIVE: list = []          # locks held by this process (checked before requests / checkpoint writes / publication)
++_LIVE_DEPTH = 0             # re-entrancy of live_lock() inside one process
++
++
++def check_active() -> None:
++    for lk in list(_ACTIVE):
++        lk.check()
++
++
++def live_held() -> bool:
++    return _LIVE_DEPTH > 0
++
++
+ def _pid_alive(pid: int) -> bool:
+     if os.name == "nt":
+         import ctypes
+@@ -41,6 +69,8 @@
+     def __init__(self, path: Path, stale_seconds: int = 6 * 3600):
+         self.path = Path(path)
+         self.stale = stale_seconds
++        self.token = secrets.token_hex(8)
++        self.lost = False
+ 
+     def _holder_dead(self) -> bool:
+         """True when the lock was left by a process on this host that no longer exists."""
+@@ -61,12 +91,28 @@
+             fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+         except FileExistsError:
+             raise LockError(f"another run holds {self.path} ({self.path.read_text(errors='ignore')})")
+-        os.write(fd, f"{socket.gethostname()} pid={os.getpid()} {time.ctime()}".encode())
++        os.write(fd, f"{socket.gethostname()} pid={os.getpid()} token={self.token} {time.ctime()}".encode())
+         os.close(fd)
++        _ACTIVE.append(self)
+         return self
+ 
++    def check(self) -> None:
++        try:
++            ours = f"token={self.token}" in self.path.read_text(errors="ignore")
++        except OSError:
++            ours = False
++        if self.lost or not ours:
++            self.lost = True
++            raise LockLost(f"lock {self.path} is no longer held by this process")
++
+     def __exit__(self, *exc):
+-        self.path.unlink(missing_ok=True)
++        if self in _ACTIVE:
++            _ACTIVE.remove(self)
++        try:
++            if f"token={self.token}" in self.path.read_text(errors="ignore"):
++                self.path.unlink()
++        except OSError:
++            pass
+ 
+ 
+ class BlobLeaseLock:
+@@ -74,6 +120,8 @@
+         self.blob = container_client.get_blob_client(key)
+         self.seconds = lease_seconds
+         self._stop = threading.Event()
++        self.lost = False
++        self.lost_reason = ""
+ 
+     def __enter__(self):
+         from azure.core.exceptions import HttpResponseError
+@@ -84,6 +132,7 @@
+             self.lease = self.blob.acquire_lease(lease_duration=self.seconds)
+         except HttpResponseError as exc:
+             raise LockError(f"another run holds the lease on {self.blob.blob_name}") from exc
++        _ACTIVE.append(self)
+         threading.Thread(target=self._renew, daemon=True).start()
+         return self
+ 
+@@ -91,11 +140,18 @@
+         while not self._stop.wait(self.seconds / 3):
+             try:
+                 self.lease.renew()
+-            except Exception:
++            except Exception as exc:  # lease lost: fail closed – check() now raises everywhere
++                self.lost, self.lost_reason = True, f"{type(exc).__name__}: {exc}"[:200]
+                 return
+ 
++    def check(self) -> None:
++        if self.lost:
++            raise LockLost(f"lease on {self.blob.blob_name} lost ({self.lost_reason})")
++
+     def __exit__(self, *exc):
+         self._stop.set()
++        if self in _ACTIVE:
++            _ACTIVE.remove(self)
+         try:
+             self.lease.release()
+         except Exception:
+@@ -108,3 +164,23 @@
+     if isinstance(storage, BlobStorage):
+         return BlobLeaseLock(storage.cc, f"{location_key}/.run.lock")
+     return FileLock(storage.local_path(f"{location_key}/.run.lock"))
++
++
++class live_lock:
++    """Process-wide exclusive right to send provider requests (all tests, all locations). Re-entrant."""
++
++    def __init__(self, storage):
++        self.storage, self.inner = storage, None
++
++    def __enter__(self):
++        global _LIVE_DEPTH
++        if _LIVE_DEPTH == 0:
++            self.inner = run_lock(self.storage, "_live").__enter__()
++        _LIVE_DEPTH += 1
++        return self
++
++    def __exit__(self, *exc):
++        global _LIVE_DEPTH
++        _LIVE_DEPTH -= 1
++        if self.inner is not None:
++            self.inner.__exit__(*exc)
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/parse/walmart.py b/walmart-scraper/src/wmscraper/parse/walmart.py
+--- walmart-scraper/src/wmscraper/parse/walmart.py
++++ walmart-scraper/src/wmscraper/parse/walmart.py
+@@ -416,6 +416,9 @@
+     image_url: str
+     location: dict = field(default_factory=dict)   # product's selected pickup location (explicit)
+     fulfillment_type: str = ""
++    fulfillment_options: list = field(default_factory=list)   # [(fulfillment, storeId)] from fulfillmentSummary
++    price_value: float | None = None                            # priceInfo.currentPrice.price (number)
++    availability: str = ""
+ 
+ 
+ def parse_product(html: str, final_url: str = "") -> ProductDetail:
+@@ -463,6 +466,10 @@
+                   "intent": clean_text(dig(product, "location", "intent")),
+                   "postalCode": clean_text(dig(product, "location", "postalCode"))},
+         fulfillment_type=clean_text(product.get("fulfillmentType")),
++        fulfillment_options=[(clean_text(o.get("fulfillment")), str(o.get("storeId") or ""))
++                             for o in product.get("fulfillmentSummary") or [] if isinstance(o, dict)],
++        price_value=(lambda v: float(v) if isinstance(v, (int, float)) else None)((pi.get("currentPrice") or {}).get("price")),
++        availability=clean_text(product.get("availabilityStatus")),
+     )
+ 
+ 
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/runner.py b/walmart-scraper/src/wmscraper/runner.py
+--- walmart-scraper/src/wmscraper/runner.py
++++ walmart-scraper/src/wmscraper/runner.py
+@@ -72,15 +72,16 @@
+         self.store: dict = self.ck.get("store_verification") or {}
+ 
+     # ------------------------------------------------------------------ helpers
+-    def _archive(self, kind: str, res, note: str = "") -> None:
+-        """Keep raw source responses (gzip) + a store-context excerpt as evidence. Bounded per kind."""
++    def _archive(self, kind: str, res, note: str = "", always: bool = False) -> dict | None:
++        """Keep raw source responses (gzip) + a store-context excerpt as evidence. Bounded per kind unless `always`
++        (store page and canaries: every response is kept, before it is validated)."""
+         import gzip
+         import hashlib
+ 
+         limit = int(self.s.get("evidence.raw_samples_per_kind", 5))
+         counts = self.ck.get("raw_counts", {})
+-        if counts.get(kind, 0) >= limit:
+-            return
++        if counts.get(kind, 0) >= limit and not always:
++            return None
+         counts[kind] = counts.get(kind, 0) + 1
+         self.ck.set("raw_counts", counts)
+         name = f"{kind}-{counts[kind]:02d}"
+@@ -96,6 +97,7 @@
+                       "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "note": note,
+                       "store_context": excerpt})
+         self.storage.put_json(f"{self.prefix}/raw/index.json", index)
++        return index[-1]
+ 
+     def _checkpoint_path(self):
+         local = self.storage.local_path(f"{self.prefix}/checkpoint.sqlite")
+@@ -111,6 +113,8 @@
+         return p
+ 
+     def _sync_checkpoint(self):
++        from .lock import check_active
++        check_active()                      # lease lost -> no further checkpoint upload
+         if not self.storage.local_path(f"{self.prefix}/checkpoint.sqlite"):
+             self.ck.db.commit()
+             self.storage.put_bytes(f"{self.prefix}/checkpoint.sqlite", self.ck.path.read_bytes())
+@@ -229,7 +233,7 @@
+         url = f"https://www.walmart.com/store/{self.loc.store_id}"
+         try:
+             res = await self.fetcher.get(url)
+-            self._archive("store", res, "store verification page")
++            self._archive("store", res, "store verification page", always=True)
+             info = parse_store(res.html, self.loc.store_id, res.final_url)
+         except (FetchError, ShapeError, ChallengeError) as exc:
+             self.store = {"verified": False, "reason": str(exc), "url": url}
+@@ -265,7 +269,35 @@
+         loc = p.location or {}
+         return loc.get("pickupStoreId") == self.loc.store_id or self.loc.store_id in (loc.get("storeIds") or [])
+ 
++    def canary_problems(self, p, item_id: str) -> list[str]:
++        """Store identity AND fulfillment AND store-sourced price, all from the returned product (not from labels,
++        cookies or request parameters). A store id somewhere in the response is not enough."""
++        want = self.loc.store_id
++        loc = p.location or {}
++        probs = []
++        if p.item_id != item_id:
++            probs.append(f"response identity {p.item_id}")
++        if loc.get("pickupStoreId") != want:
++            probs.append(f"selected pickup store {loc.get('pickupStoreId') or '-'} (location {loc})")
++        if want not in (loc.get("storeIds") or []):
++            probs.append(f"location.storeIds {loc.get('storeIds')} lacks {want}")
++        if self.loc.fulfillment == "pickup":
++            if (loc.get("intent") or "").upper() != "PICKUP":
++                probs.append(f"intent {loc.get('intent') or '-'} (expected PICKUP)")
++            if ("PICKUP", want) not in [(f.upper(), s) for f, s in p.fulfillment_options]:
++                probs.append(f"no PICKUP option for store {want} in fulfillmentSummary {p.fulfillment_options}")
++        if (p.fulfillment_type or "").upper() != "STORE":
++            probs.append(f"fulfillmentType {p.fulfillment_type or '-'} (expected STORE: store-sourced offer)")
++        shown = re.sub(r"[^0-9.]", "", p.current_price or "")
++        if not ((p.price_value or 0) > 0 or (shown and float(shown or 0) > 0)):
++            probs.append("no current price on the store offer")
++        if self.loc.zipcode and loc.get("postalCode") and loc.get("postalCode") != self.loc.zipcode:
++            probs.append(f"postalCode {loc.get('postalCode')} != {self.loc.zipcode}")
++        return probs
++
+     async def canary(self, phase: str):
++        """Every configured canary must pass. Stops at the FIRST failing item (no further request) and raises;
++        every response is archived with its hash and returned context BEFORE it is validated."""
+         items = list(self.loc.canary_items)
+         self.ck.set("canary_configured", bool(items))
+         if not items:
+@@ -273,22 +305,27 @@
+         state = self.ck.get("canary", {})
+         if state.get(phase, {}).get("ok"):
+             return
+-        problems = []
++        checked = []
+         for item_id in items:
++            res = await self.fetcher.get(f"https://www.walmart.com/ip/{item_id}")   # terminal errors propagate
++            arch = self._archive("canary", res, f"canary {phase} {item_id}", always=True)
+             try:
+-                res = await self.fetcher.get(f"https://www.walmart.com/ip/{item_id}")
+-                p = parse_product(res.html, res.final_url)
+-                if p.item_id != item_id:
+-                    problems.append(f"{item_id}: response identity {p.item_id}")
+-                elif not self._product_context_ok(p):
+-                    problems.append(f"{item_id}: selected pickup store {p.location}")
++                probs = self.canary_problems(parse_product(res.html, res.final_url), item_id)
+             except Exception as exc:
+-                problems.append(f"{item_id}: {exc}")
+-        state[phase] = {"ok": not problems, "detail": problems, "items": items}
++                probs = [f"unparsable product response: {exc}"]
++            checked.append({"item": item_id, "ok": not probs, "problems": probs,
++                            "evidence": (arch or {}).get("file"), "sha256": (arch or {}).get("sha256")})
++            if probs:
++                break
++        ok = all(c["ok"] for c in checked) and len(checked) == len(items)
++        state[phase] = {"ok": ok, "items": items, "checked": checked,
++                        "detail": [f"{c['item']}: {'; '.join(c['problems'])}" for c in checked if not c["ok"]],
++                        "not_requested": items[len(checked):]}
+         self.ck.set("canary", state)
+-        log.info("canary", extra={"phase": phase, "ok": not problems, "problems": problems})
+-        if problems and len(problems) == len(items):
+-            raise RuntimeError(f"all canary items failed at {phase} – likely blocked or wrong store")
++        log.info("canary", extra={"phase": phase, "ok": ok, "checked": checked, "not_requested": items[len(checked):]})
++        if not ok:
++            raise FetchError(f"canary failed at {phase}: {state[phase]['detail']} – stopped, "
++                             f"{len(items) - len(checked)} canary item(s) not requested", "store")
+ 
+     # ------------------------------------------------------------------ discovery / planning
+     def _listing_url(self, cid: str) -> str:
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/src/wmscraper/storage.py b/walmart-scraper/src/wmscraper/storage.py
+--- walmart-scraper/src/wmscraper/storage.py
++++ walmart-scraper/src/wmscraper/storage.py
+@@ -22,6 +22,10 @@
+ from pathlib import Path
+ 
+ 
++class ConflictError(RuntimeError):
++    """A conditional write lost: the object changed since it was read (another writer)."""
++
++
+ class Storage:
+     def put_bytes(self, key: str, data: bytes) -> None: ...
+     def get_bytes(self, key: str) -> bytes | None: ...
+@@ -36,6 +40,15 @@
+         raw = self.get_bytes(key)
+         return json.loads(raw) if raw else default
+ 
++    # ------------------------------------------------------------------ compare-and-swap (persistent budgets)
++    def get_bytes_etag(self, key: str) -> tuple[bytes | None, str | None]:
++        raise NotImplementedError
++
++    def put_bytes_if(self, key: str, data: bytes, etag: str | None) -> None:
++        """Write only if the object is unchanged since `etag` was read (etag None = must not exist yet).
++        Raises ConflictError otherwise – two writers can never both succeed."""
++        raise NotImplementedError
++
+     # ------------------------------------------------------------------ publication
+     def publish(self, location: str, run_id: str, records: list[dict], report: dict) -> dict:
+         body = json.dumps(records, ensure_ascii=False, indent=2).encode("utf-8")
+@@ -47,6 +60,8 @@
+             "published_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+         }
+         base = f"{location}/latest"
++        from .lock import check_active
++        check_active()                     # lease lost -> nothing is published
+         # 1) stage
+         self.put_bytes(f"{base}/.staging-records.json", body)
+         self.put_json(f"{base}/.staging-report.json", report)
+@@ -55,8 +70,10 @@
+             self.copy(f"{base}/records.json", f"{base}/previous-records.json")
+             self.copy(f"{base}/manifest.json", f"{base}/previous-manifest.json")
+         # 3) swap in; manifest written last = commit point
++        check_active()
+         self.copy(f"{base}/.staging-records.json", f"{base}/records.json")
+         self.copy(f"{base}/.staging-report.json", f"{base}/report.json")
++        check_active()                     # the commit point is never written without ownership
+         self.put_json(f"{base}/manifest.json", manifest)
+         return manifest
+ 
+@@ -92,6 +109,26 @@
+     def local_path(self, key):
+         return self._p(key)
+ 
++    def get_bytes_etag(self, key):
++        data = self.get_bytes(key)
++        return data, (hashlib.sha256(data).hexdigest() if data is not None else None)
++
++    def put_bytes_if(self, key, data, etag):
++        p = self._p(key)
++        mutex = p.with_name(p.name + ".cas")
++        try:
++            fd = os.open(mutex, os.O_CREAT | os.O_EXCL | os.O_WRONLY)   # short critical section, atomic create
++        except FileExistsError:
++            raise ConflictError(f"{key}: concurrent writer")
++        try:
++            _, current = self.get_bytes_etag(key)
++            if current != etag:
++                raise ConflictError(f"{key}: changed since read (expected {etag}, found {current})")
++            self.put_bytes(key, data)
++        finally:
++            os.close(fd)
++            mutex.unlink(missing_ok=True)
++
+ 
+ class BlobStorage(Storage):
+     def __init__(self, container: str):
+@@ -119,6 +156,33 @@
+     def copy(self, src, dst):
+         self.put_bytes(dst, self.get_bytes(src) or b"")
+ 
++    def get_bytes_etag(self, key):
++        from azure.core.exceptions import ResourceNotFoundError
++
++        b = self.cc.get_blob_client(key)
++        try:
++            d = b.download_blob()
++        except ResourceNotFoundError:
++            return None, None
++        return d.readall(), d.properties.etag
++
++    def put_bytes_if(self, key, data, etag):
++        from azure.core import MatchConditions
++        from azure.core.exceptions import HttpResponseError, ResourceExistsError, ResourceModifiedError
++
++        b = self.cc.get_blob_client(key)
++        try:
++            if etag is None:
++                b.upload_blob(data, overwrite=False)            # create only if absent
++            else:
++                b.upload_blob(data, overwrite=True, etag=etag, match_condition=MatchConditions.IfNotModified)
++        except (ResourceExistsError, ResourceModifiedError) as exc:
++            raise ConflictError(f"{key}: changed since read") from exc
++        except HttpResponseError as exc:
++            if exc.status_code in (409, 412):
++                raise ConflictError(f"{key}: changed since read") from exc
++            raise
++
+ 
+ def build_storage(settings) -> Storage:
+     backend = os.getenv("WMSCRAPER_OUTPUT_BACKEND") or settings.get("output.backend", "local")
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/tests/test_azure_manual.py b/walmart-scraper/tests/test_azure_manual.py
+--- walmart-scraper/tests/test_azure_manual.py
++++ walmart-scraper/tests/test_azure_manual.py
+@@ -32,10 +32,9 @@
+ 
+ 
+ def test_verify_store_stops_at_its_request_cap(site, capsys):
+-    # the store page uses the one allowed request; the canary is refused by the cap, so the probe fails closed
++    # the store page uses the one allowed request; the canary request is refused by the cap: the probe fails closed
+     assert main(["--config", str(site), "verify-store", "--location", "test-store", "--max-requests", "1"]) == 1
+-    cap = capsys.readouterr()
+-    assert "request budget of 1 reached" in cap.out and "canary" in cap.err
++    assert "request budget of 1 reached" in capsys.readouterr().err
+ 
+ 
+ def test_infrastructure_template_is_manual_and_needs_no_role_rights_or_credential():
+@@ -71,7 +70,9 @@
+     assert state["used"] == 3 and state["total"] == 3
+     ledger = st.get_bytes("_budgets/probe.jsonl").decode().splitlines()
+     assert len(ledger) == 3 and [json.loads(x)["n"] for x in ledger] == [1, 2, 3]
+-    assert TotalBudget(st, "probe", 3).remaining == 0
++    from wmscraper.lock import live_lock
++    with live_lock(st):
++        assert TotalBudget(st, "probe", 3).remaining == 0
+     capsys.readouterr()
+ 
+ 
+@@ -94,15 +95,18 @@
+             AlwaysFails.sent += 1
+             raise FetchError("HTTP 500", "http")
+ 
+-    f = AlwaysFails(s, s.location("test-store"))
+-    f.total_budget = TotalBudget(st, "retrytest", 4)
+-    with pytest.raises(FetchError, match="total budget 'retrytest' of 4"):
+-        asyncio.run(f.get("https://www.walmart.com/ip/1"))
+-    assert AlwaysFails.sent == 4                                   # 1 attempt + 3 retries, then refused
+-    f2 = AlwaysFails(s, s.location("test-store"))                  # a restarted process: nothing left
+-    f2.total_budget = TotalBudget(st, "retrytest", 4)
+-    with pytest.raises(FetchError, match="used up"):
+-        asyncio.run(f2.get("https://www.walmart.com/ip/1"))
+-    assert AlwaysFails.sent == 4
+-    with pytest.raises(ValueError, match="never raised"):
+-        TotalBudget(st, "retrytest", 40)
++    from wmscraper.lock import live_lock
++    with live_lock(st):
++        f = AlwaysFails(s, s.location("test-store"))
++        f.total_budget = TotalBudget(st, "retrytest", 4)
++        with pytest.raises(FetchError, match="total budget 'retrytest' of 4"):
++            asyncio.run(f.get("https://www.walmart.com/ip/1"))
++        assert AlwaysFails.sent == 4                               # 1 attempt + 3 retries, then refused
++    with live_lock(st):
++        f2 = AlwaysFails(s, s.location("test-store"))              # a restarted process: nothing left
++        f2.total_budget = TotalBudget(st, "retrytest", 4)
++        with pytest.raises(FetchError, match="used up"):
++            asyncio.run(f2.get("https://www.walmart.com/ip/1"))
++        assert AlwaysFails.sent == 4
++        with pytest.raises(ValueError, match="never raised"):
++            TotalBudget(st, "retrytest", 40)
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/walmart-scraper/tests/test_v118_safety.py b/walmart-scraper/tests/test_v118_safety.py
+--- walmart-scraper/tests/test_v118_safety.py
++++ walmart-scraper/tests/test_v118_safety.py
+@@ -0,0 +1,325 @@
++"""1.1.8 – client review of 27/28 Oct: atomic exclusive budget, first-failure canary stop, fulfillment + price
++verification, archive-before-validation, terminal errors, the documented --categories command (offline only)."""
++import asyncio
++import json
++import time
++from pathlib import Path
++
++import pytest
++import yaml
++from conftest import STORE, ZIP, page
++
++from wmscraper import lock
++from wmscraper.budget import BudgetError, TotalBudget
++from wmscraper.cli import main
++from wmscraper.config import load_settings
++from wmscraper.fetch import FetchError, classic_payload, provider_error
++from wmscraper.fetch.base import FixtureFetcher
++from wmscraper.lock import BlobLeaseLock, FileLock, LockLost, live_lock
++from wmscraper.storage import build_storage
++
++
++# ---------------------------------------------------------------- helpers
++def _storage(site):
++    return build_storage(load_settings(str(site)))
++
++
++def canary_product(i, *, store=STORE, intent="PICKUP", ftype="STORE", pickup_store=None, price="$2.98", summary=None):
++    pickup_store = store if pickup_store is None else pickup_store
++    return page({"props": {"pageProps": {"initialData": {"data": {"product": {
++        "usItemId": str(i), "upc": f"0000000{i}", "brand": "Acme", "sellerId": "F55CDC31AB754BB68FE0B39041159D63",
++        "sellerName": "Walmart.com", "priceInfo": {"currentPrice": {"priceString": price}},
++        "fulfillmentSummary": [{"fulfillment": "PICKUP", "storeId": store}] if summary is None else summary,
++        "fulfillmentType": ftype,
++        "location": {"storeIds": [store], "intent": intent, "postalCode": ZIP, "pickupLocation": {"storeId": pickup_store}}},
++        "idml": {"specifications": []}}}}}})
++
++
++def with_canaries(site, pages: dict):
++    """Configure the test store's canary items and serve the given product pages for them."""
++    cfg = Path(site).parent
++    fx = Path(load_settings(str(site)).get("fetch.fixture_dir"))
++    mapping = json.loads((fx / "map.json").read_text(encoding="utf-8"))
++    for item_id, html in pages.items():
++        (fx / f"canary{item_id}.html").write_text(html, encoding="utf-8")
++        mapping[f"https://www.walmart.com/ip/{item_id}"] = f"canary{item_id}.html"
++    (fx / "map.json").write_text(json.dumps(mapping), encoding="utf-8")
++    locs = yaml.safe_load((cfg / "locations.yaml").read_text(encoding="utf-8"))
++    locs["locations"][0]["canary_items"] = list(pages)
++    (cfg / "locations.yaml").write_text(yaml.safe_dump(locs), encoding="utf-8")
++
++
++def ledger_urls(site, name="probe"):
++    raw = _storage(site).get_bytes(f"_budgets/{name}.jsonl")
++    return [json.loads(x)["url"] for x in raw.decode().splitlines()] if raw else []
++
++
++def probe(site):
++    return main(["--config", str(site), "--budget", "probe:10", "verify-store", "--location", "test-store",
++                 "--max-requests", "10"])
++
++
++# ---------------------------------------------------------------- 2. stop at the first failed canary
++def _verify_result(out: str) -> dict:
++    return json.loads(out[out.index('{\n  "verified"'):])
++
++
++def _canary_state(site) -> dict:
++    from wmscraper.checkpoint import Checkpoint
++
++    run = next(p for p in (_storage(site).root / "test-store" / "runs").iterdir() if p.name.startswith("verify-"))
++    return Checkpoint(run / "checkpoint.sqlite").get("canary")["start"]
++
++
++def test_first_wrong_store_canary_stops_before_the_second_request(site, capsys):
++    with_canaries(site, {"901": canary_product(901, store="4376"), "902": canary_product(902)})
++    assert probe(site) != 0
++    err = capsys.readouterr().err
++    assert "canary failed at start" in err and "1 canary item(s) not requested" in err
++    assert ledger_urls(site) == [f"https://www.walmart.com/store/{STORE}", "https://www.walmart.com/ip/901"]
++    state = _canary_state(site)
++    assert state["ok"] is False and state["not_requested"] == ["902"]
++    assert [c["item"] for c in state["checked"]] == ["901"] and "selected pickup store 4376" in state["detail"][0]
++
++
++def test_verify_store_returns_failure_when_any_canary_fails(site, capsys):
++    with_canaries(site, {"901": canary_product(901), "902": canary_product(902, pickup_store="4376")})
++    rc = probe(site)
++    err = capsys.readouterr().err
++    assert rc != 0 and "canary failed at start" in err and "902" in err
++    assert ledger_urls(site)[-1] == "https://www.walmart.com/ip/902"
++
++
++# ---------------------------------------------------------------- 3. fulfillment + price, not just a store id
++@pytest.mark.parametrize("kw, why", [
++    ({"intent": "SHIPPING"}, "intent SHIPPING"),
++    ({"ftype": "FC"}, "fulfillmentType FC"),
++    ({"summary": [{"fulfillment": "DELIVERY", "storeId": STORE}]}, "no PICKUP option"),
++    ({"price": ""}, "no current price"),
++])
++def test_configured_store_id_alone_is_not_enough(site, capsys, kw, why):
++    with_canaries(site, {"901": canary_product(901, **kw)})
++    assert probe(site) != 0
++    assert why in capsys.readouterr().err
++
++
++def test_correct_store_fulfillment_and_price_pass(site, capsys):
++    with_canaries(site, {"901": canary_product(901), "902": canary_product(902)})
++    assert probe(site) == 0
++    res = _verify_result(capsys.readouterr().out)
++    assert res["verified"] is True and res["canary"]["start"]["ok"] is True
++    assert [c["ok"] for c in res["canary"]["start"]["checked"]] == [True, True]
++    assert len(ledger_urls(site)) == 3
++
++
++# ---------------------------------------------------------------- 4. every canary response archived before validation
++def test_canary_responses_archived_with_hash_and_context_even_when_failing(site, capsys):
++    with_canaries(site, {"901": canary_product(901, store="4376")})
++    probe(site)
++    st = _storage(site)
++    runs = [p for p in (st.root / "test-store" / "runs").iterdir() if p.name.startswith("verify-")]
++    index = json.loads((runs[0] / "raw" / "index.json").read_text(encoding="utf-8"))
++    kinds = [e["kind"] for e in index]
++    assert kinds == ["store", "canary"]
++    can = index[1]
++    assert can["url"] == "https://www.walmart.com/ip/901" and len(can["sha256"]) == 64
++    assert (runs[0] / "raw" / can["file"]).exists()
++    assert any(c.get("value") == "4376" for c in can["store_context"])           # the returned (wrong) context
++
++
++# ---------------------------------------------------------------- terminal vs retryable
++def test_auth_failure_is_terminal_and_not_retried(site, monkeypatch, capsys):
++    calls = []
++
++    async def unauthorized(self, url):
++        calls.append(url)
++        raise provider_error(401, "")
++    monkeypatch.setattr(FixtureFetcher, "_fetch_once", unauthorized)
++    s = load_settings(str(site))
++    s.raw["fetch"]["max_retries"] = 4
++    with live_lock(_storage(site)):
++        f = FixtureFetcher(s, s.location("test-store"))
++        with pytest.raises(FetchError) as e:
++            asyncio.run(f.get(f"https://www.walmart.com/store/{STORE}"))
++    assert e.value.kind == "auth" and len(calls) == 1
++    assert provider_error(400, "").kind == "compat" and provider_error(429, "").kind == "http"
++
++
++# ---------------------------------------------------------------- 1. budget: exclusive, atomic, fail closed
++def test_two_holders_of_a_one_request_budget_cannot_both_reserve(site):
++    st = _storage(site)
++    with live_lock(st):
++        a, b = TotalBudget(st, "one", 1), TotalBudget(st, "one", 1)
++        stale_state, stale_etag = b._load()                # b read the state before a reserved
++        a.take("u")
++        with pytest.raises(FetchError, match="used up"):  # b re-reads: nothing left
++            b.take("u")
++        with pytest.raises(BudgetError, match="concurrent change"):   # even a write based on the stale read loses
++            b._write({**stale_state, "used": 1}, stale_etag)
++        assert TotalBudget(st, "one", 1).used == 1
++
++
++def test_overlapping_execution_is_refused_before_any_request(site, capsys):
++    other = FileLock(_storage(site).local_path("_live/.run.lock"))
++    with other:
++        assert probe(site) == 3
++    assert "refused" in capsys.readouterr().err
++    assert ledger_urls(site) == [] and _storage(site).get_bytes("_budgets/probe.json") is None
++
++
++def test_budget_requires_the_live_lock(site):
++    with pytest.raises(BudgetError, match="live lock"):
++        TotalBudget(_storage(site), "probe", 10)
++
++
++def test_deleted_state_with_remaining_ledger_never_resets_to_zero(site):
++    st = _storage(site)
++    with live_lock(st):
++        b = TotalBudget(st, "probe", 10)
++        b.take("u1")
++        (st.root / "_budgets" / "probe.json").unlink()
++        with pytest.raises(BudgetError, match="refusing to reset"):
++            TotalBudget(st, "probe", 10)
++
++
++@pytest.mark.parametrize("damage, msg", [("invalid", "unreadable/invalid"), ("over", "outside"),
++                                         ("short_ledger", "ledger has 1 lines")])
++def test_inconsistent_state_fails_closed(site, damage, msg):
++    st = _storage(site)
++    with live_lock(st):
++        b = TotalBudget(st, "t", 5)
++        b.take("u1")
++        b.take("u2")
++        p, lg = st.root / "_budgets" / "t.json", st.root / "_budgets" / "t.jsonl"
++        if damage == "invalid":
++            p.write_text("{oops", encoding="utf-8")
++        elif damage == "over":
++            p.write_text(json.dumps({"name": "t", "total": 5, "used": 9}), encoding="utf-8")
++        else:
++            lg.write_text(lg.read_text(encoding="utf-8").splitlines()[0] + "\n", encoding="utf-8")
++        with pytest.raises(BudgetError, match=msg):
++            TotalBudget(st, "t", 5)
++
++
++def test_existing_azure_probe_identity_keeps_its_7_remaining(site):
++    """Exactly the probe budget in the walmart-scraper container since 27 Oct: used 3 of 10, 3 ledger lines."""
++    st = _storage(site)
++    st.put_bytes("_budgets/probe.json", json.dumps({"name": "probe", "total": 10, "used": 3,
++                                                    "created_at": "2026-10-27T04:10:27+00:00",
++                                                    "updated_at": "2026-10-27T04:11:36+00:00"}).encode())
++    lines = [{"ts": "2026-10-27T04:10:27+00:00", "n": 1, "store": "100", "url": "https://www.walmart.com/store/100"},
++             {"ts": "2026-10-27T04:11:12+00:00", "n": 2, "store": "100", "url": "https://www.walmart.com/ip/10450114"},
++             {"ts": "2026-10-27T04:11:36+00:00", "n": 3, "store": "100", "url": "https://www.walmart.com/ip/43436773"}]
++    st.put_bytes("_budgets/probe.jsonl", ("\n".join(json.dumps(x) for x in lines) + "\n").encode())
++    with live_lock(st):
++        b = TotalBudget(st, "probe", 10)
++        assert (b.used, b.remaining, b.state["created_at"]) == (3, 7, "2026-10-27T04:10:27+00:00")
++        b.take("next")
++        assert TotalBudget(st, "probe", 10).used == 4
++        assert json.loads(st.get_bytes("_budgets/probe.jsonl").decode().splitlines()[0])["n"] == 1   # history kept
++
++
++def test_ledger_chunks_keep_rewrites_bounded(site):
++    st = _storage(site)
++    with live_lock(st):
++        b = TotalBudget(st, "big", 450)
++        for i in range(410):
++            b.take(f"u{i}")
++        assert TotalBudget(st, "big", 450).used == 410
++    assert st.get_bytes("_budgets/big.jsonl.3").decode().count("\n") == 10
++
++
++# ---------------------------------------------------------------- lease loss
++class _Lease:
++    def renew(self):
++        raise RuntimeError("LeaseIdMismatchWithLeaseOperation")
++
++    def release(self):
++        pass
++
++
++class _Blob:
++    blob_name = "_live/.run.lock"
++
++    def exists(self):
++        return True
++
++    def acquire_lease(self, lease_duration):
++        return _Lease()
++
++
++class _Container:
++    def get_blob_client(self, key):
++        return _Blob()
++
++
++def test_lease_loss_stops_requests_checkpoint_writes_and_publication(site, tmp_path):
++    from wmscraper.checkpoint import Checkpoint
++
++    s = load_settings(str(site))
++    st = _storage(site)
++    ck = Checkpoint(tmp_path / "ck.sqlite")
++    lk = BlobLeaseLock(_Container(), "_live/.run.lock", lease_seconds=0.15)
++    calls = []
++    with lk:
++        deadline = time.time() + 5
++        while not lk.lost and time.time() < deadline:
++            time.sleep(0.02)
++        with pytest.raises(LockLost):
++            lock.check_active()
++        f = FixtureFetcher(s, s.location("test-store"))
++        with pytest.raises(FetchError) as e:
++            asyncio.run(f.get(f"https://www.walmart.com/store/{STORE}"))
++        assert e.value.kind == "lock"
++        with pytest.raises(LockLost):
++            ck.set("after", 1)
++        with pytest.raises(LockLost):
++            st.publish("test-store", "r1", [{"item_id": "1"}], {"ok": True})
++    assert ck.get("after") is None and st.get_bytes("test-store/latest/manifest.json") is None
++
++
++# ---------------------------------------------------------------- 5. documented --categories command
++def test_documented_categories_command_runs(site, capsys):
++    """README/cli docstring: python -m wmscraper run --location <key> --categories "Food,Pets" --limit 600 --demo
++    raised "'NoneType' object is not iterable" in 1.1.7."""
++    rc = main(["--config", str(site), "run", "--location", "test-store", "--categories", "Food", "--limit", "600",
++               "--demo"])
++    assert rc == 0
++    assert '"run_id"' in capsys.readouterr().out
++    with pytest.raises(SystemExit, match="unknown categories"):
++        main(["--config", str(site), "run", "--location", "test-store", "--categories", "Food,Pets", "--demo"])
++
++
++# ---------------------------------------------------------------- proposed Classic payload (documented)
++def test_classic_payload_uses_the_documented_walmart_product_source_for_product_pages(site):
++    s = load_settings(str(site))
++    s.raw["fetch"]["oxylabs"] = yaml.safe_load(
++        (Path(__file__).resolve().parents[1] / "config" / "settings.yaml").read_text(encoding="utf-8"))["fetch"]["oxylabs"]
++    loc = s.location("test-store")
++    body = classic_payload(s, loc, "https://www.walmart.com/ip/10450114")
++    assert body == {"source": "walmart_product", "product_id": "10450114", "store_id": loc.store_id,
++                    "delivery_zip": loc.zipcode, "fulfillment_type": "pickup"}
++    assert classic_payload(s, loc, "https://www.walmart.com/ip/Great-Value-Milk/10450114")["product_id"] == "10450114"
++    store = classic_payload(s, loc, f"https://www.walmart.com/store/{loc.store_id}")
++    assert store["source"] == "universal" and "store_id" not in store
++
++
++def test_exact_documented_categories_command_resolves_food_and_pets_with_the_real_config(monkeypatch):
++    """README line: python -m wmscraper run --location walmart-100-bentonville --categories "Food,Pets" --limit 600
++    against the delivered config/categories.csv. The run itself is replaced by a stub (no provider request)."""
++    import wmscraper.cli as cli
++
++    seen = {}
++
++    class Captured(Exception):
++        pass
++
++    class StubRun:
++        def __init__(self, s, loc, run_id=None, categories=None, limit=0, demo=False):
++            seen.update(location=loc.key, categories=[c.name for c in categories], limit=limit, demo=demo)
++            raise Captured()
++
++    monkeypatch.setattr(cli, "Run", StubRun)
++    with pytest.raises(Captured):
++        main(["run", "--location", "walmart-100-bentonville", "--categories", "Food,Pets", "--limit", "600"])
++    assert seen == {"location": "walmart-100-bentonville", "categories": ["Food", "Pets"], "limit": 600, "demo": True}

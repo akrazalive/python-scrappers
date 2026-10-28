@@ -25,7 +25,7 @@ param cronExpression string = '0 6 * * 1,4'
 param image string = 'docker.io/library/python:3.12-slim'
 
 @description('Blob (in the walmart-scraper container) holding the delivered source package that the job runs.')
-param releaseBlob string = 'releases/walmart-scraper-1.1.7-src.zip'
+param releaseBlob string = 'releases/walmart-scraper-1.1.8-src.zip'
 
 @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
 param assignRoles bool = false

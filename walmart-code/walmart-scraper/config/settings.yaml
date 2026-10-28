@@ -23,12 +23,25 @@ fetch:
   # Store / fulfillment parameters are provider-specific: confirm them against the
   # provider's Walmart documentation. Whatever is sent, every page is still checked
   # for the configured store id and fails the run on mismatch.
-  oxylabs:
+  oxylabs:                     # Classic Web Scraper API, realtime.oxylabs.io/v1/queries, API user + password
+    # Any non-product Walmart page (store page, listings): "url" alone. Oxylabs documents NO store parameters for this
+    # route; the 27-Oct probe showed product pages served this way select Walmart's own store for the ZIP (4376).
     payload:
       source: universal
       url: "{url}"
       render: html
       geo_location: "{zipcode}"
+    # PROPOSED for the next probe – NOT yet approved by the client, not yet run (1.1.8). Product pages (/ip/<id>) via
+    # the documented dedicated source with store localisation (developers.oxylabs.io > Web Scraper API > Walmart >
+    # Product > "Localization and Filtering": source walmart_product, product_id, store_id, delivery_zip,
+    # fulfillment_type pickup|delivery|shipping; without "parse" the response "content" is the page HTML, which the
+    # scraper verifies itself). Delete this block to fall back to the universal payload above.
+    product_payload:
+      source: walmart_product
+      product_id: "{product_id}"
+      store_id: "{store_id}"
+      delivery_zip: "{zipcode}"
+      fulfillment_type: pickup
   zyte:
     payload:
       url: "{url}"

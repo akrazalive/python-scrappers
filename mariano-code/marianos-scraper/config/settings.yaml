@@ -13,8 +13,17 @@ fetch:
   provider: oxylabs_kroger     # oxylabs_kroger (Web Scraper API, webapi.oxylabs.io, Bearer key – used for all runs so far)
                                # | oxylabs_realtime (classic realtime.oxylabs.io, username/password – validate with probe)
                                # | fixture (offline tests). Credentials only via env vars / Key Vault.
-  oxylabs_realtime:
-    payload: {source: kroger, url: "{url}", store_id: "{store_id}"}   # adjust to the plan's Kroger source if needed
+  oxylabs_realtime:            # Classic Web Scraper API (realtime.oxylabs.io/v1/queries, API user + password)
+    # Pages without a dedicated Classic source (department, coupons): "url" alone. Oxylabs documents no store
+    # parameters for that route (developers.oxylabs.io > Web Scraper API > Kroger: "Any other Kroger page can be
+    # scraped by passing its url alone"), so every such page must still pass the scraper's own store check.
+    payload: {url: "{url}"}
+    # PROPOSED – not approved, not yet run (1.1.5). Search pages via the documented `kroger_search` source with store
+    # localisation (store_id = division + store number, e.g. 53100544; fulfillment_type in_store needs store_id).
+    # The documented source targets kroger.com; whether kroger.com serves the Mariano's store 53100544 with its own
+    # in-store prices is UNVERIFIED and is exactly what Test 1 checks (store, modality and price source are read from
+    # the returned page, never assumed). Delete this block to send search pages as "url" alone.
+    search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: in_store}
   concurrency: 4               # parallel page requests (env MSCRAPER_CONCURRENCY overrides; set from the Test 2 measurement)
   max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
   timeout_seconds: 120

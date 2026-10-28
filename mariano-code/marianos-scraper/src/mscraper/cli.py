@@ -25,7 +25,8 @@ from . import logging_setup
 from .budget import TotalBudget, parse_spec
 from .config import load_settings
 from .fetch import FetchError
-from .lock import LockError, run_lock
+from . import lock
+from .lock import LockError, live_lock, run_lock
 from .runner import Runner
 from .storage import build_storage
 
@@ -36,17 +37,15 @@ def _state_dir(settings) -> Path:
 
 
 def _latest_unfinished(state_dir: Path, key: str) -> str | None:
-    import sqlite3
+    from .checkpoint import read_meta
 
-    runs = sorted((state_dir / key / "runs").glob("*/checkpoint.sqlite"), reverse=True)
-    for ck in runs:
-        db = sqlite3.connect(ck)
-        try:
-            row = db.execute("SELECT v FROM meta WHERE k='final_status'").fetchone()
-        finally:
-            db.close()
-        if not row:
-            return ck.parent.name
+    runs = sorted({p.parent for pat in ("*/checkpoint.sqlite", "*/checkpoint.manifest.json")
+                   for p in (state_dir / key / "runs").glob(pat)}, reverse=True)
+    for run_dir in runs:
+        if read_meta(run_dir, "started_at") is None:
+            continue                                # never started (e.g. created and failed before any work)
+        if read_meta(run_dir, "final_status") is None:
+            return run_dir.name
     return None
 
 
@@ -122,6 +121,9 @@ def cmd_run(args, settings, loc_key: str) -> dict:
         return asyncio.run(runner.run(publish=not args.no_publish))
 
 
+LIVE_COMMANDS = {"verify-store", "probe", "run", "run-all", "bounded-test"}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="mscraper")
     ap.add_argument("--config", default=None)
@@ -163,6 +165,16 @@ def main(argv=None) -> int:
     settings = load_settings(args.config)
     logging_setup.setup(args.log_level)
 
+    # Exclusive ownership: every command that can send provider requests runs inside the live lock (one Blob lease
+    # for all tests and locations), so two executions can never overlap or draw on the same budget concurrently.
+    if args.cmd in LIVE_COMMANDS and not lock.live_held():
+        try:
+            with live_lock(build_storage(settings)):
+                return main(argv)
+        except LockError as exc:
+            print(f"refused: {exc}", file=sys.stderr)
+            return 3
+
     if args.cmd == "verify-store":
         loc = settings.location(args.location)
         runner = Runner(settings, loc, build_storage(settings), _state_dir(settings) / "_verify")
@@ -177,7 +189,10 @@ def main(argv=None) -> int:
             finally:
                 await runner.fetcher.close()
 
-        res = asyncio.run(go())
+        try:
+            res = asyncio.run(go())
+        finally:
+            runner.ck.close()
         print(json.dumps(res, indent=2))
         return 0 if res["verified"] else 2
 
@@ -233,19 +248,31 @@ def main(argv=None) -> int:
         plan = BOUNDED_TESTS[args.test]
         spec = f"{args.test}:{plan['total']}"
         rc = 0
-        for step in plan["steps"]:
+        from .budget import BudgetError
+        from .checkpoint import CheckpointError
+
+        for i, step in enumerate(plan["steps"], 1):
             b = _total_budget(argparse.Namespace(budget=spec), settings, "")
             if b.remaining <= 0:
                 print(f"{args.test}: total of {b.total} requests used up – step not started: {' '.join(step)}")
-                rc = rc or 4
+                rc = 4
                 break
-            print(f"{args.test}: {' '.join(step)}  (total used {b.used}/{b.total})", flush=True)
+            print(f"{args.test}: step {i}: {' '.join(step)}  (total used {b.used}/{b.total})", flush=True)
             try:
-                rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
-                          "--budget", spec] + step) or rc
-            except FetchError as exc:   # the total cap stops a step part-way: report it, never send more
-                print(f"{args.test}: step stopped: {exc}")
-                rc = rc or 4
+                step_rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
+                               "--budget", spec] + step)
+            except FetchError as exc:   # auth / compatibility / store / budget / lock: never send more
+                print(f"{args.test}: step {i} stopped ({exc.kind}): {exc} – later steps NOT started")
+                rc = 4
+                break
+            except (LockError, BudgetError, CheckpointError) as exc:
+                print(f"{args.test}: step {i} stopped ({type(exc).__name__}): {exc} – later steps NOT started")
+                rc = 5
+                break
+            if step_rc:                 # e.g. store verification failed (exit 2): stop immediately
+                print(f"{args.test}: step {i} failed (exit {step_rc}) – later steps NOT started")
+                rc = step_rc
+                break
         b = _total_budget(argparse.Namespace(budget=spec), settings, "")
         print(json.dumps({"test": args.test, "exit_code": rc, "budget": b.summary()}, indent=2))
         return rc

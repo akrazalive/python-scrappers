@@ -10,13 +10,42 @@ Stored per run:
 
 A page's records are written in the same transaction that advances that listing's page
 pointer, so a crash can never lose a page or store it twice.
+
+Storage modes (MSCRAPER_CHECKPOINT_MODE):
+* direct (default, local disk): SQLite works on <run>/checkpoint.sqlite itself.
+* snapshot (Azure - the state directory is an SMB share, where SQLite's byte-range locks fail and must not be
+  disabled): SQLite works on a LOCAL file, and the durable copy on the share is a series of consistent snapshots:
+
+    <run>/checkpoint.snap-<seq>.sqlite   a complete database made with SQLite's online backup API
+    <run>/checkpoint.manifest.json       {"seq", "file", "sha256", "bytes", "written_at", "integrity": "ok"}
+
+  Flush (after a committed transaction, at most every MSCRAPER_SNAPSHOT_SECONDS, default 5; always at the end of a
+  run and before publication): backup -> integrity_check -> write the snapshot file under a temp name and rename it ->
+  write the manifest under a temp name and rename it (the COMMIT POINT) -> delete the previous snapshot. A crash at
+  any step leaves the previous manifest pointing at the previous, still existing snapshot.
+  Restore (every open): the manifest must parse, its snapshot must exist, have the recorded SHA-256 and pass
+  PRAGMA integrity_check; then it is copied to the local working file. Any mismatch raises CheckpointError (fail
+  closed - the run is not silently restarted). No manifest = nothing was committed durably = a new checkpoint.
+  Work committed after the last snapshot is redone after a crash (at most ~5 s of pages); because a page and its
+  pointer are one transaction, a redone page is never stored twice.
+  Every checkpoint write first checks the exclusive locks (lock.check_active): after a lease loss nothing is written.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import sqlite3
+import tempfile
+import time
 from contextlib import contextmanager
 from pathlib import Path
+
+from . import lock
+
+
+class CheckpointError(RuntimeError):
+    """The durable checkpoint is missing, corrupt or inconsistent: resuming from it is refused."""
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT);
@@ -48,22 +77,120 @@ CREATE TABLE IF NOT EXISTS exclusions (identity TEXT, category TEXT, sub_categor
 """
 
 
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _integrity_ok(path: Path) -> bool:
+    db = sqlite3.connect(path)
+    try:
+        return db.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+    except sqlite3.DatabaseError:
+        return False
+    finally:
+        db.close()
+
+
 class Checkpoint:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, mode: str | None = None, snapshot_seconds: float | None = None):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(self.path)
+        self.mode = mode or os.getenv("MSCRAPER_CHECKPOINT_MODE", "direct")
+        if self.mode not in ("direct", "snapshot"):
+            raise CheckpointError(f"unknown checkpoint mode {self.mode!r}")
+        self.interval = float(os.getenv("MSCRAPER_SNAPSHOT_SECONDS", "5") if snapshot_seconds is None else snapshot_seconds)
+        self.manifest = self.path.parent / "checkpoint.manifest.json"
+        self.seq, self._dirty, self._last_flush = 0, False, 0.0
+        if self.mode == "snapshot":
+            work = Path(os.getenv("MSCRAPER_LOCAL_WORK") or tempfile.gettempdir()) / "mscraper-ckpt"
+            self.work = work / hashlib.sha1(str(self.path.resolve()).encode()).hexdigest()[:16] / "checkpoint.sqlite"
+            self.work.parent.mkdir(parents=True, exist_ok=True)
+            self._restore()
+            self.db = sqlite3.connect(self.work)
+        else:
+            self.db = sqlite3.connect(self.path)
+        before = self.db.total_changes
         self.db.executescript(SCHEMA)
         self.db.commit()
+        self._dirty = self.mode == "snapshot" and (self.db.total_changes != before or self.seq == 0)
+
+    # -- snapshot mode: restore / flush ---------------------------------------------------------------------------
+    def _restore(self) -> None:
+        for stale in (self.work, self.work.with_name(self.work.name + "-journal")):
+            stale.unlink(missing_ok=True)       # the local copy is never trusted: always rebuilt from the share
+        if not self.manifest.exists():
+            if self.path.exists() and self.path.stat().st_size > 0:
+                raise CheckpointError(f"{self.path}: a direct-mode database exists but no snapshot manifest - "
+                                      f"refusing to guess which state is current")
+            return
+        try:
+            m = json.loads(self.manifest.read_text(encoding="utf-8"))
+            snap, seq, sha = self.path.parent / m["file"], int(m["seq"]), m["sha256"]
+        except Exception as exc:
+            raise CheckpointError(f"{self.manifest}: unreadable manifest ({exc})") from exc
+        if not snap.exists():
+            raise CheckpointError(f"{self.manifest}: snapshot {m['file']} is missing")
+        if _sha256(snap) != sha:
+            raise CheckpointError(f"{snap}: SHA-256 differs from the manifest (corrupt or partial snapshot)")
+        tmp = self.work.with_suffix(".restore")
+        tmp.write_bytes(snap.read_bytes())
+        if _sha256(tmp) != sha or not _integrity_ok(tmp):
+            tmp.unlink(missing_ok=True)
+            raise CheckpointError(f"{snap}: restored copy fails SHA-256 / PRAGMA integrity_check")
+        os.replace(tmp, self.work)
+        self.seq = seq
+
+    def flush(self, force: bool = False) -> dict | None:
+        """Write a consistent snapshot + manifest to the share (snapshot mode). Returns the manifest written."""
+        if self.mode != "snapshot" or not self._dirty:
+            return None
+        if not force and time.monotonic() - self._last_flush < self.interval:
+            return None
+        lock.check_active()                     # lease lost -> no further checkpoint writes
+        seq = self.seq + 1
+        local = self.work.with_name(f"snap-{seq:06d}.sqlite")
+        dst = sqlite3.connect(local)
+        try:
+            self.db.backup(dst)
+        finally:
+            dst.close()
+        if not _integrity_ok(local):
+            local.unlink(missing_ok=True)
+            raise CheckpointError("snapshot failed PRAGMA integrity_check - not written")
+        sha, size = _sha256(local), local.stat().st_size
+        name = f"checkpoint.snap-{seq:06d}.sqlite"
+        target = self.path.parent / name
+        tmp = target.with_suffix(".tmp")
+        tmp.write_bytes(local.read_bytes())
+        os.replace(tmp, target)
+        local.unlink(missing_ok=True)
+        m = {"seq": seq, "file": name, "sha256": sha, "bytes": size, "integrity": "ok",
+             "written_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        mtmp = self.manifest.with_suffix(".tmp")
+        mtmp.write_text(json.dumps(m, indent=2), encoding="utf-8")
+        lock.check_active()                     # never commit a snapshot after losing ownership
+        os.replace(mtmp, self.manifest)         # commit point
+        old = self.path.parent / f"checkpoint.snap-{self.seq:06d}.sqlite"
+        if self.seq and old != target:
+            old.unlink(missing_ok=True)
+        self.seq, self._dirty, self._last_flush = seq, False, time.monotonic()
+        return m
 
     @contextmanager
     def tx(self):
         try:
             yield self.db
+            lock.check_active()                 # lease lost -> roll back instead of committing
             self.db.commit()
         except Exception:
             self.db.rollback()
             raise
+        self._dirty = True
+        self.flush()
 
     # meta / events
     def set(self, key: str, value) -> None:
@@ -179,4 +306,33 @@ class Checkpoint:
         return dict(self.db.execute("SELECT reason, COUNT(*) FROM seen GROUP BY reason").fetchall())
 
     def close(self) -> None:
-        self.db.close()
+        try:
+            self.flush(force=True)
+        finally:
+            self.db.close()
+
+
+def read_meta(run_dir: Path, key: str):
+    """Read one meta value of a run's checkpoint in either mode without modifying it (None if absent)."""
+    run_dir = Path(run_dir)
+    manifest = run_dir / "checkpoint.manifest.json"
+    if manifest.exists():
+        m = json.loads(manifest.read_text(encoding="utf-8"))
+        path = run_dir / m["file"]
+        if _sha256(path) != m["sha256"]:
+            raise CheckpointError(f"{path}: SHA-256 differs from the manifest")
+    else:
+        path = run_dir / "checkpoint.sqlite"
+        if not path.exists() or path.stat().st_size == 0:
+            return None
+    with tempfile.TemporaryDirectory() as d:     # read a private copy: no lock on the share is ever needed
+        copy = Path(d) / "c.sqlite"
+        copy.write_bytes(path.read_bytes())
+        db = sqlite3.connect(copy)
+        try:
+            row = db.execute("SELECT v FROM meta WHERE k=?", (key,)).fetchone()
+        except sqlite3.DatabaseError:
+            row = None
+        finally:
+            db.close()
+    return json.loads(row[0]) if row else None

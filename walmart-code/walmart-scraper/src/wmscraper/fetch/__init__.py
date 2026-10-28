@@ -1,3 +1,3 @@
-from .base import FetchError, FetchResult, Fetcher, build_fetcher
+from .base import TERMINAL_KINDS, FetchError, FetchResult, Fetcher, build_fetcher, classic_payload, provider_error
 
-__all__ = ["FetchError", "FetchResult", "Fetcher", "build_fetcher"]
+__all__ = ["TERMINAL_KINDS", "FetchError", "FetchResult", "Fetcher", "build_fetcher", "classic_payload", "provider_error"]

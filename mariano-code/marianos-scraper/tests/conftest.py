@@ -55,3 +55,12 @@ def fetcher(settings, location):
 @pytest.fixture
 def storage(tmp_path):
     return LocalStorage(tmp_path / "output")
+
+
+@pytest.fixture
+def live(tmp_path):
+    """Hold the process-wide live lock (as every CLI command that sends requests does)."""
+    from mscraper.lock import live_lock
+
+    with live_lock(LocalStorage(tmp_path / "lockstore")) as lk:
+        yield lk

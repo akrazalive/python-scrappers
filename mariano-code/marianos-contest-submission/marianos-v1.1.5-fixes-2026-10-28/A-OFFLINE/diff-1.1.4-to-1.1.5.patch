@@ -1,0 +1,1516 @@
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/CHANGELOG.md b/marianos-scraper/CHANGELOG.md
+--- marianos-scraper/CHANGELOG.md
++++ marianos-scraper/CHANGELOG.md
+@@ -57,6 +57,30 @@
+ * `tools/reconcile_v100_runs.py` – machine-readable coverage / remaining-gap reconciliation of the delivered entry #69
+   run and the stopped query-expansion run, from their own checkpoints.
+ 
++## 1.1.5 (2026-10-28) – client review of 27 Oct (stop rule, exclusive ownership, lease loss, checkpoints, hashes)
++
++Offline only; no live request. Details and tests: docs/RECOVERY-AND-LOCKING.md, tests/test_v115_safety.py
++(18 new tests, 64 in total).
++1. **Stop rule** – `bounded-test` stops at the first non-zero step or terminal error; later steps are not started.
++   Terminal provider errors (401/403 auth, 400/404/422 compatibility) and store/budget/lock errors are never retried.
++2. **Exclusive ownership** – `lock.live_lock`: one Blob lease for every command that can send provider requests (all
++   tests, both locations); an overlapping execution exits 3 before any request. Real adapters refuse to start
++   without it. `TotalBudget` requires it, re-reads and validates its state before every request (no cache), writes
++   ledger-then-state, and fails closed on any inconsistency. The existing `test1` budget (0/19) is kept unchanged.
++3. **Lease loss** – a failed renewal marks the lock lost; requests, checkpoint commits/snapshots and every
++   publication step check it and stop.
++4. **Checkpoints** – `MSCRAPER_CHECKPOINT_MODE=snapshot` (Azure): SQLite on local disk, SHA-256-checked snapshots +
++   atomically replaced manifest on the share, integrity-checked restore that fails closed. Replaces the proposed
++   `nobrl` mount option from 1.1.4 item 4 (withdrawn – byte-range locks stay on and SQLite never runs on the share).
++5. **Hashes** – `release_sha256` (code + config + deploy + requirements + Dockerfile) and `deploy_sha256` in
++   SOURCE_FINGERPRINT.txt, version_info and every run's provenance; `run_test.sh collect` writes `timestamps.json`
++   (Azure execution start/end separate from controller times).
++6. **Classic API request (proposed, not approved, not run)** – `fetch.oxylabs_realtime`: the 1.1.0 body
++   `{"source": "kroger", "url": <marianos.com URL>, "store_id": …}` is not a documented Classic request and is
++   withdrawn. Search pages: documented `kroger_search` (`query`, `store_id` 53100544, `fulfillment_type in_store`),
++   which targets kroger.com – whether it serves the Mariano's store with its own prices is unverified and is what
++   Test 1 checks. Other pages: `url` alone (no documented store parameters; the page must still pass the store check).
++
+ ## 1.1.4 (2026-10-27) – zero-request deployment check before the live tests
+ 
+ 1. **`selfcheck`** (`cli.py`, `run_test.sh selfcheck`): 0 provider requests. Reports whether the Key Vault-backed
+@@ -66,7 +90,7 @@
+ 2. **Log Analytics daily cap in the template** (`main.bicep`: `workspaceCapping.dailyQuotaGb 0.03`), so the job
+    deployment cannot reset the cap that was set after the infrastructure step.
+ 3. Tests: `tests/test_v114_selfcheck.py` (2 offline tests; 46 in total).
+-4. **Proposed, not yet deployed – SQLite on the state share** (`main.bicep`: volume `mountOptions: 'nobrl'`). Live Test 1
++4. **Proposed, never deployed, withdrawn in 1.1.5 – SQLite on the state share** (`main.bicep`: volume `mountOptions: 'nobrl'`). Live Test 1
+    on 27 Oct failed before any provider request with `sqlite3.OperationalError: database is locked`: the checkpoint
+    database is on the Azure Files (SMB) share, where SQLite's byte-range locks fail. `nobrl` turns those locks off;
+    one execution at a time (parallelism 1 + run lock) means there are no concurrent writers. Template only –
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/config/settings.yaml b/marianos-scraper/config/settings.yaml
+--- marianos-scraper/config/settings.yaml
++++ marianos-scraper/config/settings.yaml
+@@ -13,8 +13,17 @@
+   provider: oxylabs_kroger     # oxylabs_kroger (Web Scraper API, webapi.oxylabs.io, Bearer key – used for all runs so far)
+                                # | oxylabs_realtime (classic realtime.oxylabs.io, username/password – validate with probe)
+                                # | fixture (offline tests). Credentials only via env vars / Key Vault.
+-  oxylabs_realtime:
+-    payload: {source: kroger, url: "{url}", store_id: "{store_id}"}   # adjust to the plan's Kroger source if needed
++  oxylabs_realtime:            # Classic Web Scraper API (realtime.oxylabs.io/v1/queries, API user + password)
++    # Pages without a dedicated Classic source (department, coupons): "url" alone. Oxylabs documents no store
++    # parameters for that route (developers.oxylabs.io > Web Scraper API > Kroger: "Any other Kroger page can be
++    # scraped by passing its url alone"), so every such page must still pass the scraper's own store check.
++    payload: {url: "{url}"}
++    # PROPOSED – not approved, not yet run (1.1.5). Search pages via the documented `kroger_search` source with store
++    # localisation (store_id = division + store number, e.g. 53100544; fulfillment_type in_store needs store_id).
++    # The documented source targets kroger.com; whether kroger.com serves the Mariano's store 53100544 with its own
++    # in-store prices is UNVERIFIED and is exactly what Test 1 checks (store, modality and price source are read from
++    # the returned page, never assumed). Delete this block to send search pages as "url" alone.
++    search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: in_store}
+   concurrency: 4               # parallel page requests (env MSCRAPER_CONCURRENCY overrides; set from the Test 2 measurement)
+   max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
+   timeout_seconds: 120
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/deploy/azure/main.bicep b/marianos-scraper/deploy/azure/main.bicep
+--- marianos-scraper/deploy/azure/main.bicep
++++ marianos-scraper/deploy/azure/main.bicep
+@@ -24,7 +24,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
+-param releaseBlob string = 'releases/marianos-scraper-1.1.4-src.zip'
++param releaseBlob string = 'releases/marianos-scraper-1.1.5-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+@@ -203,9 +203,8 @@
+       secrets: [for n in providerSecrets: { name: n, keyVaultUrl: '${kv.properties.vaultUri}secrets/${n}', identity: identity.id }]
+     }
+     template: {
+-      // nobrl: SQLite checkpoints on the SMB share fail with 'database is locked' unless byte-range locks are off
+-      // (one execution at a time: parallelism 1 + the run lock, so no concurrent writers)
+-      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name, mountOptions: 'nobrl' } ]
++      // default SMB mount (byte-range locks stay ON): SQLite never runs on the share – see MSCRAPER_CHECKPOINT_MODE
++      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name } ]
+       containers: [
+         {
+           name: 'scraper'
+@@ -219,6 +218,9 @@
+             { name: 'MSCRAPER_ARGS', value: scheduleEnabled ? 'run-all' : defaultArgs }
+             { name: 'MSCRAPER_OUTPUT_BACKEND', value: 'azure_blob' }
+             { name: 'MSCRAPER_STATE_DIR', value: '/state' }
++            // SQLite works on local disk; consistent snapshots + manifest (commit point) go to the share (checkpoint.py)
++            { name: 'MSCRAPER_CHECKPOINT_MODE', value: 'snapshot' }
++            { name: 'MSCRAPER_LOCAL_WORK', value: '/tmp/mscraper-work' }
+             { name: 'AZURE_STORAGE_ACCOUNT_URL', value: storage.properties.primaryEndpoints.blob }
+             { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
+             { name: 'RELEASE_BLOB', value: releaseBlob }
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/deploy/azure/run_test.sh b/marianos-scraper/deploy/azure/run_test.sh
+--- marianos-scraper/deploy/azure/run_test.sh
++++ marianos-scraper/deploy/azure/run_test.sh
+@@ -65,6 +65,14 @@
+     mkdir -p "$OUT/state"
+     az storage file download-batch --account-name "$SA" --account-key "$KEY" -s scraper-state -d "$OUT/state" -o none
+     cp evidence/executions.log "$OUT/" 2>/dev/null || true
++    # Azure's own execution times (properties.startTime/endTime) kept apart from this controller's start/collect times
++    python - "$OUT/execution.json" "$EXEC" "$TS" > "$OUT/timestamps.json" <<'PYTS'
++import json, sys
++e = json.load(open(sys.argv[1]))["properties"]
++ctl = [l.strip() for l in open("evidence/executions.log") if sys.argv[2] in l] if __import__("os").path.exists("evidence/executions.log") else []
++print(json.dumps({"execution": sys.argv[2], "azure_execution_start": e.get("startTime"), "azure_execution_end": e.get("endTime"),
++                  "azure_status": e.get("status"), "controller_log_lines": ctl, "collected_at_controller_utc": sys.argv[3]}, indent=2))
++PYTS
+     ( cd "$OUT" && find . -type f ! -name SHA256SUMS.txt | sort | xargs sha256sum > SHA256SUMS.txt )
+     ST=$(python -c "import json,sys;print(json.load(open(sys.argv[1]))['properties']['status'])" "$OUT/execution.json")
+     if [ "$ST" != "Running" ]; then
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/docs/RECOVERY-AND-LOCKING.md b/marianos-scraper/docs/RECOVERY-AND-LOCKING.md
+--- marianos-scraper/docs/RECOVERY-AND-LOCKING.md
++++ marianos-scraper/docs/RECOVERY-AND-LOCKING.md
+@@ -0,0 +1,83 @@
++# Recovery, locking and request budgets (v1.1.5)
++
++Answers the client review of 27 Oct, points 1-5. Everything here is covered by offline tests in
++`tests/test_v115_safety.py`. No live run has used this design yet.
++
++## 1. Stop rule (bounded tests)
++
++`bounded-test` runs its steps in order and stops at the first step that does not succeed:
++
++* a non-zero exit (e.g. store verification failed: exit 2), or
++* a terminal fetch error: `auth` (provider 401/403), `compat` (provider 400/404/422), `store`, `budget`, `lock`, or
++* a `LockError`, `BudgetError` or `CheckpointError`.
++
++Later steps are not started. Terminal errors are also never retried inside a step (`fetch.TERMINAL_KINDS`); only
++429 / 5xx / timeouts / blocked responses are retried.
++Tests: `test_failed_first_store_check_stops_bounded_test_before_any_other_step` (1 request, steps 2-3 never
++started), `test_terminal_provider_errors_are_not_retried_and_stop_the_test`.
++
++## 2. Exclusive ownership: one requester at a time
++
++`lock.live_lock(storage)` is one Blob lease (`_live/.run.lock` in the `marianos-scraper` container; a lock file
++locally). Every command that can send provider requests runs inside it: `bounded-test`, `verify-store`, `probe`,
++`run`, `run-all`. It is one lock for all tests and both locations. A second, overlapping execution exits with code 3
++before sending anything. The real provider adapters refuse to start without it.
++
++The persistent budget (`budget.TotalBudget`) can only be opened and used while the live lock is held. It has no
++cached counter: every `take()` re-checks the lock and re-reads and validates the state file from disk. Order per
++request: ledger line appended and fsynced, then the state file replaced atomically, then the request is sent. If a
++crash happens between the first two, the request is counted as used on the next open. Any other inconsistency
++fails closed and no request is sent:
++* the state file is missing while the ledger exists
++* the state file is unreadable or invalid
++* the ledger has fewer lines than `used`, or more than one extra line
++* `used` is greater than `total`
++* the total differs from the one requested
++
++The existing Azure budget `test1` (used 0 of 19, created 2026-10-27T04:09:54Z) opens unchanged. It is never reset
++or renamed.
++Tests: `test_overlapping_execution_is_refused_and_sends_nothing`, `test_budget_needs_the_live_lock_and_survives_restart`,
++`test_existing_test1_identity_from_azure_is_kept_with_19_remaining`, `test_budget_state_is_never_cached_between_two_holders`,
++`test_inconsistent_budget_fails_closed[...]`, `test_crash_between_ledger_and_state_counts_the_request_as_used`.
++
++## 3. Lease loss stops everything
++
++The lease is renewed every 20 s. If a renewal fails, the lock is marked LOST, and `lock.check_active()` raises
++`LockLost`. It is called:
++* before every provider request (`Fetcher.get` → FetchError kind `lock`)
++* before every checkpoint commit (the transaction is rolled back) and before every snapshot is written
++* before each publication step, including the manifest write (the commit point)
++
++Test: `test_lease_loss_stops_requests_checkpoint_writes_and_publication`. A lease whose renewal fails causes no
++request, no checkpoint write and nothing published.
++
++## 4. Checkpoints: SQLite on local disk, consistent snapshots on the share
++
++The 27-Oct failure was `database is locked`: SQLite's byte-range locks do not work on the Azure Files (SMB) share.
++Locks are **not** disabled (no `nobrl`). Instead (`MSCRAPER_CHECKPOINT_MODE=snapshot`, set in the job):
++
++| Step | What happens |
++|---|---|
++| Work | SQLite runs on a local file (`/tmp/mscraper-work/...`). It is never trusted after a restart and is always rebuilt from the share. |
++| Flush | After a committed transaction (at most every 5 s), always at the end of a run, and before publication: SQLite online backup, then `PRAGMA integrity_check`, then `checkpoint.snap-<seq>.sqlite` written under a temp name and renamed, then `checkpoint.manifest.json` (`seq`, file, SHA-256, bytes, integrity) written under a temp name and renamed. **This rename is the commit point.** Then the previous snapshot is deleted. |
++| Crash at any step | The previous manifest still points at the previous snapshot, which still exists. |
++| Restore (every open) | The manifest must parse, its snapshot must exist, match the SHA-256 and pass `integrity_check`. Then it is copied to local disk. Any mismatch raises `CheckpointError`: the run is refused, not silently restarted. |
++| Lost work | At most the pages committed in the last ~5 s before a crash are fetched again. A page and its listing pointer are one transaction, so a re-fetched page is never stored twice. Those requests count against the budget like any other. |
++
++Test: `test_snapshot_checkpoint_survives_hard_kill_and_resumes_without_loss_or_duplicates`. A separate process is
++killed with `os._exit(137)` on its 6th provider response, with no `finally` and no flush. A new "container" with
++an empty local directory restores from the share and finishes. The published records are identical to an
++uninterrupted reference run, with no duplicates, and fewer requests than the reference. Also covered:
++`test_corrupt_or_inconsistent_snapshot_fails_closed` (damaged bytes, missing snapshot, unreadable manifest, a newer
++uncommitted snapshot ignored) and `test_snapshot_mode_refuses_an_unmanifested_direct_database`.
++
++## 5. Hashes
++
++`SOURCE_FINGERPRINT.txt` and every report record:
++* `code_sha256` (src/mscraper/*.py, unchanged meaning)
++* `release_sha256`: src + config + deploy + requirements + Dockerfile, line endings normalised
++* `deploy_sha256`: deploy/ only
++* the SHA-256 of `main.bicep`
++
++`run_test.sh collect` writes `timestamps.json`, which keeps Azure's own execution start/end separate from this
++controller's start and collection times.
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/budget.py b/marianos-scraper/src/mscraper/budget.py
+--- marianos-scraper/src/mscraper/budget.py
++++ marianos-scraper/src/mscraper/budget.py
+@@ -1,15 +1,21 @@
+ """Total request budget shared by every command of one bounded test (Test 1 = 19, Test 2 = 300, ...).
+ 
+-The per-process caps (`--max-requests`) restart with each process; this budget does not. It is a file in the state
+-directory (Azure: the mounted Azure Files share), so it holds across commands, retries, resumes, container restarts
+-and repeated job executions:
++The per-process caps (`--max-requests`) restart with each process; this budget does not. It is a pair of files in the
++state directory (Azure: the mounted Azure Files share), so it holds across commands, retries, resumes, container
++restarts and repeated job executions:
+ 
+     state/_budgets/<name>.json     {"name", "total", "used", "created_at", "updated_at"}
+     state/_budgets/<name>.jsonl    one line per provider request: ts, n, command, store, url
+ 
+-A request is counted BEFORE it is sent; once `used == total` every further request is refused (FetchError "budget").
+-The total is fixed when the budget is created – calling it again with a different total is an error, so a cap can
+-only be raised by starting a new, separately named budget.
++Exclusive ownership (1.1.5): a budget may only be opened and used while this process holds the live lock
++(lock.live_lock – a Blob lease in Azure), so two executions can never draw on it at the same time. Every take()
++re-checks the lock, re-reads the state from disk (no cached counter) and only then reserves the next request.
++
++Order of writes per request: (1) the ledger line is appended and flushed, (2) the state file is replaced atomically,
++(3) the request is sent. A crash between (1) and (2) leaves one ledger line more than `used`; on the next open that
++request is counted as used (fail safe). Anything else is inconsistent and fails closed (BudgetError): a missing or
++invalid state file next to an existing ledger, fewer ledger lines than `used`, more than one extra line, a total that
++differs from the requested one, or used > total. A cap can only be raised by a new, separately named budget.
+ """
+ from __future__ import annotations
+ 
+@@ -20,32 +26,69 @@
+ from pathlib import Path
+ 
+ from .fetch import FetchError
++from . import lock
+ 
+ _NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
+ 
+ 
++class BudgetError(RuntimeError):
++    """The persistent budget is missing, inconsistent or not exclusively owned: no request may be sent."""
++
++
+ def _now() -> str:
+     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+ 
+ 
+ class TotalBudget:
+-    def __init__(self, directory: Path, name: str, total: int, command: str = ""):
++    def __init__(self, directory: Path, name: str, total: int, command: str = "", require_lock: bool = True):
+         if not _NAME_RE.match(name):
+             raise ValueError(f"budget name must be lowercase letters/digits/-/_: {name!r}")
+         if total <= 0:
+             raise ValueError("budget total must be > 0")
+-        self.dir, self.name, self.command = Path(directory), name, command
++        self.require_lock = require_lock
++        self._owned()
++        self.dir, self.name, self.command, self.want_total = Path(directory), name, command, total
+         self.dir.mkdir(parents=True, exist_ok=True)
+         self.path, self.log = self.dir / f"{name}.json", self.dir / f"{name}.jsonl"
+-        if self.path.exists():
++        if not self.path.exists():
++            if self.log.exists() and self._lines():
++                raise BudgetError(f"budget {name!r}: ledger exists but state file is missing – refusing to reset")
++            self.state = {"name": name, "total": total, "used": 0, "created_at": _now(), "updated_at": _now()}
++            self._save()
++        self.state = self._load()
++
++    def _owned(self) -> None:
++        if self.require_lock and not lock.live_held():
++            raise BudgetError("a persistent request budget may only be used while holding the live lock")
++        lock.check_active()
++
++    def _lines(self) -> int:
++        if not self.log.exists():
++            return 0
++        return sum(1 for ln in self.log.read_text(encoding="utf-8").splitlines() if ln.strip())
++
++    def _load(self) -> dict:
++        """Read and validate the state from disk; repair only the single crash window described above."""
++        try:
+             st = json.loads(self.path.read_text(encoding="utf-8"))
+-            if int(st["total"]) != total:
+-                raise ValueError(f"budget {name!r} already exists with total {st['total']} (asked {total}); "
+-                                 f"a cap is never raised – use a new budget name")
++            total, used = int(st["total"]), int(st["used"])
++        except Exception as exc:
++            raise BudgetError(f"budget {self.name!r}: state file unreadable/invalid ({exc})") from exc
++        if st.get("name") != self.name:
++            raise BudgetError(f"budget {self.name!r}: state file names {st.get('name')!r}")
++        if total != self.want_total:
++            raise ValueError(f"budget {self.name!r} already exists with total {total} (asked {self.want_total}); "
++                             f"a cap is never raised – use a new budget name")
++        if not 0 <= used <= total:
++            raise BudgetError(f"budget {self.name!r}: used {used} outside 0..{total}")
++        lines = self._lines()
++        if lines == used + 1 and lines <= total:      # ledger written, state not yet: count it as used
++            st["used"], st["updated_at"], st["repaired_at"] = lines, _now(), _now()
+             self.state = st
+-        else:
+-            self.state = {"name": name, "total": total, "used": 0, "created_at": _now(), "updated_at": _now()}
+             self._save()
++        elif lines != used:
++            raise BudgetError(f"budget {self.name!r}: ledger has {lines} lines but state says used={used}")
++        return st
+ 
+     @property
+     def total(self) -> int:
+@@ -65,16 +108,19 @@
+         os.replace(tmp, self.path)
+ 
+     def take(self, url: str, store_id: str = "") -> int:
+-        """Count one provider request before it is sent; refuse when the total is used up."""
++        """Reserve one provider request before it is sent; refuse when the total is used up or ownership is gone."""
++        self._owned()
++        self.state = self._load()                      # never trust an in-memory counter
+         if self.used >= self.total:
+             raise FetchError(f"total budget {self.name!r} of {self.total} requests used up", "budget")
+-        self.state["used"] = self.used + 1
+-        self.state["updated_at"] = _now()
+-        self._save()
+-        with self.log.open("a", encoding="utf-8") as f:
+-            f.write(json.dumps({"ts": self.state["updated_at"], "n": self.used, "command": self.command,
+-                                "store": store_id, "url": url}) + "\n")
+-        return self.used
++        n = self.used + 1
++        with self.log.open("a", encoding="utf-8") as f:   # (1) ledger first
++            f.write(json.dumps({"ts": _now(), "n": n, "command": self.command, "store": store_id, "url": url}) + "\n")
++            f.flush()
++            os.fsync(f.fileno())
++        self.state = {**self.state, "used": n, "updated_at": _now()}
++        self._save()                                       # (2) then the counter
++        return n
+ 
+     def summary(self) -> dict:
+         return {**self.state, "remaining": self.remaining, "ledger": str(self.log)}
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/checkpoint.py b/marianos-scraper/src/mscraper/checkpoint.py
+--- marianos-scraper/src/mscraper/checkpoint.py
++++ marianos-scraper/src/mscraper/checkpoint.py
+@@ -10,14 +10,43 @@
+ 
+ A page's records are written in the same transaction that advances that listing's page
+ pointer, so a crash can never lose a page or store it twice.
++
++Storage modes (MSCRAPER_CHECKPOINT_MODE):
++* direct (default, local disk): SQLite works on <run>/checkpoint.sqlite itself.
++* snapshot (Azure - the state directory is an SMB share, where SQLite's byte-range locks fail and must not be
++  disabled): SQLite works on a LOCAL file, and the durable copy on the share is a series of consistent snapshots:
++
++    <run>/checkpoint.snap-<seq>.sqlite   a complete database made with SQLite's online backup API
++    <run>/checkpoint.manifest.json       {"seq", "file", "sha256", "bytes", "written_at", "integrity": "ok"}
++
++  Flush (after a committed transaction, at most every MSCRAPER_SNAPSHOT_SECONDS, default 5; always at the end of a
++  run and before publication): backup -> integrity_check -> write the snapshot file under a temp name and rename it ->
++  write the manifest under a temp name and rename it (the COMMIT POINT) -> delete the previous snapshot. A crash at
++  any step leaves the previous manifest pointing at the previous, still existing snapshot.
++  Restore (every open): the manifest must parse, its snapshot must exist, have the recorded SHA-256 and pass
++  PRAGMA integrity_check; then it is copied to the local working file. Any mismatch raises CheckpointError (fail
++  closed - the run is not silently restarted). No manifest = nothing was committed durably = a new checkpoint.
++  Work committed after the last snapshot is redone after a crash (at most ~5 s of pages); because a page and its
++  pointer are one transaction, a redone page is never stored twice.
++  Every checkpoint write first checks the exclusive locks (lock.check_active): after a lease loss nothing is written.
+ """
+ from __future__ import annotations
+ 
++import hashlib
+ import json
++import os
+ import sqlite3
++import tempfile
++import time
+ from contextlib import contextmanager
+ from pathlib import Path
+ 
++from . import lock
++
++
++class CheckpointError(RuntimeError):
++    """The durable checkpoint is missing, corrupt or inconsistent: resuming from it is refused."""
++
+ SCHEMA = """
+ CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT);
+ CREATE TABLE IF NOT EXISTS listings (
+@@ -48,22 +77,120 @@
+ """
+ 
+ 
++def _sha256(path: Path) -> str:
++    h = hashlib.sha256()
++    with open(path, "rb") as f:
++        for chunk in iter(lambda: f.read(1 << 20), b""):
++            h.update(chunk)
++    return h.hexdigest()
++
++
++def _integrity_ok(path: Path) -> bool:
++    db = sqlite3.connect(path)
++    try:
++        return db.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
++    except sqlite3.DatabaseError:
++        return False
++    finally:
++        db.close()
++
++
+ class Checkpoint:
+-    def __init__(self, path: Path):
++    def __init__(self, path: Path, mode: str | None = None, snapshot_seconds: float | None = None):
+         self.path = Path(path)
+         self.path.parent.mkdir(parents=True, exist_ok=True)
+-        self.db = sqlite3.connect(self.path)
++        self.mode = mode or os.getenv("MSCRAPER_CHECKPOINT_MODE", "direct")
++        if self.mode not in ("direct", "snapshot"):
++            raise CheckpointError(f"unknown checkpoint mode {self.mode!r}")
++        self.interval = float(os.getenv("MSCRAPER_SNAPSHOT_SECONDS", "5") if snapshot_seconds is None else snapshot_seconds)
++        self.manifest = self.path.parent / "checkpoint.manifest.json"
++        self.seq, self._dirty, self._last_flush = 0, False, 0.0
++        if self.mode == "snapshot":
++            work = Path(os.getenv("MSCRAPER_LOCAL_WORK") or tempfile.gettempdir()) / "mscraper-ckpt"
++            self.work = work / hashlib.sha1(str(self.path.resolve()).encode()).hexdigest()[:16] / "checkpoint.sqlite"
++            self.work.parent.mkdir(parents=True, exist_ok=True)
++            self._restore()
++            self.db = sqlite3.connect(self.work)
++        else:
++            self.db = sqlite3.connect(self.path)
++        before = self.db.total_changes
+         self.db.executescript(SCHEMA)
+         self.db.commit()
++        self._dirty = self.mode == "snapshot" and (self.db.total_changes != before or self.seq == 0)
++
++    # -- snapshot mode: restore / flush ---------------------------------------------------------------------------
++    def _restore(self) -> None:
++        for stale in (self.work, self.work.with_name(self.work.name + "-journal")):
++            stale.unlink(missing_ok=True)       # the local copy is never trusted: always rebuilt from the share
++        if not self.manifest.exists():
++            if self.path.exists() and self.path.stat().st_size > 0:
++                raise CheckpointError(f"{self.path}: a direct-mode database exists but no snapshot manifest - "
++                                      f"refusing to guess which state is current")
++            return
++        try:
++            m = json.loads(self.manifest.read_text(encoding="utf-8"))
++            snap, seq, sha = self.path.parent / m["file"], int(m["seq"]), m["sha256"]
++        except Exception as exc:
++            raise CheckpointError(f"{self.manifest}: unreadable manifest ({exc})") from exc
++        if not snap.exists():
++            raise CheckpointError(f"{self.manifest}: snapshot {m['file']} is missing")
++        if _sha256(snap) != sha:
++            raise CheckpointError(f"{snap}: SHA-256 differs from the manifest (corrupt or partial snapshot)")
++        tmp = self.work.with_suffix(".restore")
++        tmp.write_bytes(snap.read_bytes())
++        if _sha256(tmp) != sha or not _integrity_ok(tmp):
++            tmp.unlink(missing_ok=True)
++            raise CheckpointError(f"{snap}: restored copy fails SHA-256 / PRAGMA integrity_check")
++        os.replace(tmp, self.work)
++        self.seq = seq
++
++    def flush(self, force: bool = False) -> dict | None:
++        """Write a consistent snapshot + manifest to the share (snapshot mode). Returns the manifest written."""
++        if self.mode != "snapshot" or not self._dirty:
++            return None
++        if not force and time.monotonic() - self._last_flush < self.interval:
++            return None
++        lock.check_active()                     # lease lost -> no further checkpoint writes
++        seq = self.seq + 1
++        local = self.work.with_name(f"snap-{seq:06d}.sqlite")
++        dst = sqlite3.connect(local)
++        try:
++            self.db.backup(dst)
++        finally:
++            dst.close()
++        if not _integrity_ok(local):
++            local.unlink(missing_ok=True)
++            raise CheckpointError("snapshot failed PRAGMA integrity_check - not written")
++        sha, size = _sha256(local), local.stat().st_size
++        name = f"checkpoint.snap-{seq:06d}.sqlite"
++        target = self.path.parent / name
++        tmp = target.with_suffix(".tmp")
++        tmp.write_bytes(local.read_bytes())
++        os.replace(tmp, target)
++        local.unlink(missing_ok=True)
++        m = {"seq": seq, "file": name, "sha256": sha, "bytes": size, "integrity": "ok",
++             "written_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
++        mtmp = self.manifest.with_suffix(".tmp")
++        mtmp.write_text(json.dumps(m, indent=2), encoding="utf-8")
++        lock.check_active()                     # never commit a snapshot after losing ownership
++        os.replace(mtmp, self.manifest)         # commit point
++        old = self.path.parent / f"checkpoint.snap-{self.seq:06d}.sqlite"
++        if self.seq and old != target:
++            old.unlink(missing_ok=True)
++        self.seq, self._dirty, self._last_flush = seq, False, time.monotonic()
++        return m
+ 
+     @contextmanager
+     def tx(self):
+         try:
+             yield self.db
++            lock.check_active()                 # lease lost -> roll back instead of committing
+             self.db.commit()
+         except Exception:
+             self.db.rollback()
+             raise
++        self._dirty = True
++        self.flush()
+ 
+     # meta / events
+     def set(self, key: str, value) -> None:
+@@ -179,4 +306,33 @@
+         return dict(self.db.execute("SELECT reason, COUNT(*) FROM seen GROUP BY reason").fetchall())
+ 
+     def close(self) -> None:
+-        self.db.close()
++        try:
++            self.flush(force=True)
++        finally:
++            self.db.close()
++
++
++def read_meta(run_dir: Path, key: str):
++    """Read one meta value of a run's checkpoint in either mode without modifying it (None if absent)."""
++    run_dir = Path(run_dir)
++    manifest = run_dir / "checkpoint.manifest.json"
++    if manifest.exists():
++        m = json.loads(manifest.read_text(encoding="utf-8"))
++        path = run_dir / m["file"]
++        if _sha256(path) != m["sha256"]:
++            raise CheckpointError(f"{path}: SHA-256 differs from the manifest")
++    else:
++        path = run_dir / "checkpoint.sqlite"
++        if not path.exists() or path.stat().st_size == 0:
++            return None
++    with tempfile.TemporaryDirectory() as d:     # read a private copy: no lock on the share is ever needed
++        copy = Path(d) / "c.sqlite"
++        copy.write_bytes(path.read_bytes())
++        db = sqlite3.connect(copy)
++        try:
++            row = db.execute("SELECT v FROM meta WHERE k=?", (key,)).fetchone()
++        except sqlite3.DatabaseError:
++            row = None
++        finally:
++            db.close()
++    return json.loads(row[0]) if row else None
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/cli.py b/marianos-scraper/src/mscraper/cli.py
+--- marianos-scraper/src/mscraper/cli.py
++++ marianos-scraper/src/mscraper/cli.py
+@@ -25,7 +25,8 @@
+ from .budget import TotalBudget, parse_spec
+ from .config import load_settings
+ from .fetch import FetchError
+-from .lock import LockError, run_lock
++from . import lock
++from .lock import LockError, live_lock, run_lock
+ from .runner import Runner
+ from .storage import build_storage
+ 
+@@ -36,17 +37,15 @@
+ 
+ 
+ def _latest_unfinished(state_dir: Path, key: str) -> str | None:
+-    import sqlite3
++    from .checkpoint import read_meta
+ 
+-    runs = sorted((state_dir / key / "runs").glob("*/checkpoint.sqlite"), reverse=True)
+-    for ck in runs:
+-        db = sqlite3.connect(ck)
+-        try:
+-            row = db.execute("SELECT v FROM meta WHERE k='final_status'").fetchone()
+-        finally:
+-            db.close()
+-        if not row:
+-            return ck.parent.name
++    runs = sorted({p.parent for pat in ("*/checkpoint.sqlite", "*/checkpoint.manifest.json")
++                   for p in (state_dir / key / "runs").glob(pat)}, reverse=True)
++    for run_dir in runs:
++        if read_meta(run_dir, "started_at") is None:
++            continue                                # never started (e.g. created and failed before any work)
++        if read_meta(run_dir, "final_status") is None:
++            return run_dir.name
+     return None
+ 
+ 
+@@ -122,6 +121,9 @@
+         return asyncio.run(runner.run(publish=not args.no_publish))
+ 
+ 
++LIVE_COMMANDS = {"verify-store", "probe", "run", "run-all", "bounded-test"}
++
++
+ def main(argv=None) -> int:
+     ap = argparse.ArgumentParser(prog="mscraper")
+     ap.add_argument("--config", default=None)
+@@ -163,6 +165,16 @@
+     settings = load_settings(args.config)
+     logging_setup.setup(args.log_level)
+ 
++    # Exclusive ownership: every command that can send provider requests runs inside the live lock (one Blob lease
++    # for all tests and locations), so two executions can never overlap or draw on the same budget concurrently.
++    if args.cmd in LIVE_COMMANDS and not lock.live_held():
++        try:
++            with live_lock(build_storage(settings)):
++                return main(argv)
++        except LockError as exc:
++            print(f"refused: {exc}", file=sys.stderr)
++            return 3
++
+     if args.cmd == "verify-store":
+         loc = settings.location(args.location)
+         runner = Runner(settings, loc, build_storage(settings), _state_dir(settings) / "_verify")
+@@ -177,7 +189,10 @@
+             finally:
+                 await runner.fetcher.close()
+ 
+-        res = asyncio.run(go())
++        try:
++            res = asyncio.run(go())
++        finally:
++            runner.ck.close()
+         print(json.dumps(res, indent=2))
+         return 0 if res["verified"] else 2
+ 
+@@ -233,19 +248,31 @@
+         plan = BOUNDED_TESTS[args.test]
+         spec = f"{args.test}:{plan['total']}"
+         rc = 0
+-        for step in plan["steps"]:
++        from .budget import BudgetError
++        from .checkpoint import CheckpointError
++
++        for i, step in enumerate(plan["steps"], 1):
+             b = _total_budget(argparse.Namespace(budget=spec), settings, "")
+             if b.remaining <= 0:
+                 print(f"{args.test}: total of {b.total} requests used up – step not started: {' '.join(step)}")
+-                rc = rc or 4
++                rc = 4
+                 break
+-            print(f"{args.test}: {' '.join(step)}  (total used {b.used}/{b.total})", flush=True)
++            print(f"{args.test}: step {i}: {' '.join(step)}  (total used {b.used}/{b.total})", flush=True)
+             try:
+-                rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
+-                          "--budget", spec] + step) or rc
+-            except FetchError as exc:   # the total cap stops a step part-way: report it, never send more
+-                print(f"{args.test}: step stopped: {exc}")
+-                rc = rc or 4
++                step_rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
++                               "--budget", spec] + step)
++            except FetchError as exc:   # auth / compatibility / store / budget / lock: never send more
++                print(f"{args.test}: step {i} stopped ({exc.kind}): {exc} – later steps NOT started")
++                rc = 4
++                break
++            except (LockError, BudgetError, CheckpointError) as exc:
++                print(f"{args.test}: step {i} stopped ({type(exc).__name__}): {exc} – later steps NOT started")
++                rc = 5
++                break
++            if step_rc:                 # e.g. store verification failed (exit 2): stop immediately
++                print(f"{args.test}: step {i} failed (exit {step_rc}) – later steps NOT started")
++                rc = step_rc
++                break
+         b = _total_budget(argparse.Namespace(budget=spec), settings, "")
+         print(json.dumps({"test": args.test, "exit_code": rc, "budget": b.summary()}, indent=2))
+         return rc
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/evidence.py b/marianos-scraper/src/mscraper/evidence.py
+--- marianos-scraper/src/mscraper/evidence.py
++++ marianos-scraper/src/mscraper/evidence.py
+@@ -36,7 +36,10 @@
+     cfg = {name: file_sha256(base / "config" / name) for name in
+            ("settings.yaml", "categories.csv", "locations.yaml", "private_label_brands.txt")}
+     req = file_sha256(base / "requirements.txt")
+-    return {"scraper_version": __version__, "code_sha256": code_sha256(), "config_sha256": cfg,
++    from .version import deploy_sha256, release_sha256
++
++    return {"scraper_version": __version__, "code_sha256": code_sha256(), "release_sha256": release_sha256(),
++            "deploy_sha256": deploy_sha256(), "config_sha256": cfg,
+             "requirements_sha256": req, "python": sys.version.split()[0], "platform": platform.platform(),
+             "argv": argv or sys.argv[1:]}
+ 
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/fetch.py b/marianos-scraper/src/mscraper/fetch.py
+--- marianos-scraper/src/mscraper/fetch.py
++++ marianos-scraper/src/mscraper/fetch.py
+@@ -29,7 +29,33 @@
+ class FetchError(Exception):
+     def __init__(self, message: str, kind: str = "error"):
+         super().__init__(message)
+-        self.kind = kind  # http | blocked | timeout | budget | error
++        self.kind = kind  # http | blocked | timeout | budget | error | auth | compat | store | lock
++
++    @property
++    def terminal(self) -> bool:
++        return self.kind in TERMINAL_KINDS
++
++
++# Never retried, and a bounded test stops at the first one: retrying cannot fix a rejected credential, an unsupported
++# request (provider 400/404/422), a wrong store/fulfillment context, a used-up budget or a lost exclusive lock.
++TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
++
++
++def provider_error(status: int, text: str) -> "FetchError":
++    """Classify a provider HTTP error: 401/403 auth, 400/404/422 compatibility (terminal); 429/5xx retryable."""
++    if status in (401, 403):
++        return FetchError(f"provider authentication failed (HTTP {status})", "auth")
++    if status in (400, 404, 422):
++        return FetchError(f"provider rejected the request (HTTP {status}): {text[:200]}", "compat")
++    return FetchError(f"provider HTTP {status}: {text[:160]}", "http")
++
++
++def require_live_lock(fetcher) -> None:
++    """Real provider adapters may only start inside lock.live_lock (one requester at a time)."""
++    from . import lock
++
++    if not lock.live_held():
++        raise FetchError(f"{fetcher.name}: provider requests need the live lock (exclusive ownership)", "lock")
+ 
+ 
+ class Fetcher:
+@@ -78,6 +104,11 @@
+                 raise FetchError(f"request budget of {self.budget} reached", "budget")
+             async with self.sem:
+                 await self._pace()
++                from . import lock
++                try:
++                    lock.check_active()                 # a lost lease stops every further request
++                except lock.LockLost as exc:
++                    raise FetchError(str(exc), "lock") from exc
+                 if self.total_budget is not None:   # counted before sending; raises once the test's total is used
+                     self.total_budget.take(url, self.loc.store_id)
+                 self.stats["requests"] += 1
+@@ -97,12 +128,14 @@
+                     return res
+                 except FetchError as exc:
+                     last = exc
+-                    if exc.kind == "budget":
++                    if exc.terminal:
+                         raise
+                     self.stats["blocked" if exc.kind == "blocked" else "http_errors"] += 1
+                 except asyncio.TimeoutError:
+                     last = FetchError("timeout", "timeout")
+                 except Exception as exc:  # parse errors raised by validate(), provider faults
++                    if isinstance(getattr(exc, "kind", None), str) and exc.kind in TERMINAL_KINDS:
++                        raise
+                     last = exc
+                     self.stats["blocked"] += 1 if getattr(exc, "kind", "") in ("challenge", "malformed") else 0
+             if attempt < max_retries:
+@@ -120,6 +153,7 @@
+     async def start(self):
+         import httpx
+ 
++        require_live_lock(self)
+         key = os.getenv("OXYLABS_WEBAPI_KEY")
+         if not key:
+             raise FetchError("OXYLABS_WEBAPI_KEY is not set (env var / Key Vault secret)", "error")
+@@ -139,7 +173,7 @@
+             self.stats["provider_faults"] += 1
+             raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
+         if r.status_code >= 400:
+-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
++            raise provider_error(r.status_code, r.text)
+         res = (r.json().get("results") or [{}])[0]
+         meta = res.get("metadata") or {}
+         status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
+@@ -199,6 +233,7 @@
+     async def start(self):
+         import httpx
+ 
++        require_live_lock(self)
+         user, pwd = os.getenv("OXYLABS_USERNAME"), os.getenv("OXYLABS_PASSWORD")
+         if not (user and pwd):
+             raise FetchError("OXYLABS_USERNAME / OXYLABS_PASSWORD are not set (env vars / Key Vault secrets)", "error")
+@@ -208,8 +243,7 @@
+         await self.client.aclose()
+ 
+     async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:
+-        tpl = self.s.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
+-        body = _fill(tpl, url=url, store_id=self.loc.store_id, zipcode=self.loc.zipcode)
++        body = realtime_payload(self.s, self.loc, url)
+         if render_js:
+             body["render"] = "html"
+         t0 = time.monotonic()
+@@ -219,13 +253,27 @@
+             self.stats["provider_faults"] += 1
+             raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
+         if r.status_code >= 400:
+-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
++            raise provider_error(r.status_code, r.text)
+         res = (r.json().get("results") or [{}])[0]
+         content = res.get("content") or ""
+         status = int(res.get("status_code") or 200)
+         return FetchResult(url, status, content if isinstance(content, str) else "", elapsed)
+ 
+ 
++def realtime_payload(settings, location, url: str) -> dict:
++    """Classic Web Scraper API body (realtime.oxylabs.io/v1/queries).
++    Search pages (…/search?query=…): `fetch.oxylabs_realtime.search_payload` when configured – the documented
++    `kroger_search` source with store localisation ({query}, {store_id}). Everything else: `…oxylabs_realtime.payload`."""
++    from urllib.parse import parse_qs, urlparse
++
++    u = urlparse(url)
++    query = (parse_qs(u.query).get("query") or [""])[0]
++    tpl = settings.get("fetch.oxylabs_realtime.search_payload") if (u.path.rstrip("/").endswith("/search") and query) else None
++    if not tpl:
++        tpl = settings.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
++    return _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
++
++
+ def build_fetcher(settings, location, **kw) -> Fetcher:
+     name = os.getenv("MSCRAPER_FETCH_PROVIDER") or settings.get("fetch.provider", "oxylabs_kroger")
+     if name == "oxylabs_kroger":
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/lock.py b/marianos-scraper/src/mscraper/lock.py
+--- marianos-scraper/src/mscraper/lock.py
++++ marianos-scraper/src/mscraper/lock.py
+@@ -1,12 +1,24 @@
+-"""Prevents overlapping runs for the same location.
++"""Exclusive locks.
+ 
+-* Local: an exclusive lock file (atomic create) with stale-lock recovery.
+-* Azure: a Blob lease, renewed while the run is alive; a crashed run's lease expires
+-  automatically, so the next scheduled run can continue from its checkpoint.
++* `run_lock(storage, location)` – one run per location (unchanged purpose).
++* `live_lock(storage)` – ONE process at a time may send provider requests at all, whatever the command, test or
++  location (bounded-test, verify-store, probe, run, run-all). It is held around the whole bounded-test sequence and
++  every use of a persistent request budget. Re-entrant inside one process (the bounded-test steps run nested).
++
++Backends:
++* Local: an exclusive lock file (atomic create) holding a random owner token; stale-lock recovery only when the
++  holder process on this host is gone.
++* Azure: a Blob lease (60 s), renewed every 20 s by a background thread. A crashed holder's lease expires on its own,
++  so a restarted execution can take over and resume.
++
++Lease loss fails closed: when a renewal fails (or the local lock file is no longer ours), the lock is marked LOST and
++`check_active()` raises `LockLost`. It is called before every provider request (fetch.py), every checkpoint write
++(checkpoint.py) and every publication step (storage.py), so nothing more is sent, written or published.
+ """
+ from __future__ import annotations
+ 
+ import os
++import secrets
+ import socket
+ import threading
+ import time
+@@ -17,6 +29,23 @@
+     pass
+ 
+ 
++class LockLost(LockError):
++    """The exclusive lock was lost while work was in progress: stop requests, checkpoint writes and publication."""
++
++
++_ACTIVE: list = []          # locks held by this process (checked before requests / checkpoint writes / publication)
++_LIVE_DEPTH = 0             # re-entrancy of live_lock() inside one process
++
++
++def check_active() -> None:
++    for lk in list(_ACTIVE):
++        lk.check()
++
++
++def live_held() -> bool:
++    return _LIVE_DEPTH > 0
++
++
+ def _pid_alive(pid: int) -> bool:
+     if os.name == "nt":
+         import ctypes
+@@ -41,6 +70,8 @@
+     def __init__(self, path: Path, stale_seconds: int = 6 * 3600):
+         self.path = Path(path)
+         self.stale = stale_seconds
++        self.token = secrets.token_hex(8)
++        self.lost = False
+ 
+     def _holder_dead(self) -> bool:
+         """True when the lock was left by a process on this host that no longer exists."""
+@@ -61,12 +92,28 @@
+             fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+         except FileExistsError:
+             raise LockError(f"another run holds {self.path} ({self.path.read_text(errors='ignore')})")
+-        os.write(fd, f"{socket.gethostname()} pid={os.getpid()} {time.ctime()}".encode())
++        os.write(fd, f"{socket.gethostname()} pid={os.getpid()} token={self.token} {time.ctime()}".encode())
+         os.close(fd)
++        _ACTIVE.append(self)
+         return self
+ 
++    def check(self) -> None:
++        try:
++            ours = f"token={self.token}" in self.path.read_text(errors="ignore")
++        except OSError:
++            ours = False
++        if self.lost or not ours:
++            self.lost = True
++            raise LockLost(f"lock {self.path} is no longer held by this process")
++
+     def __exit__(self, *exc):
+-        self.path.unlink(missing_ok=True)
++        if self in _ACTIVE:
++            _ACTIVE.remove(self)
++        try:
++            if f"token={self.token}" in self.path.read_text(errors="ignore"):
++                self.path.unlink()
++        except OSError:
++            pass
+ 
+ 
+ class BlobLeaseLock:
+@@ -74,6 +121,8 @@
+         self.blob = container_client.get_blob_client(key)
+         self.seconds = lease_seconds
+         self._stop = threading.Event()
++        self.lost = False
++        self.lost_reason = ""
+ 
+     def __enter__(self):
+         from azure.core.exceptions import HttpResponseError
+@@ -84,6 +133,7 @@
+             self.lease = self.blob.acquire_lease(lease_duration=self.seconds)
+         except HttpResponseError as exc:
+             raise LockError(f"another run holds the lease on {self.blob.blob_name}") from exc
++        _ACTIVE.append(self)
+         threading.Thread(target=self._renew, daemon=True).start()
+         return self
+ 
+@@ -91,11 +141,18 @@
+         while not self._stop.wait(self.seconds / 3):
+             try:
+                 self.lease.renew()
+-            except Exception:
++            except Exception as exc:  # lease lost: fail closed – check() now raises everywhere
++                self.lost, self.lost_reason = True, f"{type(exc).__name__}: {exc}"[:200]
+                 return
+ 
++    def check(self) -> None:
++        if self.lost:
++            raise LockLost(f"lease on {self.blob.blob_name} lost ({self.lost_reason})")
++
+     def __exit__(self, *exc):
+         self._stop.set()
++        if self in _ACTIVE:
++            _ACTIVE.remove(self)
+         try:
+             self.lease.release()
+         except Exception:
+@@ -108,3 +165,23 @@
+     if isinstance(storage, BlobStorage):
+         return BlobLeaseLock(storage.cc, f"{location_key}/.run.lock")
+     return FileLock(storage.local_path(f"{location_key}/.run.lock"))
++
++
++class live_lock:
++    """Process-wide exclusive right to send provider requests (all tests, all locations). Re-entrant."""
++
++    def __init__(self, storage):
++        self.storage, self.inner = storage, None
++
++    def __enter__(self):
++        global _LIVE_DEPTH
++        if _LIVE_DEPTH == 0:
++            self.inner = run_lock(self.storage, "_live").__enter__()
++        _LIVE_DEPTH += 1
++        return self
++
++    def __exit__(self, *exc):
++        global _LIVE_DEPTH
++        _LIVE_DEPTH -= 1
++        if self.inner is not None:
++            self.inner.__exit__(*exc)
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/runner.py b/marianos-scraper/src/mscraper/runner.py
+--- marianos-scraper/src/mscraper/runner.py
++++ marianos-scraper/src/mscraper/runner.py
+@@ -505,6 +505,7 @@
+             prev.append({**self.fetcher.stats, "ended_at": _now()})
+             self.ck.set("fetch_stats_before_resume", prev)
+             await self.fetcher.close()
++            self.ck.flush(force=True)
+         runtime = time.monotonic() - t0 + float(self.ck.get("runtime_before_resume", 0))
+         self.ck.set("runtime_before_resume", runtime)
+         return self.finish(runtime, publish)
+@@ -571,6 +572,7 @@
+             (self.dir / name).write_text(body, encoding="utf-8")
+             self.storage.put_bytes(f"{base}/{name}", body.encode("utf-8"))
+         status = "validation_failed"
++        self.ck.flush(force=True)       # durable checkpoint before anything is published
+         if v.ok and not demo and publish:
+             extras = {k: files[k] for k in ("observations.json", "coverage.json") if k in files}
+             self.storage.publish(self.loc.key, self.run_id, records, report, extras=extras)
+@@ -579,6 +581,7 @@
+             status = "valid_not_published_demo" if demo else "valid_not_published"
+         self.ck.set("final_status", status)
+         self.ck.event("final_status", {"status": status, "records": len(records), "errors": v.errors[:20]})
++        self.ck.flush(force=True)
+         log.info("run finished", extra={"status": status, "records": len(records), "errors": v.errors[:10]})
+         return {"run_id": self.run_id, "status": status, "records": len(records), "dir": str(self.dir),
+                 "errors": v.errors, "warnings": v.warnings}
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/storage.py b/marianos-scraper/src/mscraper/storage.py
+--- marianos-scraper/src/mscraper/storage.py
++++ marianos-scraper/src/mscraper/storage.py
+@@ -47,6 +47,8 @@
+             "published_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+         }
+         base = f"{location}/latest"
++        from .lock import check_active
++        check_active()                     # lease lost -> nothing is published
+         # 1) stage
+         self.put_bytes(f"{base}/.staging-records.json", body)
+         self.put_json(f"{base}/.staging-report.json", report)
+@@ -57,12 +59,14 @@
+             self.copy(f"{base}/records.json", f"{base}/previous-records.json")
+             self.copy(f"{base}/manifest.json", f"{base}/previous-manifest.json")
+         # 3) swap in; manifest written last = commit point
++        check_active()
+         self.copy(f"{base}/.staging-records.json", f"{base}/records.json")
+         self.copy(f"{base}/.staging-report.json", f"{base}/report.json")
+         for name in (extras or {}):
+             if self.get_bytes(f"{base}/{name}"):
+                 self.copy(f"{base}/{name}", f"{base}/previous-{name}")
+             self.copy(f"{base}/.staging-{name}", f"{base}/{name}")
++        check_active()                     # the commit point is never written without ownership
+         self.put_json(f"{base}/manifest.json", manifest)
+         return manifest
+ 
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/src/mscraper/version.py b/marianos-scraper/src/mscraper/version.py
+--- marianos-scraper/src/mscraper/version.py
++++ marianos-scraper/src/mscraper/version.py
+@@ -6,8 +6,12 @@
+ import sys
+ from pathlib import Path
+ 
+-__version__ = "1.1.4"
++__version__ = "1.1.5"
+ _SRC = Path(__file__).resolve().parent
++_ROOT = _SRC.parents[1]
++# release_sha256 covers everything that decides what a deployment does (client review 27 Oct: code_sha256 alone
++# excludes the template): application code, config, the Azure template/scripts, requirements and Dockerfile.
++RELEASE_PARTS = ("src", "config", "deploy", "requirements.txt", "requirements.lock", "Dockerfile")
+ 
+ 
+ def code_sha256() -> str:
+@@ -18,6 +22,31 @@
+     return h.hexdigest()
+ 
+ 
++def _tree_sha256(parts, root: Path = _ROOT) -> str:
++    """SHA-256 over (relative path, content with LF line endings) of every file, sorted – same on Windows and Linux."""
++    files = []
++    for part in parts:
++        p = root / part
++        if p.is_file():
++            files.append(p)
++        elif p.is_dir():
++            files += [f for f in p.rglob("*") if f.is_file() and "__pycache__" not in f.parts and f.suffix != ".pyc"]
++    h = hashlib.sha256()
++    for f in sorted(files, key=lambda x: x.relative_to(root).as_posix()):
++        h.update(f.relative_to(root).as_posix().encode() + b"\0")
++        h.update(f.read_bytes().replace(b"\r\n", b"\n") + b"\0")
++    return h.hexdigest()
++
++
++def release_sha256() -> str:
++    return _tree_sha256(RELEASE_PARTS)
++
++
++def deploy_sha256() -> str:
++    return _tree_sha256(("deploy",))
++
++
+ def version_info() -> dict:
+     return {"name": "marianos-scraper", "version": __version__, "code_sha256": code_sha256(),
++            "release_sha256": release_sha256(), "deploy_sha256": deploy_sha256(),
+             "python": sys.version.split()[0], "platform": platform.platform()}
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/tests/conftest.py b/marianos-scraper/tests/conftest.py
+--- marianos-scraper/tests/conftest.py
++++ marianos-scraper/tests/conftest.py
+@@ -55,3 +55,12 @@
+ @pytest.fixture
+ def storage(tmp_path):
+     return LocalStorage(tmp_path / "output")
++
++
++@pytest.fixture
++def live(tmp_path):
++    """Hold the process-wide live lock (as every CLI command that sends requests does)."""
++    from mscraper.lock import live_lock
++
++    with live_lock(LocalStorage(tmp_path / "lockstore")) as lk:
++        yield lk
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/tests/test_v110_client_points.py b/marianos-scraper/tests/test_v110_client_points.py
+--- marianos-scraper/tests/test_v110_client_points.py
++++ marianos-scraper/tests/test_v110_client_points.py
+@@ -273,9 +273,10 @@
+ 
+ 
+ def test_realtime_adapter_builds_store_pinned_payload_from_config(settings, location):
+-    from mscraper.fetch import OxylabsRealtimeFetcher, _fill
++    # 1.1.5: the 1.1.0 body {"source": "kroger", "url": …, "store_id": …} is not a documented Classic request and is
++    # withdrawn; search pages use the documented kroger_search source with store localisation (see test_v115_safety)
++    from mscraper.fetch import OxylabsRealtimeFetcher, realtime_payload
+     f = OxylabsRealtimeFetcher(settings, location)
+-    body = _fill(settings.get("fetch.oxylabs_realtime.payload"), url="https://www.marianos.com/search?query=x",
+-                 store_id=location.store_id, zipcode=location.zipcode)
+-    assert body == {"source": "kroger", "url": "https://www.marianos.com/search?query=x", "store_id": "53100544"}
++    body = realtime_payload(settings, location, "https://www.marianos.com/search?query=x")
++    assert body == {"source": "kroger_search", "query": "x", "store_id": "53100544", "fulfillment_type": "in_store"}
+     assert f.name == "oxylabs_realtime"
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/tests/test_v112_bounded_tests.py b/marianos-scraper/tests/test_v112_bounded_tests.py
+--- marianos-scraper/tests/test_v112_bounded_tests.py
++++ marianos-scraper/tests/test_v112_bounded_tests.py
+@@ -10,7 +10,7 @@
+ from mscraper.fetch import FetchError, FixtureFetcher
+ 
+ 
+-def test_total_budget_persists_refuses_and_cannot_be_raised(tmp_path):
++def test_total_budget_persists_refuses_and_cannot_be_raised(tmp_path, live):
+     b = TotalBudget(tmp_path, "test1", 3, command="x")
+     for _ in range(2):
+         b.take("u1")
+@@ -27,7 +27,7 @@
+     assert parse_spec("test2:300") == ("test2", 300)
+ 
+ 
+-def test_retries_and_resumed_processes_count_against_the_same_total(settings, location, tmp_path):
++def test_retries_and_resumed_processes_count_against_the_same_total(settings, location, tmp_path, live):
+     def fetcher():
+         f = FixtureFetcher(settings, location, fixtures=dict(PAGES), root=str(FIX))
+         f.total_budget = TotalBudget(tmp_path, "test2", 5)
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/tests/test_v115_safety.py b/marianos-scraper/tests/test_v115_safety.py
+--- marianos-scraper/tests/test_v115_safety.py
++++ marianos-scraper/tests/test_v115_safety.py
+@@ -0,0 +1,355 @@
++"""v1.1.5 – client review of 27 Oct: stop rule, exclusive ownership, lease loss, checkpoint integrity (offline)."""
++import asyncio
++import json
++import os
++import shutil
++import sqlite3
++import subprocess
++import sys
++import threading
++import time
++from pathlib import Path
++
++import pytest
++from conftest import FIX, PAGES, ROOT
++
++from mscraper import cli, lock
++from mscraper.budget import BudgetError, TotalBudget
++from mscraper.checkpoint import Checkpoint, CheckpointError
++from mscraper.config import Category, Location, load_settings
++from mscraper.fetch import FetchError, FixtureFetcher
++from mscraper.lock import BlobLeaseLock, FileLock, LockLost
++from mscraper.runner import Runner
++from mscraper.storage import LocalStorage
++
++CFG = str(ROOT / "config" / "settings.yaml")
++TESTS = Path(__file__).resolve().parent
++
++
++# ---------------------------------------------------------------- helpers
++def _fast(monkeypatch):
++    monkeypatch.setattr("mscraper.fetch.Fetcher._pace", lambda self: asyncio.sleep(0))
++    monkeypatch.setattr("mscraper.fetch.random.uniform", lambda a, b: 0)
++
++
++def _serve(monkeypatch, mapping):
++    """CLI runs with the fixture provider serving `mapping` (url substring -> saved page)."""
++    calls = []
++    orig = FixtureFetcher.__init__
++
++    def init(self, settings, location, fixtures=None, root=None):
++        orig(self, settings, location, fixtures=dict(mapping), root=str(FIX))
++        self.calls = calls
++    monkeypatch.setattr(FixtureFetcher, "__init__", init)
++    monkeypatch.setenv("MSCRAPER_FETCH_PROVIDER", "fixture")
++    return calls
++
++
++def _budget_file(tmp_path, name="test1"):
++    return json.loads((tmp_path / "state" / "_budgets" / f"{name}.json").read_text(encoding="utf-8"))
++
++
++# ---------------------------------------------------------------- 1. stop rule
++def test_failed_first_store_check_stops_bounded_test_before_any_other_step(tmp_path, monkeypatch, capsys):
++    """Crystal Lake verify-store gets a response for store 53100539 (wrong store): step 1 fails, steps 2 and 3
++    (Vernon Hills verify-store, probe) are never started and no further provider request is made."""
++    monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
++    _fast(monkeypatch)
++    calls = _serve(monkeypatch, {"/search?query=milk": "search_milk_store539.html.gz"})
++    rc = cli.main(["--config", CFG, "bounded-test", "test1"])
++    out = capsys.readouterr().out
++    assert rc == 2
++    assert "step 1 failed (exit 2) – later steps NOT started" in out
++    assert "step 2" not in out and "step 3" not in out
++    assert len(calls) == 1                                   # the one wrong-store response, nothing after it
++    assert _budget_file(tmp_path)["used"] == 1
++    ledger = (tmp_path / "state" / "_budgets" / "test1.jsonl").read_text(encoding="utf-8").splitlines()
++    assert [json.loads(x)["store"] for x in ledger] == ["53100544"]
++
++
++def test_terminal_provider_errors_are_not_retried_and_stop_the_test(tmp_path, monkeypatch, capsys):
++    """A rejected credential (HTTP 401) is terminal: one request, no retry, later steps not started."""
++    monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
++    _fast(monkeypatch)
++    calls = _serve(monkeypatch, {})
++
++    async def unauthorized(self, url, render_js):
++        self.calls.append(url)
++        raise FetchError("provider authentication failed (HTTP 401)", "auth")
++    monkeypatch.setattr(FixtureFetcher, "_fetch_once", unauthorized)
++    rc = cli.main(["--config", CFG, "bounded-test", "test1"])
++    out = capsys.readouterr().out
++    assert rc == 4 and "step 1 stopped (auth)" in out and "step 2" not in out
++    assert len(calls) == 1 and _budget_file(tmp_path)["used"] == 1
++
++
++# ---------------------------------------------------------------- 2. exclusive ownership, overlap, persistence
++def test_overlapping_execution_is_refused_and_sends_nothing(tmp_path, monkeypatch, capsys):
++    monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
++    _fast(monkeypatch)
++    calls = _serve(monkeypatch, {"/search?query=milk": "search_milk_store544.html.gz"})
++    settings = load_settings(CFG)
++    from mscraper.storage import build_storage
++    other = FileLock(build_storage(settings).local_path("_live/.run.lock"))    # another execution holds the lease
++    with other:
++        for cmd in (["bounded-test", "test1"], ["verify-store", "--location", "marianos-502-vernon-hills"],
++                    ["probe", "--location", "marianos-544-crystal-lake"]):
++            assert cli.main(["--config", CFG] + cmd) == 3
++    assert "refused" in capsys.readouterr().err
++    assert calls == [] and not (tmp_path / "state" / "_budgets" / "test1.json").exists()
++
++
++def test_budget_needs_the_live_lock_and_survives_restart(tmp_path):
++    with pytest.raises(BudgetError, match="live lock"):
++        TotalBudget(tmp_path, "test1", 19)                    # no exclusive ownership -> refused
++    with lock.live_lock(LocalStorage(tmp_path / "locks")):
++        b = TotalBudget(tmp_path, "test1", 19)
++        b.take("u1")
++        b.take("u2")
++    with lock.live_lock(LocalStorage(tmp_path / "locks")):     # a restarted execution: same identity, same count
++        again = TotalBudget(tmp_path, "test1", 19)
++        assert (again.used, again.remaining) == (2, 17)
++
++
++def test_existing_test1_identity_from_azure_is_kept_with_19_remaining(tmp_path, live):
++    """The exact state file that is on the Azure share since 27 Oct (used 0/19, no ledger) opens unchanged."""
++    (tmp_path / "test1.json").write_text(json.dumps({"name": "test1", "total": 19, "used": 0,
++                                                     "created_at": "2026-10-27T04:09:54+00:00",
++                                                     "updated_at": "2026-10-27T04:09:54+00:00"}), encoding="utf-8")
++    b = TotalBudget(tmp_path, "test1", 19)
++    assert (b.used, b.remaining, b.state["created_at"]) == (0, 19, "2026-10-27T04:09:54+00:00")
++    with pytest.raises(ValueError, match="never raised"):
++        TotalBudget(tmp_path, "test1", 20)
++
++
++def test_budget_state_is_never_cached_between_two_holders(tmp_path, live):
++    a, b = TotalBudget(tmp_path, "one", 1), TotalBudget(tmp_path, "one", 1)
++    a.take("u")
++    with pytest.raises(FetchError, match="used up"):           # b re-reads the file: no second reservation
++        b.take("u")
++    assert TotalBudget(tmp_path, "one", 1).used == 1
++
++
++@pytest.mark.parametrize("damage, msg", [
++    ("delete_state", "state file is missing"),
++    ("truncate_ledger", "ledger has 1 lines but state says used=2"),
++    ("invalid_state", "unreadable/invalid"),
++    ("used_over_total", "outside"),
++])
++def test_inconsistent_budget_fails_closed(tmp_path, live, damage, msg):
++    b = TotalBudget(tmp_path, "t", 3)
++    b.take("u1")
++    b.take("u2")
++    st, lg = tmp_path / "t.json", tmp_path / "t.jsonl"
++    if damage == "delete_state":
++        st.unlink()
++    elif damage == "truncate_ledger":
++        lg.write_text(lg.read_text(encoding="utf-8").splitlines()[0] + "\n", encoding="utf-8")
++    elif damage == "invalid_state":
++        st.write_text("{not json", encoding="utf-8")
++    else:
++        st.write_text(json.dumps({"name": "t", "total": 3, "used": 9}), encoding="utf-8")
++    with pytest.raises(BudgetError, match=msg):
++        TotalBudget(tmp_path, "t", 3)
++
++
++def test_crash_between_ledger_and_state_counts_the_request_as_used(tmp_path, live):
++    b = TotalBudget(tmp_path, "t", 3)
++    b.take("u1")
++    with (tmp_path / "t.jsonl").open("a", encoding="utf-8") as f:   # ledger line written, then the process died
++        f.write(json.dumps({"n": 2, "url": "u2"}) + "\n")
++    again = TotalBudget(tmp_path, "t", 3)
++    assert again.used == 2 and again.state.get("repaired_at")
++
++
++# ---------------------------------------------------------------- 3. lease loss
++class _Lease:
++    def __init__(self):
++        self.renewals = 0
++
++    def renew(self):
++        self.renewals += 1
++        raise RuntimeError("LeaseIdMismatchWithLeaseOperation")
++
++    def release(self):
++        pass
++
++
++class _Blob:
++    blob_name = "_live/.run.lock"
++
++    def exists(self):
++        return True
++
++    def acquire_lease(self, lease_duration):
++        self.lease = _Lease()
++        return self.lease
++
++
++class _Container:
++    def get_blob_client(self, key):
++        return _Blob()
++
++
++def test_lease_loss_stops_requests_checkpoint_writes_and_publication(settings, location, tmp_path):
++    lk = BlobLeaseLock(_Container(), "_live/.run.lock", lease_seconds=0.15)
++    ck = Checkpoint(tmp_path / "run" / "checkpoint.sqlite")
++    store = LocalStorage(tmp_path / "out")
++    f = FixtureFetcher(settings, location, fixtures=dict(PAGES), root=str(FIX))
++    with lk:
++        ck.set("before", 1)                                   # works while the lease is held
++        deadline = time.time() + 5
++        while not lk.lost and time.time() < deadline:         # renewal fails -> lease marked lost
++            time.sleep(0.02)
++        assert lk.lost
++        with pytest.raises(LockLost):
++            lock.check_active()
++        with pytest.raises(FetchError) as e:                  # no further provider request
++            asyncio.run(f.get("https://www.marianos.com/search?query=milk"))
++        assert e.value.kind == "lock" and f.calls == []
++        with pytest.raises(LockLost):                         # no checkpoint write (rolled back)
++            ck.set("after", 2)
++        with pytest.raises(LockLost):                         # nothing published
++            store.publish("test-544", "r1", [{"upc": "1"}], {"ok": True})
++    assert ck.get("before") == 1 and ck.get("after") is None
++    assert not (tmp_path / "out" / "test-544" / "latest").exists()
++
++
++# ---------------------------------------------------------------- 4. checkpoint integrity / hard-kill restart
++def make_settings():
++    s = load_settings(ROOT / "config" / "settings.yaml")
++    s.raw["crawl"]["max_pages_per_query"] = 3
++    s.raw["crawl"]["skip_shelf_patterns"] = [r"^(?!Beef$|Steaks$|Frozen Meat$|Organic Meat$).*"]
++    s.raw["fetch"]["min_page_bytes"] = 1000
++    s.raw["crawl"]["brand_slices"] = False
++    s.categories = [Category("Meat", "https://www.marianos.com/d/meat", "Category + ALL subcategories"),
++                    Category("Coupons", "https://www.marianos.com/savings/cl/coupons/", "Category + ALL subcategories")]
++    return s
++
++
++def make_location():
++    return Location(key="test-544", store_id="53100544", zipcode="60014", expected_address="105 Northwest Hwy",
++                    canary_query="milk", canary_upcs=("0001111050438",))
++
++
++class KillingFetcher(FixtureFetcher):
++    """Hard kill (no finally blocks, no flush) on the N-th provider response – like SIGKILL / a lost replica."""
++
++    def __init__(self, *a, kill_after=0, **kw):
++        super().__init__(*a, **kw)
++        self.kill_after = kill_after
++
++    async def _fetch_once(self, url, render_js):
++        if self.kill_after and len(self.calls) >= self.kill_after:
++            os._exit(137)
++        return await super()._fetch_once(url, render_js)
++
++
++def crash_child(state_dir: str, out_dir: str, run_id: str, kill_after: int):
++    s, loc = make_settings(), make_location()
++    f = KillingFetcher(s, loc, fixtures=dict(PAGES), root=str(FIX), kill_after=kill_after)
++    asyncio.run(Runner(s, loc, LocalStorage(Path(out_dir)), Path(state_dir), run_id=run_id, fetcher=f).run())
++
++
++def _ids(storage_root):
++    recs = json.loads((Path(storage_root) / "test-544" / "latest" / "records.json").read_text(encoding="utf-8"))
++    return [r["upc"] for r in recs]
++
++
++def test_snapshot_checkpoint_survives_hard_kill_and_resumes_without_loss_or_duplicates(tmp_path, monkeypatch):
++    monkeypatch.setenv("MSCRAPER_CHECKPOINT_MODE", "snapshot")
++    monkeypatch.setenv("MSCRAPER_SNAPSHOT_SECONDS", "0")
++    # reference: the same run without interruption
++    monkeypatch.setenv("MSCRAPER_LOCAL_WORK", str(tmp_path / "work-ref"))
++    s, loc = make_settings(), make_location()
++    ref = FixtureFetcher(s, loc, fixtures=dict(PAGES), root=str(FIX))
++    res_ref = asyncio.run(Runner(s, loc, LocalStorage(tmp_path / "out-ref"), tmp_path / "state-ref",
++                                 run_id="20261028T000000Z-ref000", fetcher=ref).run())
++    assert res_ref["status"] == "published"
++    # interrupted: a separate process is hard-killed on its 6th provider response
++    run_id, state = "20261028T000000Z-kill00", tmp_path / "state"
++    env = {**os.environ, "MSCRAPER_LOCAL_WORK": str(tmp_path / "work-container1"),
++           "PYTHONPATH": os.pathsep.join([str(ROOT / "src"), str(TESTS)])}
++    code = ("import sys, test_v115_safety as t; "
++            f"t.crash_child({str(state)!r}, {str(tmp_path / 'out')!r}, {run_id!r}, 6)")
++    p = subprocess.run([sys.executable, "-c", code], env=env, cwd=str(TESTS), capture_output=True, text=True)
++    assert p.returncode == 137, p.stderr[-2000:]
++    run_dir = state / "test-544" / "runs" / run_id
++    m = json.loads((run_dir / "checkpoint.manifest.json").read_text(encoding="utf-8"))
++    assert m["seq"] >= 1 and m["integrity"] == "ok"
++    assert not (run_dir / "checkpoint.sqlite").exists()       # SQLite never ran on the (SMB) state directory
++    # resume in a NEW container: empty local working directory, everything comes from the share
++    monkeypatch.setenv("MSCRAPER_LOCAL_WORK", str(tmp_path / "work-container2"))
++    f2 = FixtureFetcher(s, loc, fixtures=dict(PAGES), root=str(FIX))
++    r2 = Runner(s, loc, LocalStorage(tmp_path / "out"), state, run_id=run_id, fetcher=f2)
++    assert r2.ck.get("started_at")                            # restored state, not a fresh run
++    res = asyncio.run(r2.run())
++    assert res["status"] == "published", res["errors"]
++    ids = _ids(tmp_path / "out")
++    assert len(ids) == len(set(ids)) and sorted(ids) == sorted(_ids(tmp_path / "out-ref"))
++    assert r2.ck.get("resumes") == 1
++    assert len(f2.calls) < len(ref.calls)                    # committed work before the kill was not refetched
++
++
++def test_corrupt_or_inconsistent_snapshot_fails_closed(tmp_path, monkeypatch):
++    monkeypatch.setenv("MSCRAPER_LOCAL_WORK", str(tmp_path / "work"))
++    path = tmp_path / "run" / "checkpoint.sqlite"
++    ck = Checkpoint(path, mode="snapshot", snapshot_seconds=0)
++    ck.set("k", 1)
++    ck.close()
++    m = json.loads((path.parent / "checkpoint.manifest.json").read_text(encoding="utf-8"))
++    snap = path.parent / m["file"]
++    good = snap.read_bytes()
++    # a crash after writing a NEWER snapshot but before the manifest switch: the committed snapshot is still used
++    (path.parent / f"checkpoint.snap-{m['seq'] + 1:06d}.sqlite").write_bytes(b"partial")
++    again = Checkpoint(path, mode="snapshot")
++    assert again.get("k") == 1
++    again.close()
++    mid = len(good) // 2
++    snap.write_bytes(good[:mid] + bytes(b ^ 0xFF for b in good[mid:mid + 64]) + good[mid + 64:])  # damaged bytes
++    with pytest.raises(CheckpointError, match="SHA-256"):
++        Checkpoint(path, mode="snapshot")
++    snap.unlink()                                             # snapshot missing
++    with pytest.raises(CheckpointError, match="missing"):
++        Checkpoint(path, mode="snapshot")
++    (path.parent / "checkpoint.manifest.json").write_text("{", encoding="utf-8")
++    with pytest.raises(CheckpointError, match="unreadable"):
++        Checkpoint(path, mode="snapshot")
++
++
++def test_snapshot_mode_refuses_an_unmanifested_direct_database(tmp_path, monkeypatch):
++    monkeypatch.setenv("MSCRAPER_LOCAL_WORK", str(tmp_path / "work"))
++    path = tmp_path / "run" / "checkpoint.sqlite"
++    Checkpoint(path, mode="direct").set("k", 1)
++    with pytest.raises(CheckpointError, match="no snapshot manifest"):
++        Checkpoint(path, mode="snapshot")
++
++
++def test_provider_errors_are_classified_terminal_or_retryable():
++    from mscraper.fetch import provider_error
++
++    assert provider_error(401, "").kind == "auth" and provider_error(401, "").terminal
++    assert provider_error(403, "").kind == "auth"
++    assert provider_error(400, "unsupported source").kind == "compat" and provider_error(422, "").terminal
++    assert provider_error(429, "").kind == "http" and not provider_error(429, "").terminal
++    assert not provider_error(503, "").terminal
++
++
++def test_real_provider_adapter_refuses_to_start_without_the_live_lock(settings, location, monkeypatch):
++    from mscraper.fetch import OxylabsRealtimeFetcher
++
++    monkeypatch.setenv("OXYLABS_USERNAME", "u")
++    monkeypatch.setenv("OXYLABS_PASSWORD", "p")
++    with pytest.raises(FetchError) as e:
++        asyncio.run(OxylabsRealtimeFetcher(settings, location).start())
++    assert e.value.kind == "lock"
++
++
++def test_classic_payloads_are_the_documented_routes():
++    """Classic API: search pages -> documented kroger_search with store localisation; other pages -> url alone."""
++    from mscraper.fetch import realtime_payload
++
++    s, loc = load_settings(ROOT / "config" / "settings.yaml"), make_location()
++    assert realtime_payload(s, loc, "https://www.marianos.com/search?query=Light%20Bulbs&searchType=default_search") == {
++        "source": "kroger_search", "query": "Light Bulbs", "store_id": "53100544", "fulfillment_type": "in_store"}
++    assert realtime_payload(s, loc, "https://www.marianos.com/d/meat") == {"url": "https://www.marianos.com/d/meat"}
+diff -ruN --strip-trailing-cr -x MANIFEST.txt -x SOURCE_FINGERPRINT.txt a/marianos-scraper/tools/package_source.py b/marianos-scraper/tools/package_source.py
+--- marianos-scraper/tools/package_source.py
++++ marianos-scraper/tools/package_source.py
+@@ -8,7 +8,7 @@
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(ROOT / "src"))
+-from mscraper.version import __version__, code_sha256  # noqa: E402
++from mscraper.version import RELEASE_PARTS, __version__, code_sha256, deploy_sha256, release_sha256  # noqa: E402
+ from mscraper.evidence import file_sha256  # noqa: E402
+ 
+ INCLUDE = ["src", "config", "tests", "deploy", "docs", "tools", "README.md", "CHANGELOG.md", "requirements.txt",
+@@ -21,7 +21,10 @@
+     out.parent.mkdir(exist_ok=True)
+     cfg = "".join(f"config_sha256[{n}]={file_sha256(ROOT / 'config' / n)}\n"
+                   for n in ("settings.yaml", "categories.csv", "locations.yaml", "private_label_brands.txt"))
+-    fp = (f"version={__version__}\ncode_sha256={code_sha256()}\n{cfg}"
++    fp = (f"version={__version__}\ncode_sha256={code_sha256()}\n"
++          f"release_sha256={release_sha256()}   # {' + '.join(RELEASE_PARTS)}\n"
++          f"deploy_sha256={deploy_sha256()}   # deploy/ (Azure template + scripts)\n"
++          f"deploy_sha256[main.bicep]={file_sha256(ROOT / 'deploy' / 'azure' / 'main.bicep')}\n{cfg}"
+           f"requirements_sha256={file_sha256(ROOT / 'requirements.txt')}\n")
+     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+         for item in INCLUDE:
+@@ -33,6 +36,7 @@
+                 z.write(f, f"marianos-scraper/{f.relative_to(ROOT).as_posix()}")
+         z.writestr("marianos-scraper/SOURCE_FINGERPRINT.txt", fp)
+     print(out, hashlib.sha256(out.read_bytes()).hexdigest())
++    print(fp)
+     return out
+ 
+ 

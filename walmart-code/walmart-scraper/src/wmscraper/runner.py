@@ -72,15 +72,16 @@ class Run:
         self.store: dict = self.ck.get("store_verification") or {}
 
     # ------------------------------------------------------------------ helpers
-    def _archive(self, kind: str, res, note: str = "") -> None:
-        """Keep raw source responses (gzip) + a store-context excerpt as evidence. Bounded per kind."""
+    def _archive(self, kind: str, res, note: str = "", always: bool = False) -> dict | None:
+        """Keep raw source responses (gzip) + a store-context excerpt as evidence. Bounded per kind unless `always`
+        (store page and canaries: every response is kept, before it is validated)."""
         import gzip
         import hashlib
 
         limit = int(self.s.get("evidence.raw_samples_per_kind", 5))
         counts = self.ck.get("raw_counts", {})
-        if counts.get(kind, 0) >= limit:
-            return
+        if counts.get(kind, 0) >= limit and not always:
+            return None
         counts[kind] = counts.get(kind, 0) + 1
         self.ck.set("raw_counts", counts)
         name = f"{kind}-{counts[kind]:02d}"
@@ -96,6 +97,7 @@ class Run:
                       "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "note": note,
                       "store_context": excerpt})
         self.storage.put_json(f"{self.prefix}/raw/index.json", index)
+        return index[-1]
 
     def _checkpoint_path(self):
         local = self.storage.local_path(f"{self.prefix}/checkpoint.sqlite")
@@ -111,6 +113,8 @@ class Run:
         return p
 
     def _sync_checkpoint(self):
+        from .lock import check_active
+        check_active()                      # lease lost -> no further checkpoint upload
         if not self.storage.local_path(f"{self.prefix}/checkpoint.sqlite"):
             self.ck.db.commit()
             self.storage.put_bytes(f"{self.prefix}/checkpoint.sqlite", self.ck.path.read_bytes())
@@ -229,7 +233,7 @@ class Run:
         url = f"https://www.walmart.com/store/{self.loc.store_id}"
         try:
             res = await self.fetcher.get(url)
-            self._archive("store", res, "store verification page")
+            self._archive("store", res, "store verification page", always=True)
             info = parse_store(res.html, self.loc.store_id, res.final_url)
         except (FetchError, ShapeError, ChallengeError) as exc:
             self.store = {"verified": False, "reason": str(exc), "url": url}
@@ -265,7 +269,35 @@ class Run:
         loc = p.location or {}
         return loc.get("pickupStoreId") == self.loc.store_id or self.loc.store_id in (loc.get("storeIds") or [])
 
+    def canary_problems(self, p, item_id: str) -> list[str]:
+        """Store identity AND fulfillment AND store-sourced price, all from the returned product (not from labels,
+        cookies or request parameters). A store id somewhere in the response is not enough."""
+        want = self.loc.store_id
+        loc = p.location or {}
+        probs = []
+        if p.item_id != item_id:
+            probs.append(f"response identity {p.item_id}")
+        if loc.get("pickupStoreId") != want:
+            probs.append(f"selected pickup store {loc.get('pickupStoreId') or '-'} (location {loc})")
+        if want not in (loc.get("storeIds") or []):
+            probs.append(f"location.storeIds {loc.get('storeIds')} lacks {want}")
+        if self.loc.fulfillment == "pickup":
+            if (loc.get("intent") or "").upper() != "PICKUP":
+                probs.append(f"intent {loc.get('intent') or '-'} (expected PICKUP)")
+            if ("PICKUP", want) not in [(f.upper(), s) for f, s in p.fulfillment_options]:
+                probs.append(f"no PICKUP option for store {want} in fulfillmentSummary {p.fulfillment_options}")
+        if (p.fulfillment_type or "").upper() != "STORE":
+            probs.append(f"fulfillmentType {p.fulfillment_type or '-'} (expected STORE: store-sourced offer)")
+        shown = re.sub(r"[^0-9.]", "", p.current_price or "")
+        if not ((p.price_value or 0) > 0 or (shown and float(shown or 0) > 0)):
+            probs.append("no current price on the store offer")
+        if self.loc.zipcode and loc.get("postalCode") and loc.get("postalCode") != self.loc.zipcode:
+            probs.append(f"postalCode {loc.get('postalCode')} != {self.loc.zipcode}")
+        return probs
+
     async def canary(self, phase: str):
+        """Every configured canary must pass. Stops at the FIRST failing item (no further request) and raises;
+        every response is archived with its hash and returned context BEFORE it is validated."""
         items = list(self.loc.canary_items)
         self.ck.set("canary_configured", bool(items))
         if not items:
@@ -273,22 +305,27 @@ class Run:
         state = self.ck.get("canary", {})
         if state.get(phase, {}).get("ok"):
             return
-        problems = []
+        checked = []
         for item_id in items:
+            res = await self.fetcher.get(f"https://www.walmart.com/ip/{item_id}")   # terminal errors propagate
+            arch = self._archive("canary", res, f"canary {phase} {item_id}", always=True)
             try:
-                res = await self.fetcher.get(f"https://www.walmart.com/ip/{item_id}")
-                p = parse_product(res.html, res.final_url)
-                if p.item_id != item_id:
-                    problems.append(f"{item_id}: response identity {p.item_id}")
-                elif not self._product_context_ok(p):
-                    problems.append(f"{item_id}: selected pickup store {p.location}")
+                probs = self.canary_problems(parse_product(res.html, res.final_url), item_id)
             except Exception as exc:
-                problems.append(f"{item_id}: {exc}")
-        state[phase] = {"ok": not problems, "detail": problems, "items": items}
+                probs = [f"unparsable product response: {exc}"]
+            checked.append({"item": item_id, "ok": not probs, "problems": probs,
+                            "evidence": (arch or {}).get("file"), "sha256": (arch or {}).get("sha256")})
+            if probs:
+                break
+        ok = all(c["ok"] for c in checked) and len(checked) == len(items)
+        state[phase] = {"ok": ok, "items": items, "checked": checked,
+                        "detail": [f"{c['item']}: {'; '.join(c['problems'])}" for c in checked if not c["ok"]],
+                        "not_requested": items[len(checked):]}
         self.ck.set("canary", state)
-        log.info("canary", extra={"phase": phase, "ok": not problems, "problems": problems})
-        if problems and len(problems) == len(items):
-            raise RuntimeError(f"all canary items failed at {phase} – likely blocked or wrong store")
+        log.info("canary", extra={"phase": phase, "ok": ok, "checked": checked, "not_requested": items[len(checked):]})
+        if not ok:
+            raise FetchError(f"canary failed at {phase}: {state[phase]['detail']} – stopped, "
+                             f"{len(items) - len(checked)} canary item(s) not requested", "store")
 
     # ------------------------------------------------------------------ discovery / planning
     def _listing_url(self, cid: str) -> str:

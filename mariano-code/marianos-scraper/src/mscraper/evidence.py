@@ -36,7 +36,10 @@ def fingerprints(settings, argv: list[str] | None = None) -> dict:
     cfg = {name: file_sha256(base / "config" / name) for name in
            ("settings.yaml", "categories.csv", "locations.yaml", "private_label_brands.txt")}
     req = file_sha256(base / "requirements.txt")
-    return {"scraper_version": __version__, "code_sha256": code_sha256(), "config_sha256": cfg,
+    from .version import deploy_sha256, release_sha256
+
+    return {"scraper_version": __version__, "code_sha256": code_sha256(), "release_sha256": release_sha256(),
+            "deploy_sha256": deploy_sha256(), "config_sha256": cfg,
             "requirements_sha256": req, "python": sys.version.split()[0], "platform": platform.platform(),
             "argv": argv or sys.argv[1:]}
 

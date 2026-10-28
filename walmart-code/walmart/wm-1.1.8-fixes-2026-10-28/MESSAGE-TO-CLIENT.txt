@@ -1,0 +1,63 @@
+WALMART #32/#38 — walmart-scraper 1.1.8: your five corrections (offline), documented Classic payload proposal, dated plan
+
+Hello Darren,
+
+Thank you for the detailed review, and for being clear about the award terms. I understand that nothing is promised until the requirements are met and verified.
+
+Attached is wm-1.1.8-fixes-2026-10-28.zip. Start with 00-INDEX.md; 03-REQUIREMENT-CHECK.md maps each of your points to the change and the test that proves it.
+- Version: walmart-scraper 1.1.8, source_sha256 f3396f3a237afd416fcd2c559425e66ca8e8152c6440e1de6e1d8d8910b8f4e0. The fingerprint covers src, config, the deploy template and scripts, tools and tests.
+- Offline only: no provider request, no Azure execution, nothing deployed since 27 Oct.
+- The 27-Oct failure and the "probe" budget (3 of 10 used, 7 remaining) are preserved. Nothing was published or relabelled, and unresolved coverage stays blocked.
+- 71 offline tests, all passed: 49 existing + 22 new. A-OFFLINE has the diff against the 1.1.7 zip you inspected and the test output.
+
+YOUR FIVE POINTS
+1. Budget across overlapping executions
+- The budget can only be used while the process holds one exclusive Blob lease that covers every request path (run, run-all, verify-store). An overlapping execution exits before any request.
+- Each reservation re-reads the state with its ETag and writes conditionally (If-Match / create-if-absent). Your two-holder case now fails for the second holder, even when it writes from a stale read.
+- The ledger is written before the count.
+- A deleted state next to an existing ledger fails closed; it never resets to 0. So do invalid state, used > total, and a short ledger.
+- The existing probe identity opens with 7 remaining.
+- A lost lease stops requests, checkpoint writes and every publication step.
+
+2. Stop at the first failed canary
+- The first failing item raises, and later canary items are not requested.
+- verify-store returns non-zero unless the store and every canary pass; the unconditional success return is removed.
+- Provider 401/403 (authentication) and 400/404/422 (compatibility) are terminal and never retried. 429/5xx, timeouts and challenges stay retryable.
+
+3. Fulfillment, not just a store ID
+Each canary must show all of these in Walmart's returned product:
+- pickupLocation.storeId = 100
+- storeIds contains 100
+- intent PICKUP
+- a PICKUP option for store 100 in fulfillmentSummary
+- fulfillmentType STORE (a store-sourced offer)
+- a current price > 0
+- postal code 72712
+Your SHIPPING case now fails, and so do FC, a missing PICKUP option and a missing price (tests included).
+
+4. Every canary response archived before validation, including failures: raw gzip, SHA-256 and the returned context.
+
+5. --categories: fixed. A regression test runs the exact README command (--categories "Food,Pets" --limit 600) against the delivered config, without any provider request.
+
+CLASSIC WALMART ROUTE (folder B; a proposal, not approved, not run)
+- From Oxylabs' documentation for realtime.oxylabs.io/v1/queries (pages saved and hashed in the package): the dedicated source "walmart_product" takes product_id, store_id, delivery_zip and fulfillment_type (pickup).
+- Proposed canary body: {"source": "walmart_product", "product_id": "10450114", "store_id": "100", "delivery_zip": "72712", "fulfillment_type": "pickup"}.
+- The store page stays on the "url alone" route.
+- No "parse" is sent: the scraper verifies Walmart's own page data itself.
+- It would use only the 7 remaining probe requests.
+Not established, and I am not assuming either:
+- whether your plan includes walmart_product, and its rate. Walmart pages may be force-rendered, so I budget at the rendered rate: 7 requests is about $0.01.
+- whether category listings can be pinned to store #100 on the Classic plan. Oxylabs documents no store parameters for "url alone" pages, and the 27-Oct probe showed that route picks store 4376.
+This listing route is the main risk for full Walmart coverage on this plan. I will report it plainly rather than collect from the wrong store.
+
+DATES (US Central, details in 02-PLAN-AND-DATES.md)
+- Offline fixes: completed Tue 27 Oct, 23:00 CDT (28 Oct 04:00 UTC), and delivered with this message.
+- After your OK: redeploy 1.1.8 and the zero-request selfcheck within 2 hours.
+- After you confirm the entitlement/rate and approve the walmart_product probe: probe result within 2 hours of approval.
+- Listing route: about 2 working days after the probe passes and a route is approved. At risk, as above.
+- Full acceptance: about 5-7 working days after those approvals and budgets. This covers the full traversal, UPC/data/offer checks, same-version interruption/resume, failed-publication protection and the unattended Azure repeat.
+
+No paid attempt, deployment or schedule will happen until you approve it. Credentials stay out of chat, code, logs and packages.
+
+Best regards,
+Asif Khan

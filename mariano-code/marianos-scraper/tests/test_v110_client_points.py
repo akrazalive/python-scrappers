@@ -273,9 +273,10 @@ def test_store_verification_records_fulfillment_and_response(settings, location,
 
 
 def test_realtime_adapter_builds_store_pinned_payload_from_config(settings, location):
-    from mscraper.fetch import OxylabsRealtimeFetcher, _fill
+    # 1.1.5: the 1.1.0 body {"source": "kroger", "url": …, "store_id": …} is not a documented Classic request and is
+    # withdrawn; search pages use the documented kroger_search source with store localisation (see test_v115_safety)
+    from mscraper.fetch import OxylabsRealtimeFetcher, realtime_payload
     f = OxylabsRealtimeFetcher(settings, location)
-    body = _fill(settings.get("fetch.oxylabs_realtime.payload"), url="https://www.marianos.com/search?query=x",
-                 store_id=location.store_id, zipcode=location.zipcode)
-    assert body == {"source": "kroger", "url": "https://www.marianos.com/search?query=x", "store_id": "53100544"}
+    body = realtime_payload(settings, location, "https://www.marianos.com/search?query=x")
+    assert body == {"source": "kroger_search", "query": "x", "store_id": "53100544", "fulfillment_type": "in_store"}
     assert f.name == "oxylabs_realtime"

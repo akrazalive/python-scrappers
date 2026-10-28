@@ -1,5 +1,32 @@
 # Changes
 
+## 1.1.8 (2026-10-28) – client review of 28 Oct (budget safety, canary rules, fulfillment, evidence, --categories)
+
+Offline only; no live or Azure request. Tests: `tests/test_v118_safety.py` (22 new, 71 in total).
+1. **Budget: exclusive and atomic** (`budget.py`, `lock.py`, `storage.py`). A budget is used only while the process
+   holds the live lock (one Blob lease for every request path: `run`, `run-all`, `verify-store`). An overlapping
+   execution exits 3 before any request. Every reservation re-reads the state with its ETag and writes it
+   conditionally (If-Match / create-if-absent), so a second holder can never also reserve. The ledger line is
+   written before the counter. A deleted state next to an existing ledger, an invalid state, used > total, or a
+   ledger shorter than `used` all fail closed. They never reset to 0. The existing `probe` budget (3 of 10) keeps
+   its identity and 7 remaining. Ledger chunks of 200 lines keep each write bounded.
+2. **Canary stops at the first failure** (`runner.canary`). The first failing item raises a store error, and later
+   canary items are not requested. `verify-store` returns non-zero unless the store and every canary pass (the
+   unconditional success return is removed). Provider 401/403 (auth) and 400/404/422 (compatibility) are terminal
+   and never retried. 429/5xx/timeouts/challenges stay retryable. Real adapters refuse to start without the live
+   lock.
+3. **Fulfillment and price verified, not only a store id** (`runner.canary_problems`). All of these come from the
+   returned product: `location.pickupLocation.storeId` = store, `location.storeIds` contains it,
+   `location.intent` = PICKUP, a PICKUP option for the store in `fulfillmentSummary`, `fulfillmentType` = STORE
+   (store-sourced offer), a current price > 0, and a matching postal code.
+4. **Every canary response archived before validation**, including failures (`_archive(..., always=True)`): raw
+   gzip, SHA-256 and the returned store/fulfillment context in `raw/index.json`.
+5. **`--categories` fixed** (`cli.cmd_run`): regression tests run the exact README command (`--categories "Food,Pets" --limit 600`) against the delivered config, and the demo form on the test site.
+6. **Lease loss** stops requests, checkpoint commits/uploads and every publication step (`lock.check_active`).
+7. **Proposed Classic product payload** (`config/settings.yaml` `fetch.oxylabs.product_payload`, NOT yet approved
+   or run): documented source `walmart_product` with `product_id`, `store_id`, `delivery_zip`,
+   `fulfillment_type: pickup`. All other pages keep the `universal` payload. Delete the block to revert.
+
 ## 1.1.7 (2026-10-27) – persistent request ledger and zero-request selfcheck
 
 1. **Persistent total request budget** (`src/wmscraper/budget.py`, hooked into `fetch/base.py`): `--budget NAME:TOTAL`

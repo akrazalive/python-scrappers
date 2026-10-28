@@ -65,6 +65,14 @@ ContainerAppConsoleLogs_CL | where ContainerJobName_s == '$JOB' and ContainerGro
     mkdir -p "$OUT/state"
     az storage file download-batch --account-name "$SA" --account-key "$KEY" -s scraper-state -d "$OUT/state" -o none
     cp evidence/executions.log "$OUT/" 2>/dev/null || true
+    # Azure's own execution times (properties.startTime/endTime) kept apart from this controller's start/collect times
+    python - "$OUT/execution.json" "$EXEC" "$TS" > "$OUT/timestamps.json" <<'PYTS'
+import json, sys
+e = json.load(open(sys.argv[1]))["properties"]
+ctl = [l.strip() for l in open("evidence/executions.log") if sys.argv[2] in l] if __import__("os").path.exists("evidence/executions.log") else []
+print(json.dumps({"execution": sys.argv[2], "azure_execution_start": e.get("startTime"), "azure_execution_end": e.get("endTime"),
+                  "azure_status": e.get("status"), "controller_log_lines": ctl, "collected_at_controller_utc": sys.argv[3]}, indent=2))
+PYTS
     ( cd "$OUT" && find . -type f ! -name SHA256SUMS.txt | sort | xargs sha256sum > SHA256SUMS.txt )
     ST=$(python -c "import json,sys;print(json.load(open(sys.argv[1]))['properties']['status'])" "$OUT/execution.json")
     if [ "$ST" != "Running" ]; then

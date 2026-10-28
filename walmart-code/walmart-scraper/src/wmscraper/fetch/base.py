@@ -10,6 +10,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import random
 import time
 from dataclasses import dataclass
@@ -49,6 +50,42 @@ def fill(template, **values):
     return template
 
 
+# Never retried: a rejected credential (401/403) or an unsupported request (400/404/422) cannot be fixed by retrying;
+# store/budget/lock failures stop the work. 429 / 5xx / timeouts / challenges stay retryable.
+TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
+
+
+def provider_error(status: int, text: str) -> "FetchError":
+    if status in (401, 403):
+        return FetchError(f"provider authentication failed (HTTP {status})", "auth")
+    if status in (400, 404, 422):
+        return FetchError(f"provider rejected the request (HTTP {status}): {text[:200]}", "compat")
+    return FetchError(f"provider HTTP {status}: {text[:200]}", "http")
+
+
+def require_live_lock(fetcher) -> None:
+    """Real provider adapters may only start inside lock.live_lock (one requester at a time)."""
+    from .. import lock
+
+    if not lock.live_held():
+        raise FetchError(f"{fetcher.name}: provider requests need the live lock (exclusive ownership)", "lock")
+
+
+_IP_RE = re.compile(r"walmart\.com/ip/(?:[^/?#]+/)?(\d+)")
+
+
+def classic_payload(settings, location, url: str) -> dict:
+    """Classic Web Scraper API body (realtime.oxylabs.io/v1/queries).
+    Product pages: the documented `walmart_product` source with store localisation (store_id, delivery_zip,
+    fulfillment_type) when `fetch.oxylabs.product_payload` is configured; everything else: `fetch.oxylabs.payload`."""
+    m = _IP_RE.search(url)
+    tpl = settings.get("fetch.oxylabs.product_payload") if m else None
+    if tpl:
+        return fill(tpl, url=url, product_id=m.group(1), store_id=location.store_id, zipcode=location.zipcode)
+    tpl = settings.get("fetch.oxylabs.payload", {"source": "universal", "url": "{url}", "render": "html", "geo_location": "{zipcode}"})
+    return fill(tpl, url=url, store_id=location.store_id, zipcode=location.zipcode)
+
+
 class Fetcher:
     name = "base"
 
@@ -85,7 +122,12 @@ class Fetcher:
 
     async def get(self, url: str) -> FetchResult:
         last_exc: FetchError | None = None
+        from .. import lock
         for attempt in range(1, self.retries + 2):
+            try:
+                lock.check_active()                 # a lost lease stops every further request
+            except lock.LockLost as exc:
+                raise FetchError(str(exc), "lock") from exc
             if self.budget and self.stats["requests"] >= self.budget:
                 raise FetchError(f"request budget of {self.budget} reached (fetch.max_requests_per_run)", "budget")
             if self.total_budget is not None:  # counted and saved before the request is sent, retries included
@@ -95,6 +137,8 @@ class Fetcher:
             try:
                 res = await self._fetch_once(url)
             except FetchError as exc:
+                if exc.kind in TERMINAL_KINDS:     # auth / compatibility: retrying cannot help, never retried
+                    raise
                 last_exc = exc
             except Exception as exc:  # network, provider errors
                 last_exc = FetchError(f"{type(exc).__name__}: {exc}", "error")
@@ -131,6 +175,8 @@ class OxylabsFetcher(Fetcher):
     async def start(self):
         import httpx
 
+        require_live_lock(self)
+
         user, pwd = os.getenv("OXYLABS_USERNAME"), os.getenv("OXYLABS_PASSWORD")
         if not user or not pwd:
             raise FetchError("OXYLABS_USERNAME / OXYLABS_PASSWORD are not set", "error")
@@ -140,14 +186,15 @@ class OxylabsFetcher(Fetcher):
         await self.client.aclose()
 
     async def _fetch_once(self, url: str) -> FetchResult:
-        tpl = self.s.get("fetch.oxylabs.payload", {"source": "universal", "url": "{url}", "render": "html", "geo_location": "{zipcode}"})
-        body = fill(tpl, url=url, store_id=self.loc.store_id, zipcode=self.loc.zipcode)
+        body = classic_payload(self.s, self.loc, url)
         t0 = time.monotonic()
         r = await self.client.post(self.endpoint, json=body)
         if r.status_code >= 400:
-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
+            raise provider_error(r.status_code, r.text)
         res = (r.json().get("results") or [{}])[0]
-        return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200), res.get("content") or "", time.monotonic() - t0)
+        content = res.get("content") or ""
+        return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200),
+                           content if isinstance(content, str) else "", time.monotonic() - t0)
 
 
 class OxylabsWebApiFetcher(Fetcher):
@@ -160,6 +207,8 @@ class OxylabsWebApiFetcher(Fetcher):
 
     async def start(self):
         import httpx
+
+        require_live_lock(self)
 
         key = os.getenv("OXYLABS_WEBAPI_KEY")
         if not key:
@@ -182,7 +231,7 @@ class OxylabsWebApiFetcher(Fetcher):
         t0 = time.monotonic()
         r = await self.client.post(endpoint, json=body)
         if r.status_code >= 400:
-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
+            raise provider_error(r.status_code, r.text)
         res = (r.json().get("results") or [{}])[0]
         meta = res.get("metadata") or {}
         status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
@@ -195,6 +244,8 @@ class ZyteFetcher(Fetcher):
 
     async def start(self):
         import httpx
+
+        require_live_lock(self)
 
         key = os.getenv("ZYTE_API_KEY")
         if not key:
@@ -210,7 +261,7 @@ class ZyteFetcher(Fetcher):
         t0 = time.monotonic()
         r = await self.client.post(self.endpoint, json=body)
         if r.status_code >= 400:
-            raise FetchError(f"provider HTTP {r.status_code}: {r.text[:200]}", "http")
+            raise provider_error(r.status_code, r.text)
         data = r.json()
         return FetchResult(url, data.get("url") or url, int(data.get("statusCode") or 200), data.get("browserHtml") or "", time.monotonic() - t0)
 

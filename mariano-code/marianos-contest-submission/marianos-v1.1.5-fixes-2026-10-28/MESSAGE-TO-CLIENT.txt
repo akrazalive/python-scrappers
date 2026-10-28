@@ -1,0 +1,70 @@
+MARIANO'S #69 — marianos-scraper 1.1.5: your five corrections (offline), Classic API route finding, dated plan
+
+Hello,
+
+Thank you for the careful review, and for being clear about the award terms. I understand that nothing is promised until the requirements are met and verified.
+
+Attached is marianos-v1.1.5-fixes-2026-10-28.zip. Start with 00-INDEX.md; 03-REQUIREMENT-CHECK.md maps each of your points to the change and the test that proves it.
+- Offline only: no provider request, no Azure execution, nothing deployed since 27 Oct.
+- The Azure budget test1 (0 of 19 used) is untouched and keeps its identity.
+- 64 offline tests, all passed: 46 existing + 18 new.
+- The package includes the diff against the 1.1.4 zip you inspected.
+
+Hashes, as you asked, covering the template as well as the code:
+- code_sha256 99eafc35962c4fec3abbfab7f28172f15b78d0dd4f533b1aae9b18f817938268
+- release_sha256 f1f7b0cdead650e5160000cdc8c6e62d02b282306270ece42bd36d14b0428256 (src + config + deploy + requirements + Dockerfile)
+- deploy_sha256 fe9215d89659aabd57a1481233a364042c95e5ea5c5d826db26b6d053f1641a8
+- main.bicep de5f9776864e2e45c2df1c23392813e1b7ea91895a43d9586e2631423b5076a2
+
+YOUR FIVE POINTS (design: A-OFFLINE/RECOVERY-AND-LOCKING.md)
+1. Stop rule
+- bounded-test stops at the first non-zero step or terminal error, and later steps are not started.
+- Provider 401/403 and 400/404/422 are never retried.
+- Test: a wrong-store first check ends Test 1 after exactly one request, with steps 2 and 3 never started.
+
+2. Overlap and the shared budget
+- One exclusive Blob lease covers every command that can send requests, across all tests and both locations. An overlapping execution exits before any request.
+- The real provider adapters refuse to start without that lease.
+- The budget can only be used while the lease is held. It re-reads and validates its state before every request, writes the ledger before the count, and fails closed on any inconsistency.
+- Tests cover overlap rejection, restart persistence, the crash window and each inconsistency.
+
+3. Lease loss
+- A failed renewal marks the lease lost.
+- Requests, checkpoint commits/snapshots and every publication step check that and stop.
+- There is a lease-loss test.
+
+4. Checkpoint locking
+- nobrl is withdrawn: byte-range locks stay on, and SQLite never runs on the share.
+- SQLite works on local disk.
+- The durable copy is a SHA-256-checked snapshot plus a manifest written atomically (the commit point).
+- Restore checks the hash and integrity and fails closed.
+- Test: a separate process is hard-killed (os._exit, no flush). A new "container" with an empty local disk restores from the share and finishes. The output is identical to an uninterrupted run, with no duplicates.
+- Corrupt, missing and inconsistent snapshots are refused.
+
+5. Budget identity, hashes and timestamps
+- test1 keeps its identity and 19 remaining.
+- The hashes above cover the template.
+- Evidence collection now writes Azure's own execution start/end separately from controller timestamps.
+- Correction to my 27-Oct report (03-REQUIREMENT-CHECK.md): per the execution record, the selfcheck ran 04:03:15-04:04:03 UTC (I had quoted the controller start, 04:02:43, and an approximate end). For Test 1 the record shows start 04:09:14 UTC and no end time; 04:11:35 was the last console line, not a recorded end.
+
+ONE IMPORTANT FINDING (folder B; a proposal, not approved, not run)
+- On the Classic Web Scraper API, Oxylabs documents only kroger_search and kroger_product, which target kroger.com, with store_id and fulfillment_type, plus "url alone" for other pages. The documentation page is saved and hashed in the package.
+- There is no documented Classic route for marianos.com with store parameters. A dedicated Mariano's endpoint exists only on the newer Web API, which is not your plan.
+- The Classic body my earlier versions would have sent was therefore not a documented request, and 1.1.5 withdraws it.
+- Proposed instead for search pages: {"source": "kroger_search", "query": "<query>", "store_id": "53100544", "fulfillment_type": "in_store"}.
+Not established:
+- whether your plan includes kroger_search, and its rate (Test 1 is at most about $0.03 even at the rendered rate)
+- whether kroger.com with store 53100544 returns the Mariano's Crystal Lake store, in-store modality and that store's own prices
+Test 1 step 1 reads all three from the returned page. If they are not right, the stop rule ends the test after that one request.
+
+DATES (US Central, details in 02-PLAN-AND-DATES.md)
+- Offline fixes: completed Tue 27 Oct, 23:00 CDT (28 Oct 04:00 UTC), and delivered with this message.
+- After your OK: redeploy 1.1.5 and the zero-request selfcheck within 2 hours.
+- After you check the kroger_search entitlement/rate and approve the route: Test 1 result within 2 hours. If it passes, Test 2 result within 3 more hours.
+- The evidence package you called v1.1.4 (it will carry code 1.1.5): 1 working day after Test 2.
+- Full acceptance: Test 3 (duration measured in Test 2), then failed-publication proof and the unattended second execution, about 2-3 working days after Test 3. The coupon linkage stays a separate decision.
+
+No paid attempt, deployment or schedule will happen until you approve it. Credentials stay out of chat, code, logs and packages.
+
+Regards,
+Asif Khan

@@ -47,6 +47,8 @@ class Storage:
             "published_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         }
         base = f"{location}/latest"
+        from .lock import check_active
+        check_active()                     # lease lost -> nothing is published
         # 1) stage
         self.put_bytes(f"{base}/.staging-records.json", body)
         self.put_json(f"{base}/.staging-report.json", report)
@@ -57,12 +59,14 @@ class Storage:
             self.copy(f"{base}/records.json", f"{base}/previous-records.json")
             self.copy(f"{base}/manifest.json", f"{base}/previous-manifest.json")
         # 3) swap in; manifest written last = commit point
+        check_active()
         self.copy(f"{base}/.staging-records.json", f"{base}/records.json")
         self.copy(f"{base}/.staging-report.json", f"{base}/report.json")
         for name in (extras or {}):
             if self.get_bytes(f"{base}/{name}"):
                 self.copy(f"{base}/{name}", f"{base}/previous-{name}")
             self.copy(f"{base}/.staging-{name}", f"{base}/{name}")
+        check_active()                     # the commit point is never written without ownership
         self.put_json(f"{base}/manifest.json", manifest)
         return manifest
 

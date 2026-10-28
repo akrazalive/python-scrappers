@@ -1,0 +1,25 @@
+# Mariano's #69 – your review of 27 Oct, point by point (1.1.5, offline)
+
+Every row was re-checked against the delivered source. Each named test was run, and all passed (full output in
+A-OFFLINE/offline-tests-1.1.5.txt: 64 passed).
+
+| # | You asked | Done in 1.1.5 (where) | Proof (tests/…) |
+|---|---|---|---|
+| 1 | bounded-test must stop on a non-zero step and on FetchError; stop immediately on auth / compatibility / store-context failure | `cli.py` bounded-test loop: `break` on a non-zero step, on FetchError and on Lock/Budget/Checkpoint errors; `fetch.py` `TERMINAL_KINDS` (auth, compat, store, budget, lock) are never retried; provider 401/403 → auth, 400/404/422 → compat | test_v115_safety: `test_failed_first_store_check_stops_bounded_test_before_any_other_step` (wrong-store response: exit 2, steps 2-3 never started, exactly 1 provider request, ledger 1 line), `test_terminal_provider_errors_are_not_retried_and_stop_the_test`, `test_provider_errors_are_classified_terminal_or_retryable` |
+| 2 | Exclusion around the whole bounded-test and the shared budget, both locations; verify-store and probe must lock; no cached budget; show overlap rejection and restart persistence | `lock.live_lock`: one Blob lease (`_live/.run.lock`) for every command that can send requests (bounded-test, verify-store, probe, run, run-all), all tests and both locations; real adapters refuse to start without it; `budget.py` requires it, re-reads + validates state before every request, ledger-then-state, fails closed | `test_overlapping_execution_is_refused_and_sends_nothing` (exit 3, 0 requests, no budget touched), `test_budget_needs_the_live_lock_and_survives_restart`, `test_budget_state_is_never_cached_between_two_holders`, `test_inconsistent_budget_fails_closed[4 cases]`, `test_crash_between_ledger_and_state_counts_the_request_as_used`, `test_real_provider_adapter_refuses_to_start_without_the_live_lock`; test_v112 worst-case `test_bounded_test1_never_exceeds_19_requests_even_when_repeated` still passes |
+| 3 | Lease loss must stop requests, checkpoint writes and publication | `lock.BlobLeaseLock`: a failed renewal marks it LOST; `check_active()` in `Fetcher.get` (each request), `Checkpoint.tx` / `flush` (each write), `storage.publish` (before staging, before swap, before the manifest) | `test_lease_loss_stops_requests_checkpoint_writes_and_publication` (0 requests, write rolled back, nothing published) |
+| 4 | No nobrl as "proof"; a corrected locking design, a documented flush/restore, a bounded integrity/restart test; /tmp alone is insufficient | `nobrl` withdrawn (byte-range locks stay on); `checkpoint.py` snapshot mode: SQLite on local disk, a SHA-256-checked snapshot + an atomically renamed manifest on the share as the commit point; restore verifies hash + `PRAGMA integrity_check` and fails closed; `main.bicep` sets `MSCRAPER_CHECKPOINT_MODE=snapshot`; documented in A-OFFLINE/RECOVERY-AND-LOCKING.md §4 | `test_snapshot_checkpoint_survives_hard_kill_and_resumes_without_loss_or_duplicates` (separate process killed with `os._exit(137)`, no flush; a new container with an empty local disk resumes; output identical to an uninterrupted run, no duplicates, fewer requests), `test_corrupt_or_inconsistent_snapshot_fails_closed`, `test_snapshot_mode_refuses_an_unmanifested_direct_database` |
+| 5a | Keep the same budget identity and remaining allowance; no reset, no new name | `test1` is opened unchanged; a total can never be raised under the same name; a missing state never resets | `test_existing_test1_identity_from_azure_is_kept_with_19_remaining` (the exact Azure state file: 0/19, created 2026-10-27T04:09:54Z) |
+| 5b | Hashes covering the deployment template as well as the code | `release_sha256` (src + config + deploy + requirements + Dockerfile), `deploy_sha256`, `main.bicep` SHA-256: SOURCE_FINGERPRINT-1.1.5.txt, `version_info()`, every run's provenance | SOURCE_FINGERPRINT-1.1.5.txt |
+| 5c | Execution-record timestamps separate from controller timestamps | `run_test.sh collect` now writes `timestamps.json` (Azure `startTime`/`endTime`/status vs controller log); the 27-Oct times are corrected below | table below |
+
+## Corrected 27-Oct timestamps (UTC), by source
+
+| Execution | Controller: start command issued (evidence/executions.log) | Azure execution record: startTime | Azure execution record: endTime | Other source |
+|---|---|---|---|---|
+| mscraper-job-hu2268z (selfcheck, Succeeded) | 2026-10-27T04:02:43Z | 2026-10-27T04:03:15Z | 2026-10-27T04:04:03Z | – |
+| mscraper-job-k972pfi (Test 1, Failed) | 2026-10-27T04:08:42Z | 2026-10-27T04:09:14Z | **not recorded** (null in the saved execution.json) | budget file created 04:09:54Z (state/_budgets/test1.json); last console line of the third attempt 04:11:35Z (Log Analytics TimeGenerated) |
+
+My 27-Oct message gave the selfcheck as "04:02:43-04:05". That mixed the controller start with an approximate end;
+the execution record says 04:03:15-04:04:03. The Test 1 end was taken from the console log, not from the execution
+record, which has no end time.

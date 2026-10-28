@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from mscraper.version import __version__, code_sha256  # noqa: E402
+from mscraper.version import RELEASE_PARTS, __version__, code_sha256, deploy_sha256, release_sha256  # noqa: E402
 from mscraper.evidence import file_sha256  # noqa: E402
 
 INCLUDE = ["src", "config", "tests", "deploy", "docs", "tools", "README.md", "CHANGELOG.md", "requirements.txt",
@@ -21,7 +21,10 @@ def main() -> Path:
     out.parent.mkdir(exist_ok=True)
     cfg = "".join(f"config_sha256[{n}]={file_sha256(ROOT / 'config' / n)}\n"
                   for n in ("settings.yaml", "categories.csv", "locations.yaml", "private_label_brands.txt"))
-    fp = (f"version={__version__}\ncode_sha256={code_sha256()}\n{cfg}"
+    fp = (f"version={__version__}\ncode_sha256={code_sha256()}\n"
+          f"release_sha256={release_sha256()}   # {' + '.join(RELEASE_PARTS)}\n"
+          f"deploy_sha256={deploy_sha256()}   # deploy/ (Azure template + scripts)\n"
+          f"deploy_sha256[main.bicep]={file_sha256(ROOT / 'deploy' / 'azure' / 'main.bicep')}\n{cfg}"
           f"requirements_sha256={file_sha256(ROOT / 'requirements.txt')}\n")
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         for item in INCLUDE:
@@ -33,6 +36,7 @@ def main() -> Path:
                 z.write(f, f"marianos-scraper/{f.relative_to(ROOT).as_posix()}")
         z.writestr("marianos-scraper/SOURCE_FINGERPRINT.txt", fp)
     print(out, hashlib.sha256(out.read_bytes()).hexdigest())
+    print(fp)
     return out
 
 

@@ -43,7 +43,7 @@ def cmd_run(args, s):
     cats = None  # None -> the location's configured scope (or all categories)
     if args.categories:
         wanted = {c.strip().lower() for c in args.categories.split(",")}
-        cats = [c for c in cats if c.name.lower() in wanted]
+        cats = [c for c in s.categories if c.name.lower() in wanted]
         missing = wanted - {c.name.lower() for c in cats}
         if missing:
             sys.exit(f"unknown categories: {sorted(missing)}")
@@ -100,9 +100,14 @@ def cmd_verify_store(args, s):
         finally:
             await run.fetcher.close()
 
-    asyncio.run(go())
-    print(json.dumps({"store": run.store, "canary": run.ck.get("canary")}, indent=2))
-    return 0
+    try:
+        asyncio.run(go())
+    finally:
+        run._sync_checkpoint()
+    canary = (run.ck.get("canary") or {}).get("start") or {}
+    ok = bool(run.store.get("verified")) and (canary.get("ok") or not run.loc.canary_items)
+    print(json.dumps({"verified": ok, "store": run.store, "canary": run.ck.get("canary")}, indent=2))
+    return 0 if ok else 2
 
 
 PROVIDER_ENV = {"oxylabs_webapi": ("OXYLABS_WEBAPI_KEY",), "oxylabs": ("OXYLABS_USERNAME", "OXYLABS_PASSWORD"),
@@ -202,6 +207,9 @@ def cmd_retry_failed(args, s):
     return 0
 
 
+LIVE_COMMANDS = {"run", "run-all", "verify-store"}
+
+
 def main(argv=None):
     _load_env()
     ap = argparse.ArgumentParser(prog="wmscraper", description="Walmart location-specific scraper")
@@ -239,6 +247,15 @@ def main(argv=None):
     rf.add_argument("--run-id", required=True)
     args = ap.parse_args(argv)
     s = load_settings(args.config)
+    from . import lock
+    if args.cmd in LIVE_COMMANDS and not lock.live_held():
+        # Exclusive ownership: one requester at a time for every command that can send provider requests
+        try:
+            with lock.live_lock(build_storage(s)):
+                return main(argv)
+        except lock.LockError as exc:
+            print(f"refused: {exc}", file=sys.stderr)
+            return 3
     if os.getenv("WMSCRAPER_FETCH_PROVIDER"):  # chosen at deployment (Key Vault holds the matching credential)
         s.raw.setdefault("fetch", {})["provider"] = os.environ["WMSCRAPER_FETCH_PROVIDER"]
     if args.budget:

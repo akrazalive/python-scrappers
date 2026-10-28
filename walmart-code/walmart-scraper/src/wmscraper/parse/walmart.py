@@ -416,6 +416,9 @@ class ProductDetail:
     image_url: str
     location: dict = field(default_factory=dict)   # product's selected pickup location (explicit)
     fulfillment_type: str = ""
+    fulfillment_options: list = field(default_factory=list)   # [(fulfillment, storeId)] from fulfillmentSummary
+    price_value: float | None = None                            # priceInfo.currentPrice.price (number)
+    availability: str = ""
 
 
 def parse_product(html: str, final_url: str = "") -> ProductDetail:
@@ -463,6 +466,10 @@ def parse_product(html: str, final_url: str = "") -> ProductDetail:
                   "intent": clean_text(dig(product, "location", "intent")),
                   "postalCode": clean_text(dig(product, "location", "postalCode"))},
         fulfillment_type=clean_text(product.get("fulfillmentType")),
+        fulfillment_options=[(clean_text(o.get("fulfillment")), str(o.get("storeId") or ""))
+                             for o in product.get("fulfillmentSummary") or [] if isinstance(o, dict)],
+        price_value=(lambda v: float(v) if isinstance(v, (int, float)) else None)((pi.get("currentPrice") or {}).get("price")),
+        availability=clean_text(product.get("availabilityStatus")),
     )
 
 

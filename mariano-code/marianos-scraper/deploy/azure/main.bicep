@@ -24,7 +24,7 @@ param cronExpression string = '0 7 * * 2,5'
 param image string = 'docker.io/library/python:3.12-slim'
 
 @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
-param releaseBlob string = 'releases/marianos-scraper-1.1.4-src.zip'
+param releaseBlob string = 'releases/marianos-scraper-1.1.5-src.zip'
 
 @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
 param assignRoles bool = false
@@ -203,9 +203,8 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
       secrets: [for n in providerSecrets: { name: n, keyVaultUrl: '${kv.properties.vaultUri}secrets/${n}', identity: identity.id }]
     }
     template: {
-      // nobrl: SQLite checkpoints on the SMB share fail with 'database is locked' unless byte-range locks are off
-      // (one execution at a time: parallelism 1 + the run lock, so no concurrent writers)
-      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name, mountOptions: 'nobrl' } ]
+      // default SMB mount (byte-range locks stay ON): SQLite never runs on the share – see MSCRAPER_CHECKPOINT_MODE
+      volumes: [ { name: 'state', storageType: 'AzureFile', storageName: envStorage.name } ]
       containers: [
         {
           name: 'scraper'
@@ -219,6 +218,9 @@ resource job 'Microsoft.App/jobs@2024-03-01' = if (deployJob) {
             { name: 'MSCRAPER_ARGS', value: scheduleEnabled ? 'run-all' : defaultArgs }
             { name: 'MSCRAPER_OUTPUT_BACKEND', value: 'azure_blob' }
             { name: 'MSCRAPER_STATE_DIR', value: '/state' }
+            // SQLite works on local disk; consistent snapshots + manifest (commit point) go to the share (checkpoint.py)
+            { name: 'MSCRAPER_CHECKPOINT_MODE', value: 'snapshot' }
+            { name: 'MSCRAPER_LOCAL_WORK', value: '/tmp/mscraper-work' }
             { name: 'AZURE_STORAGE_ACCOUNT_URL', value: storage.properties.primaryEndpoints.blob }
             { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
             { name: 'RELEASE_BLOB', value: releaseBlob }

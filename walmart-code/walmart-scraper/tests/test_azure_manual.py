@@ -32,10 +32,9 @@ def test_status_reports_missing_credential_by_name_only(site, capsys, monkeypatc
 
 
 def test_verify_store_stops_at_its_request_cap(site, capsys):
-    # the store page uses the one allowed request; the canary is refused by the cap, so the probe fails closed
+    # the store page uses the one allowed request; the canary request is refused by the cap: the probe fails closed
     assert main(["--config", str(site), "verify-store", "--location", "test-store", "--max-requests", "1"]) == 1
-    cap = capsys.readouterr()
-    assert "request budget of 1 reached" in cap.out and "canary" in cap.err
+    assert "request budget of 1 reached" in capsys.readouterr().err
 
 
 def test_infrastructure_template_is_manual_and_needs_no_role_rights_or_credential():
@@ -71,7 +70,9 @@ def test_probe_total_holds_across_repeated_executions(site, capsys):
     assert state["used"] == 3 and state["total"] == 3
     ledger = st.get_bytes("_budgets/probe.jsonl").decode().splitlines()
     assert len(ledger) == 3 and [json.loads(x)["n"] for x in ledger] == [1, 2, 3]
-    assert TotalBudget(st, "probe", 3).remaining == 0
+    from wmscraper.lock import live_lock
+    with live_lock(st):
+        assert TotalBudget(st, "probe", 3).remaining == 0
     capsys.readouterr()
 
 
@@ -94,15 +95,18 @@ def test_retries_count_against_the_total_and_the_cap_cannot_be_raised(site):
             AlwaysFails.sent += 1
             raise FetchError("HTTP 500", "http")
 
-    f = AlwaysFails(s, s.location("test-store"))
-    f.total_budget = TotalBudget(st, "retrytest", 4)
-    with pytest.raises(FetchError, match="total budget 'retrytest' of 4"):
-        asyncio.run(f.get("https://www.walmart.com/ip/1"))
-    assert AlwaysFails.sent == 4                                   # 1 attempt + 3 retries, then refused
-    f2 = AlwaysFails(s, s.location("test-store"))                  # a restarted process: nothing left
-    f2.total_budget = TotalBudget(st, "retrytest", 4)
-    with pytest.raises(FetchError, match="used up"):
-        asyncio.run(f2.get("https://www.walmart.com/ip/1"))
-    assert AlwaysFails.sent == 4
-    with pytest.raises(ValueError, match="never raised"):
-        TotalBudget(st, "retrytest", 40)
+    from wmscraper.lock import live_lock
+    with live_lock(st):
+        f = AlwaysFails(s, s.location("test-store"))
+        f.total_budget = TotalBudget(st, "retrytest", 4)
+        with pytest.raises(FetchError, match="total budget 'retrytest' of 4"):
+            asyncio.run(f.get("https://www.walmart.com/ip/1"))
+        assert AlwaysFails.sent == 4                               # 1 attempt + 3 retries, then refused
+    with live_lock(st):
+        f2 = AlwaysFails(s, s.location("test-store"))              # a restarted process: nothing left
+        f2.total_budget = TotalBudget(st, "retrytest", 4)
+        with pytest.raises(FetchError, match="used up"):
+            asyncio.run(f2.get("https://www.walmart.com/ip/1"))
+        assert AlwaysFails.sent == 4
+        with pytest.raises(ValueError, match="never raised"):
+            TotalBudget(st, "retrytest", 40)

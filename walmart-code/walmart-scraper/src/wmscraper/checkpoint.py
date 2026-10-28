@@ -58,8 +58,10 @@ class Checkpoint:
 
     @contextmanager
     def tx(self):
+        from .lock import check_active
         try:
             yield self.db
+            check_active()                  # lease lost -> roll back instead of committing
             self.db.commit()
         except Exception:
             self.db.rollback()

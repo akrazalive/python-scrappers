@@ -10,7 +10,7 @@ from mscraper.budget import TotalBudget, parse_spec
 from mscraper.fetch import FetchError, FixtureFetcher
 
 
-def test_total_budget_persists_refuses_and_cannot_be_raised(tmp_path):
+def test_total_budget_persists_refuses_and_cannot_be_raised(tmp_path, live):
     b = TotalBudget(tmp_path, "test1", 3, command="x")
     for _ in range(2):
         b.take("u1")
@@ -27,7 +27,7 @@ def test_total_budget_persists_refuses_and_cannot_be_raised(tmp_path):
     assert parse_spec("test2:300") == ("test2", 300)
 
 
-def test_retries_and_resumed_processes_count_against_the_same_total(settings, location, tmp_path):
+def test_retries_and_resumed_processes_count_against_the_same_total(settings, location, tmp_path, live):
     def fetcher():
         f = FixtureFetcher(settings, location, fixtures=dict(PAGES), root=str(FIX))
         f.total_budget = TotalBudget(tmp_path, "test2", 5)

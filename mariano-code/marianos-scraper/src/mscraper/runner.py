@@ -505,6 +505,7 @@ class Runner:
             prev.append({**self.fetcher.stats, "ended_at": _now()})
             self.ck.set("fetch_stats_before_resume", prev)
             await self.fetcher.close()
+            self.ck.flush(force=True)
         runtime = time.monotonic() - t0 + float(self.ck.get("runtime_before_resume", 0))
         self.ck.set("runtime_before_resume", runtime)
         return self.finish(runtime, publish)
@@ -571,6 +572,7 @@ class Runner:
             (self.dir / name).write_text(body, encoding="utf-8")
             self.storage.put_bytes(f"{base}/{name}", body.encode("utf-8"))
         status = "validation_failed"
+        self.ck.flush(force=True)       # durable checkpoint before anything is published
         if v.ok and not demo and publish:
             extras = {k: files[k] for k in ("observations.json", "coverage.json") if k in files}
             self.storage.publish(self.loc.key, self.run_id, records, report, extras=extras)
@@ -579,6 +581,7 @@ class Runner:
             status = "valid_not_published_demo" if demo else "valid_not_published"
         self.ck.set("final_status", status)
         self.ck.event("final_status", {"status": status, "records": len(records), "errors": v.errors[:20]})
+        self.ck.flush(force=True)
         log.info("run finished", extra={"status": status, "records": len(records), "errors": v.errors[:10]})
         return {"run_id": self.run_id, "status": status, "records": len(records), "dir": str(self.dir),
                 "errors": v.errors, "warnings": v.warnings}

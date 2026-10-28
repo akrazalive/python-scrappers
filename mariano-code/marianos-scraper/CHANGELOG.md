@@ -57,6 +57,30 @@ Why the code changed between collection and delivery of entry #69:
 * `tools/reconcile_v100_runs.py` – machine-readable coverage / remaining-gap reconciliation of the delivered entry #69
   run and the stopped query-expansion run, from their own checkpoints.
 
+## 1.1.5 (2026-10-28) – client review of 27 Oct (stop rule, exclusive ownership, lease loss, checkpoints, hashes)
+
+Offline only; no live request. Details and tests: docs/RECOVERY-AND-LOCKING.md, tests/test_v115_safety.py
+(18 new tests, 64 in total).
+1. **Stop rule** – `bounded-test` stops at the first non-zero step or terminal error; later steps are not started.
+   Terminal provider errors (401/403 auth, 400/404/422 compatibility) and store/budget/lock errors are never retried.
+2. **Exclusive ownership** – `lock.live_lock`: one Blob lease for every command that can send provider requests (all
+   tests, both locations); an overlapping execution exits 3 before any request. Real adapters refuse to start
+   without it. `TotalBudget` requires it, re-reads and validates its state before every request (no cache), writes
+   ledger-then-state, and fails closed on any inconsistency. The existing `test1` budget (0/19) is kept unchanged.
+3. **Lease loss** – a failed renewal marks the lock lost; requests, checkpoint commits/snapshots and every
+   publication step check it and stop.
+4. **Checkpoints** – `MSCRAPER_CHECKPOINT_MODE=snapshot` (Azure): SQLite on local disk, SHA-256-checked snapshots +
+   atomically replaced manifest on the share, integrity-checked restore that fails closed. Replaces the proposed
+   `nobrl` mount option from 1.1.4 item 4 (withdrawn – byte-range locks stay on and SQLite never runs on the share).
+5. **Hashes** – `release_sha256` (code + config + deploy + requirements + Dockerfile) and `deploy_sha256` in
+   SOURCE_FINGERPRINT.txt, version_info and every run's provenance; `run_test.sh collect` writes `timestamps.json`
+   (Azure execution start/end separate from controller times).
+6. **Classic API request (proposed, not approved, not run)** – `fetch.oxylabs_realtime`: the 1.1.0 body
+   `{"source": "kroger", "url": <marianos.com URL>, "store_id": …}` is not a documented Classic request and is
+   withdrawn. Search pages: documented `kroger_search` (`query`, `store_id` 53100544, `fulfillment_type in_store`),
+   which targets kroger.com – whether it serves the Mariano's store with its own prices is unverified and is what
+   Test 1 checks. Other pages: `url` alone (no documented store parameters; the page must still pass the store check).
+
 ## 1.1.4 (2026-10-27) – zero-request deployment check before the live tests
 
 1. **`selfcheck`** (`cli.py`, `run_test.sh selfcheck`): 0 provider requests. Reports whether the Key Vault-backed
@@ -66,7 +90,7 @@ Why the code changed between collection and delivery of entry #69:
 2. **Log Analytics daily cap in the template** (`main.bicep`: `workspaceCapping.dailyQuotaGb 0.03`), so the job
    deployment cannot reset the cap that was set after the infrastructure step.
 3. Tests: `tests/test_v114_selfcheck.py` (2 offline tests; 46 in total).
-4. **Proposed, not yet deployed – SQLite on the state share** (`main.bicep`: volume `mountOptions: 'nobrl'`). Live Test 1
+4. **Proposed, never deployed, withdrawn in 1.1.5 – SQLite on the state share** (`main.bicep`: volume `mountOptions: 'nobrl'`). Live Test 1
    on 27 Oct failed before any provider request with `sqlite3.OperationalError: database is locked`: the checkpoint
    database is on the Azure Files (SMB) share, where SQLite's byte-range locks fail. `nobrl` turns those locks off;
    one execution at a time (parallelism 1 + run lock) means there are no concurrent writers. Template only –

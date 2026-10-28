@@ -22,6 +22,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+class ConflictError(RuntimeError):
+    """A conditional write lost: the object changed since it was read (another writer)."""
+
+
 class Storage:
     def put_bytes(self, key: str, data: bytes) -> None: ...
     def get_bytes(self, key: str) -> bytes | None: ...
@@ -36,6 +40,15 @@ class Storage:
         raw = self.get_bytes(key)
         return json.loads(raw) if raw else default
 
+    # ------------------------------------------------------------------ compare-and-swap (persistent budgets)
+    def get_bytes_etag(self, key: str) -> tuple[bytes | None, str | None]:
+        raise NotImplementedError
+
+    def put_bytes_if(self, key: str, data: bytes, etag: str | None) -> None:
+        """Write only if the object is unchanged since `etag` was read (etag None = must not exist yet).
+        Raises ConflictError otherwise – two writers can never both succeed."""
+        raise NotImplementedError
+
     # ------------------------------------------------------------------ publication
     def publish(self, location: str, run_id: str, records: list[dict], report: dict) -> dict:
         body = json.dumps(records, ensure_ascii=False, indent=2).encode("utf-8")
@@ -47,6 +60,8 @@ class Storage:
             "published_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         }
         base = f"{location}/latest"
+        from .lock import check_active
+        check_active()                     # lease lost -> nothing is published
         # 1) stage
         self.put_bytes(f"{base}/.staging-records.json", body)
         self.put_json(f"{base}/.staging-report.json", report)
@@ -55,8 +70,10 @@ class Storage:
             self.copy(f"{base}/records.json", f"{base}/previous-records.json")
             self.copy(f"{base}/manifest.json", f"{base}/previous-manifest.json")
         # 3) swap in; manifest written last = commit point
+        check_active()
         self.copy(f"{base}/.staging-records.json", f"{base}/records.json")
         self.copy(f"{base}/.staging-report.json", f"{base}/report.json")
+        check_active()                     # the commit point is never written without ownership
         self.put_json(f"{base}/manifest.json", manifest)
         return manifest
 
@@ -92,6 +109,26 @@ class LocalStorage(Storage):
     def local_path(self, key):
         return self._p(key)
 
+    def get_bytes_etag(self, key):
+        data = self.get_bytes(key)
+        return data, (hashlib.sha256(data).hexdigest() if data is not None else None)
+
+    def put_bytes_if(self, key, data, etag):
+        p = self._p(key)
+        mutex = p.with_name(p.name + ".cas")
+        try:
+            fd = os.open(mutex, os.O_CREAT | os.O_EXCL | os.O_WRONLY)   # short critical section, atomic create
+        except FileExistsError:
+            raise ConflictError(f"{key}: concurrent writer")
+        try:
+            _, current = self.get_bytes_etag(key)
+            if current != etag:
+                raise ConflictError(f"{key}: changed since read (expected {etag}, found {current})")
+            self.put_bytes(key, data)
+        finally:
+            os.close(fd)
+            mutex.unlink(missing_ok=True)
+
 
 class BlobStorage(Storage):
     def __init__(self, container: str):
@@ -118,6 +155,33 @@ class BlobStorage(Storage):
 
     def copy(self, src, dst):
         self.put_bytes(dst, self.get_bytes(src) or b"")
+
+    def get_bytes_etag(self, key):
+        from azure.core.exceptions import ResourceNotFoundError
+
+        b = self.cc.get_blob_client(key)
+        try:
+            d = b.download_blob()
+        except ResourceNotFoundError:
+            return None, None
+        return d.readall(), d.properties.etag
+
+    def put_bytes_if(self, key, data, etag):
+        from azure.core import MatchConditions
+        from azure.core.exceptions import HttpResponseError, ResourceExistsError, ResourceModifiedError
+
+        b = self.cc.get_blob_client(key)
+        try:
+            if etag is None:
+                b.upload_blob(data, overwrite=False)            # create only if absent
+            else:
+                b.upload_blob(data, overwrite=True, etag=etag, match_condition=MatchConditions.IfNotModified)
+        except (ResourceExistsError, ResourceModifiedError) as exc:
+            raise ConflictError(f"{key}: changed since read") from exc
+        except HttpResponseError as exc:
+            if exc.status_code in (409, 412):
+                raise ConflictError(f"{key}: changed since read") from exc
+            raise
 
 
 def build_storage(settings) -> Storage:
