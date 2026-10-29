@@ -1,0 +1,45 @@
+MARIANO'S #69 — 1.1.6 focused corrected revision
+
+This is an offline-only package: no provider request, Azure deployment, or budget use was made.
+The client-side Classic authentication diagnostic is acknowledged as separate evidence: it does not
+prove Mariano's/Kroger entitlement, account rate, banner support, local prices, or scraper behavior.
+This package itself made no provider request, Azure deployment, or budget use.
+
+The requested Mariano's corrections are implemented:
+- retailer 401/403 inside a provider-200 envelope is terminal `refused` and the body is saved;
+  provider authentication remains `auth`, and other HTTP errors remain retryable;
+- Classic mapping preserves the supported brand semantics and rejects page > 1, coupon filtering,
+  and unknown parameters as `compat` instead of silently repeating page 1;
+- returned banner, store, fulfillment, and price context are checked for the configured location;
+- local test work is isolated with `MSCRAPER_LOCAL_WORK`.
+
+Offline validation: 67 tests passed.
+
+Fingerprints:
+code_sha256 7353f2133c72205c5b813c46bbcb832caedb16280e61346d57897b6631f87b6a
+release_sha256 9fb2fc8f8c57f0cb508c7013c7ae20329d050aa37f8c9efabaf200918a46e322
+deploy_sha256 0382cb619b0ad5ee11c4e829c90837d8a1b5a5414b5623a599ed8cebb796d96c
+
+Classic search uses exactly:
+kroger_search {query, store_id 53100544, fulfillment_type in_store, brand}
+`page > 1`, `savings=Coupons`, and unknown query parameters are rejected as unsupported. Test 2
+uses page 2 and brand slices, so Classic can only be partial or stop. A Crystal Lake pass does not
+prove Vernon Hills; Vernon Hills remains disabled and is a separate verify.
+
+The configured Crystal Lake location is 53100544 / 60014. Vernon Hills 53100502 / 60061 remains
+disabled and separate; a Crystal Lake pass cannot establish Vernon Hills.
+
+The test1 budget remains 0 of 19 in the last supplied state. Please confirm that `kroger_search` is
+entitled on the account and confirm its rate, then give a go/no-go. The exact proposed route is:
+
+kroger_search {query, store_id 53100544, fulfillment_type in_store, brand}
+
+Test 2 uses page 2 and brand slices. Because page > 1 is explicitly unsupported on Classic, Test 2
+can only be partial or stop; it must not count page-1 repetition as pagination evidence.
+
+After your OK:
+1. PROVIDER=oxylabs_realtime ./deploy/azure/deploy.sh <sub> scraper-contest-asif-test job
+2. ./deploy/azure/run_test.sh <sub> scraper-contest-asif-test selfcheck
+3. … test1, then … test2
+
+Proposed delivery checkpoint: Fri 30 Oct, 17:00 CDT.

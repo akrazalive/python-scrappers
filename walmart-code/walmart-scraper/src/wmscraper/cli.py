@@ -93,6 +93,7 @@ def cmd_verify_store(args, s):
         from .fetch import build_fetcher
 
         run.fetcher = build_fetcher(s, loc)
+        run.fetcher.on_refusal = lambda res: run._archive("refused", res, "target access denial", always=True)
         await run.fetcher.start()
         try:
             await run.verify_store()

@@ -6,7 +6,7 @@ import platform
 import sys
 from pathlib import Path
 
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 _SRC = Path(__file__).resolve().parent
 _ROOT = _SRC.parents[1]
 # release_sha256 covers everything that decides what a deployment does (client review 27 Oct: code_sha256 alone

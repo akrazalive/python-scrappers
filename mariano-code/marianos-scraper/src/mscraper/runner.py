@@ -7,6 +7,8 @@ with the SHA-256 of the exact response and a gzip excerpt of its price-bearing p
 from __future__ import annotations
 
 import asyncio
+import gzip
+import hashlib
 import json
 import logging
 import re
@@ -51,6 +53,7 @@ class Runner:
         self.dir.mkdir(parents=True, exist_ok=True)
         self.ck = Checkpoint(self.dir / "checkpoint.sqlite")
         self.fetcher = fetcher or build_fetcher(settings, location)
+        self.fetcher.on_refusal = self._archive_refusal
         self.census: dict[str, dict] = self.ck.get("offer_census", {})
         self.page_size = int(settings.get("crawl.page_size", 24))
         self.max_pages = int(settings.get("crawl.max_pages_per_query", 42))
@@ -58,6 +61,18 @@ class Runner:
         self.skip_shelves = [re.compile(p, re.I) for p in settings.get("crawl.skip_shelf_patterns") or []]
         self.raw_per_cat = int(settings.get("evidence.raw_pages_per_category", 2))
         self._raw_count: dict[str, int] = {}
+
+    def _archive_refusal(self, res) -> None:
+        raw = res.html.encode("utf-8")
+        sha = hashlib.sha256(raw).hexdigest()
+        directory = self.dir / "evidence" / "refusals"
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / f"{sha}.html.gz").write_bytes(gzip.compress(raw))
+        (directory / f"{sha}.json").write_text(
+            json.dumps({"url": res.url, "status": res.status, "bytes": len(raw), "sha256": sha},
+                       indent=2),
+            encoding="utf-8",
+        )
 
     # ------------------------------------------------------------------ helpers
     def _ctx(self, category: str, sub: str) -> dict:
@@ -143,6 +158,7 @@ class Runner:
             "search_request_pinned_to_store": sp.request_location == self.loc.store_id,
             "zipcode_matches": (not self.loc.zipcode) or st.zipcode == self.loc.zipcode,
             "address_matches": (not self.loc.expected_address) or self.loc.expected_address.lower() in st.full_address.lower(),
+            "banner_matches": "mariano" in st.banner.lower(),
             "prices_from_store": all(((sp.products.get(u, {}).get("data") or {}).get("price") or {}).get("storePrices", {})
                                      .get("sourceLocationId") == self.loc.store_id for u in sp.upcs if u in sp.products),
         }

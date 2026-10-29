@@ -28,12 +28,13 @@ class FetchResult:
     status: int
     html: str
     elapsed: float
+    raw_response: str = ""
 
 
 class FetchError(Exception):
     def __init__(self, message: str, kind: str = "error"):
         super().__init__(message)
-        self.kind = kind  # http | challenge | timeout | error
+        self.kind = kind  # http | challenge | timeout | error | auth | refused | compat | lock
 
 
 def fill(template, **values):
@@ -52,7 +53,7 @@ def fill(template, **values):
 
 # Never retried: a rejected credential (401/403) or an unsupported request (400/404/422) cannot be fixed by retrying;
 # store/budget/lock failures stop the work. 429 / 5xx / timeouts / challenges stay retryable.
-TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
+TERMINAL_KINDS = {"auth", "compat", "refused", "store", "budget", "lock"}
 
 
 def provider_error(status: int, text: str) -> "FetchError":
@@ -102,6 +103,7 @@ class Fetcher:
         self._lock = asyncio.Lock()
         self.budget = int(settings.get("fetch.max_requests_per_run", 0))  # 0 = unlimited
         self.total_budget = None  # persistent TotalBudget (budget.py), shared by every process of one approved test
+        self.on_refusal = None
         self.stats = {"requests": 0, "retries": 0, "challenges": 0, "http_errors": 0, "slow": 0}
 
     async def start(self):  # pragma: no cover - overridden where needed
@@ -130,9 +132,13 @@ class Fetcher:
                 raise FetchError(str(exc), "lock") from exc
             if self.budget and self.stats["requests"] >= self.budget:
                 raise FetchError(f"request budget of {self.budget} reached (fetch.max_requests_per_run)", "budget")
+            await self._pace()
+            try:
+                lock.check_active()             # re-check after pacing, immediately before reserving/sending
+            except lock.LockLost as exc:
+                raise FetchError(str(exc), "lock") from exc
             if self.total_budget is not None:  # counted and saved before the request is sent, retries included
                 self.total_budget.take(url, self.loc.store_id)
-            await self._pace()
             self.stats["requests"] += 1
             try:
                 res = await self._fetch_once(url)
@@ -148,6 +154,10 @@ class Fetcher:
                     log.warning("slow_response", extra={"url": url, "seconds": round(res.elapsed, 1)})
                 if res.status >= 400:
                     self.stats["http_errors"] += 1
+                    if res.status in (401, 403):
+                        if self.on_refusal:
+                            self.on_refusal(res)
+                        raise FetchError(f"target refused HTTP {res.status}", "refused")
                     last_exc = FetchError(f"HTTP {res.status}", "http")
                 elif detect_challenge(res.html, res.final_url):
                     self.stats["challenges"] += 1
@@ -194,7 +204,7 @@ class OxylabsFetcher(Fetcher):
         res = (r.json().get("results") or [{}])[0]
         content = res.get("content") or ""
         return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200),
-                           content if isinstance(content, str) else "", time.monotonic() - t0)
+                           content if isinstance(content, str) else "", time.monotonic() - t0, r.text)
 
 
 class OxylabsWebApiFetcher(Fetcher):

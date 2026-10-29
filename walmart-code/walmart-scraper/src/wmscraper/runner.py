@@ -70,6 +70,8 @@ class Run:
         self.crawl_date = self.ck.get("crawl_date") or datetime.now(timezone.utc).date().isoformat()
         self.ck.set("crawl_date", self.crawl_date)
         self.store: dict = self.ck.get("store_verification") or {}
+        self.fetcher = build_fetcher(self.s, self.loc)
+        self.fetcher.on_refusal = lambda res: self._archive("refused", res, "target access denial", always=True)
 
     # ------------------------------------------------------------------ helpers
     def _archive(self, kind: str, res, note: str = "", always: bool = False) -> dict | None:
@@ -143,7 +145,6 @@ class Run:
                                          "items_already_kept": self.ck.count_items(), **version_info()})
             self.ck.event("session_start", {"resumed": resumed, "items_already_kept": self.ck.count_items(),
                                             **version_info()})  # which exact source ran each part of the run
-            self.fetcher = build_fetcher(self.s, self.loc)
             await self.fetcher.start()
             self.aborted = ""
             try:

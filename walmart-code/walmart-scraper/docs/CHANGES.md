@@ -1,5 +1,14 @@
 # Changes
 
+## 1.1.9 (2026-10-29) – lease safety and target refusal evidence
+
+1. The lease is checked again after pacing immediately before budget reservation and the provider send; a lost lease
+   raises terminal `lock` and makes zero provider calls.
+2. Target HTTP 401/403 responses inside provider results are terminal `refused` errors and are archived with raw body,
+   SHA-256, and returned store context. Provider 401/403 remain `auth`; 503 remains retryable.
+3. The Classic probe remains limited to `walmart_product` canaries. The listing route is unresolved; `walmart_search`
+   is a separate later evaluation and is not claimed to work.
+
 ## 1.1.8 (2026-10-28) – client review of 28 Oct (budget safety, canary rules, fulfillment, evidence, --categories)
 
 Offline only; no live or Azure request. Tests: `tests/test_v118_safety.py` (22 new, 71 in total).

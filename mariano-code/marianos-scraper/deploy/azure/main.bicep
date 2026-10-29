@@ -24,7 +24,7 @@ param cronExpression string = '0 7 * * 2,5'
 param image string = 'docker.io/library/python:3.12-slim'
 
 @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
-param releaseBlob string = 'releases/marianos-scraper-1.1.5-src.zip'
+param releaseBlob string = 'releases/marianos-scraper-1.1.6-src.zip'
 
 @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
 param assignRoles bool = false

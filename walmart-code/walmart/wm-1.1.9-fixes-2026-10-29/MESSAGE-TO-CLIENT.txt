@@ -1,0 +1,34 @@
+WALMART #32/#38 — 1.1.9 focused corrected revision
+
+The client-side Classic authentication diagnostic is acknowledged as separate evidence: it does not
+prove Walmart route entitlement, account rate, local listing results, product prices, or scraper
+behavior. This package itself made no provider request, Azure deployment, or budget use.
+
+The two requested fixes are implemented and covered by regression tests:
+the lease is checked again after pacing immediately before reservation/send, and target 401/403
+responses are archived as terminal `refused` evidence. Provider 401/403 remain `auth`; 503 remains
+retryable. The bounded verification path also archives target refusal evidence before returning
+nonzero.
+
+Offline validation: 74 tests passed.
+
+Fingerprint:
+source_sha256 9810d691c7a4ff4ee7c0c930a9cf5b7a263f2b313190e39eabd0b2a0333c3064
+
+The store page probe body is `universal`. The canary product body is:
+{"source":"walmart_product","product_id":"10450114","store_id":"100","delivery_zip":"72712","fulfillment_type":"pickup"}
+
+The listing route is still an open risk on Classic. I do not claim it works. `walmart_search` is a
+separate later evaluation, documented with store localisation. The canary route remains
+`walmart_product`; no new store claim is made.
+
+Budget remains 3 of 10 in the last supplied state; the #4376 results remain recorded as failures.
+Please confirm
+`walmart_product` entitlement and rate, then give a go/no-go.
+
+After your OK:
+1. PROVIDER=oxylabs ./deploy/azure/deploy.sh <sub> scraper-contest-asif-test job
+2. ./deploy/azure/run_test.sh <sub> scraper-contest-asif-test selfcheck
+3. ./deploy/azure/run_test.sh <sub> scraper-contest-asif-test probe (7 remaining requests)
+
+Proposed delivery checkpoint: Fri 30 Oct, 17:00 CDT.

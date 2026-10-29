@@ -24,12 +24,14 @@ class FetchResult:
     status: int
     html: str
     elapsed: float
+    raw_response: str = ""
 
 
 class FetchError(Exception):
     def __init__(self, message: str, kind: str = "error"):
         super().__init__(message)
         self.kind = kind  # http | blocked | timeout | budget | error | auth | compat | store | lock
+        self.result: FetchResult | None = None
 
     @property
     def terminal(self) -> bool:
@@ -38,7 +40,7 @@ class FetchError(Exception):
 
 # Never retried, and a bounded test stops at the first one: retrying cannot fix a rejected credential, an unsupported
 # request (provider 400/404/422), a wrong store/fulfillment context, a used-up budget or a lost exclusive lock.
-TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
+TERMINAL_KINDS = {"auth", "compat", "refused", "store", "budget", "lock"}
 
 
 def provider_error(status: int, text: str) -> "FetchError":
@@ -72,6 +74,7 @@ class Fetcher:
         self.min_bytes = int(settings.get("fetch.min_page_bytes", 50000))
         self.budget = int(settings.get("fetch.max_requests_per_run", 0))
         self.total_budget = None   # budget.TotalBudget shared by all commands of one bounded test (persists on disk)
+        self.on_refusal = None
         self.concurrency = int(os.getenv("MSCRAPER_CONCURRENCY") or settings.get("fetch.concurrency", 4))
         self.sem = asyncio.Semaphore(self.concurrency)
         self._last = 0.0
@@ -119,6 +122,12 @@ class Fetcher:
                         self.stats["slow"] += 1
                         log.warning("slow response", extra={"url": url, "seconds": round(res.elapsed, 1)})
                     if res.status >= 400:
+                        if res.status in (401, 403):
+                            exc = FetchError(f"target refused HTTP {res.status}", "refused")
+                            exc.result = res
+                            if self.on_refusal:
+                                self.on_refusal(res)
+                            raise exc
                         raise FetchError(f"HTTP {res.status}", "http")
                     if len(res.html) < self.min_bytes:
                         raise FetchError(f"response too small ({len(res.html)} bytes) – blocked or empty", "blocked")
@@ -257,7 +266,7 @@ class OxylabsRealtimeFetcher(Fetcher):
         res = (r.json().get("results") or [{}])[0]
         content = res.get("content") or ""
         status = int(res.get("status_code") or 200)
-        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed)
+        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text)
 
 
 def realtime_payload(settings, location, url: str) -> dict:
@@ -267,11 +276,28 @@ def realtime_payload(settings, location, url: str) -> dict:
     from urllib.parse import parse_qs, urlparse
 
     u = urlparse(url)
-    query = (parse_qs(u.query).get("query") or [""])[0]
-    tpl = settings.get("fetch.oxylabs_realtime.search_payload") if (u.path.rstrip("/").endswith("/search") and query) else None
+    params = parse_qs(u.query, keep_blank_values=True)
+    query = (params.get("query") or [""])[0]
+    is_search = u.path.rstrip("/").endswith("/search") and bool(query)
+    if is_search:
+        allowed = {"query", "searchType", "brandName", "page", "savings"}
+        unknown = set(params) - allowed
+        unsupported = set(unknown)
+        if int((params.get("page") or ["1"])[0] or 1) > 1:
+            unsupported.add("page")
+        if "savings" in params:
+            unsupported.add("savings")
+        if unsupported:
+            names = "/".join(sorted(unsupported))
+            raise FetchError(f"unsupported on Classic kroger_search: {names}", "compat")
+    tpl = settings.get("fetch.oxylabs_realtime.search_payload") if is_search else None
     if not tpl:
         tpl = settings.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
-    return _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
+    body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
+    brand = (params.get("brandName") or [""])[0]
+    if is_search and brand:
+        body["brand"] = brand
+    return body
 
 
 def build_fetcher(settings, location, **kw) -> Fetcher:

@@ -3,6 +3,16 @@
 All times UTC. `code_sha256` = SHA-256 over every `src/mscraper/*.py` file (path + bytes, sorted), as computed by
 `mscraper.version.code_sha256()` and printed by `tools/package_source.py`.
 
+## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
+
+1. Retailer HTTP 401/403 responses inside provider-200 results are terminal `refused` errors and are archived under
+   each run's refusal evidence. Provider authentication failures remain `auth`; other HTTP failures remain retryable.
+2. Classic `kroger_search` maps `brandName` to `brand` and rejects pagination beyond page 1, coupon filtering, and
+   unknown query parameters as `compat`; it never silently sends page 1 instead.
+3. Store verification now requires the returned banner to identify Mariano's. Crystal Lake verification does not
+   imply Vernon Hills verification; Vernon Hills remains disabled.
+4. Tests isolate local work files with `MSCRAPER_LOCAL_WORK`.
+
 ## Runs and the code that produced them
 
 | Run | Code at collection | Scope | Result |

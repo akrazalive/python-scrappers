@@ -1,0 +1,288 @@
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/CHANGELOG.md C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/CHANGELOG.md
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/CHANGELOG.md	2026-10-28 08:49:26.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/CHANGELOG.md	2026-10-29 08:58:54.000000000 +0500
+@@ -3,6 +3,16 @@
+ All times UTC. `code_sha256` = SHA-256 over every `src/mscraper/*.py` file (path + bytes, sorted), as computed by
+ `mscraper.version.code_sha256()` and printed by `tools/package_source.py`.
+ 
++## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
++
++1. Retailer HTTP 401/403 responses inside provider-200 results are terminal `refused` errors and are archived under
++   each run's refusal evidence. Provider authentication failures remain `auth`; other HTTP failures remain retryable.
++2. Classic `kroger_search` maps `brandName` to `brand` and rejects pagination beyond page 1, coupon filtering, and
++   unknown query parameters as `compat`; it never silently sends page 1 instead.
++3. Store verification now requires the returned banner to identify Mariano's. Crystal Lake verification does not
++   imply Vernon Hills verification; Vernon Hills remains disabled.
++4. Tests isolate local work files with `MSCRAPER_LOCAL_WORK`.
++
+ ## Runs and the code that produced them
+ 
+ | Run | Code at collection | Scope | Result |
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/SOURCE_FINGERPRINT.txt C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/SOURCE_FINGERPRINT.txt
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/SOURCE_FINGERPRINT.txt	2026-10-28 08:49:26.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/SOURCE_FINGERPRINT.txt	2026-10-29 09:00:52.000000000 +0500
+@@ -1,8 +1,8 @@
+-version=1.1.5
+-code_sha256=99eafc35962c4fec3abbfab7f28172f15b78d0dd4f533b1aae9b18f817938268
+-release_sha256=f1f7b0cdead650e5160000cdc8c6e62d02b282306270ece42bd36d14b0428256   # src + config + deploy + requirements.txt + requirements.lock + Dockerfile
+-deploy_sha256=fe9215d89659aabd57a1481233a364042c95e5ea5c5d826db26b6d053f1641a8   # deploy/ (Azure template + scripts)
+-deploy_sha256[main.bicep]=de5f9776864e2e45c2df1c23392813e1b7ea91895a43d9586e2631423b5076a2
++version=1.1.6
++code_sha256=7353f2133c72205c5b813c46bbcb832caedb16280e61346d57897b6631f87b6a
++release_sha256=9fb2fc8f8c57f0cb508c7013c7ae20329d050aa37f8c9efabaf200918a46e322   # src + config + deploy + requirements.txt + requirements.lock + Dockerfile
++deploy_sha256=0382cb619b0ad5ee11c4e829c90837d8a1b5a5414b5623a599ed8cebb796d96c   # deploy/ (Azure template + scripts)
++deploy_sha256[main.bicep]=ec775fe407a91636953a2c23f22d8aeb6564e8970c739ab91df10d848f0771f6
+ config_sha256[settings.yaml]=e3b0820c1cfe2ba9714eff3b78983221c61a96b2dbb6a769a291ba39ba04ceb1
+ config_sha256[categories.csv]=606133cb12548d3f7f437ea9e0a056d88d0dd7f621ec0e1c210bb2fc20044da4
+ config_sha256[locations.yaml]=fc3ce2f2c9ebf2f6df0b15bc83b5e59eb3194bed55057a595318926931904a8b
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/deploy/azure/main.bicep C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/deploy/azure/main.bicep
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/deploy/azure/main.bicep	2026-10-28 08:29:38.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/deploy/azure/main.bicep	2026-10-29 08:38:36.000000000 +0500
+@@ -24,7 +24,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
+-param releaseBlob string = 'releases/marianos-scraper-1.1.5-src.zip'
++param releaseBlob string = 'releases/marianos-scraper-1.1.6-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/src/mscraper/fetch.py C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/src/mscraper/fetch.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/src/mscraper/fetch.py	2026-10-28 08:46:44.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/src/mscraper/fetch.py	2026-10-29 08:38:36.000000000 +0500
+@@ -24,12 +24,14 @@
+     status: int
+     html: str
+     elapsed: float
++    raw_response: str = ""
+ 
+ 
+ class FetchError(Exception):
+     def __init__(self, message: str, kind: str = "error"):
+         super().__init__(message)
+         self.kind = kind  # http | blocked | timeout | budget | error | auth | compat | store | lock
++        self.result: FetchResult | None = None
+ 
+     @property
+     def terminal(self) -> bool:
+@@ -38,7 +40,7 @@
+ 
+ # Never retried, and a bounded test stops at the first one: retrying cannot fix a rejected credential, an unsupported
+ # request (provider 400/404/422), a wrong store/fulfillment context, a used-up budget or a lost exclusive lock.
+-TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
++TERMINAL_KINDS = {"auth", "compat", "refused", "store", "budget", "lock"}
+ 
+ 
+ def provider_error(status: int, text: str) -> "FetchError":
+@@ -72,6 +74,7 @@
+         self.min_bytes = int(settings.get("fetch.min_page_bytes", 50000))
+         self.budget = int(settings.get("fetch.max_requests_per_run", 0))
+         self.total_budget = None   # budget.TotalBudget shared by all commands of one bounded test (persists on disk)
++        self.on_refusal = None
+         self.concurrency = int(os.getenv("MSCRAPER_CONCURRENCY") or settings.get("fetch.concurrency", 4))
+         self.sem = asyncio.Semaphore(self.concurrency)
+         self._last = 0.0
+@@ -119,6 +122,12 @@
+                         self.stats["slow"] += 1
+                         log.warning("slow response", extra={"url": url, "seconds": round(res.elapsed, 1)})
+                     if res.status >= 400:
++                        if res.status in (401, 403):
++                            exc = FetchError(f"target refused HTTP {res.status}", "refused")
++                            exc.result = res
++                            if self.on_refusal:
++                                self.on_refusal(res)
++                            raise exc
+                         raise FetchError(f"HTTP {res.status}", "http")
+                     if len(res.html) < self.min_bytes:
+                         raise FetchError(f"response too small ({len(res.html)} bytes) – blocked or empty", "blocked")
+@@ -257,7 +266,7 @@
+         res = (r.json().get("results") or [{}])[0]
+         content = res.get("content") or ""
+         status = int(res.get("status_code") or 200)
+-        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed)
++        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text)
+ 
+ 
+ def realtime_payload(settings, location, url: str) -> dict:
+@@ -267,11 +276,28 @@
+     from urllib.parse import parse_qs, urlparse
+ 
+     u = urlparse(url)
+-    query = (parse_qs(u.query).get("query") or [""])[0]
+-    tpl = settings.get("fetch.oxylabs_realtime.search_payload") if (u.path.rstrip("/").endswith("/search") and query) else None
++    params = parse_qs(u.query, keep_blank_values=True)
++    query = (params.get("query") or [""])[0]
++    is_search = u.path.rstrip("/").endswith("/search") and bool(query)
++    if is_search:
++        allowed = {"query", "searchType", "brandName", "page", "savings"}
++        unknown = set(params) - allowed
++        unsupported = set(unknown)
++        if int((params.get("page") or ["1"])[0] or 1) > 1:
++            unsupported.add("page")
++        if "savings" in params:
++            unsupported.add("savings")
++        if unsupported:
++            names = "/".join(sorted(unsupported))
++            raise FetchError(f"unsupported on Classic kroger_search: {names}", "compat")
++    tpl = settings.get("fetch.oxylabs_realtime.search_payload") if is_search else None
+     if not tpl:
+         tpl = settings.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
+-    return _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
++    body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
++    brand = (params.get("brandName") or [""])[0]
++    if is_search and brand:
++        body["brand"] = brand
++    return body
+ 
+ 
+ def build_fetcher(settings, location, **kw) -> Fetcher:
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/src/mscraper/runner.py C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/src/mscraper/runner.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/src/mscraper/runner.py	2026-10-28 08:23:52.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/src/mscraper/runner.py	2026-10-29 08:38:36.000000000 +0500
+@@ -7,6 +7,8 @@
+ from __future__ import annotations
+ 
+ import asyncio
++import gzip
++import hashlib
+ import json
+ import logging
+ import re
+@@ -51,6 +53,7 @@
+         self.dir.mkdir(parents=True, exist_ok=True)
+         self.ck = Checkpoint(self.dir / "checkpoint.sqlite")
+         self.fetcher = fetcher or build_fetcher(settings, location)
++        self.fetcher.on_refusal = self._archive_refusal
+         self.census: dict[str, dict] = self.ck.get("offer_census", {})
+         self.page_size = int(settings.get("crawl.page_size", 24))
+         self.max_pages = int(settings.get("crawl.max_pages_per_query", 42))
+@@ -59,6 +62,18 @@
+         self.raw_per_cat = int(settings.get("evidence.raw_pages_per_category", 2))
+         self._raw_count: dict[str, int] = {}
+ 
++    def _archive_refusal(self, res) -> None:
++        raw = res.html.encode("utf-8")
++        sha = hashlib.sha256(raw).hexdigest()
++        directory = self.dir / "evidence" / "refusals"
++        directory.mkdir(parents=True, exist_ok=True)
++        (directory / f"{sha}.html.gz").write_bytes(gzip.compress(raw))
++        (directory / f"{sha}.json").write_text(
++            json.dumps({"url": res.url, "status": res.status, "bytes": len(raw), "sha256": sha},
++                       indent=2),
++            encoding="utf-8",
++        )
++
+     # ------------------------------------------------------------------ helpers
+     def _ctx(self, category: str, sub: str) -> dict:
+         st = self.ck.get("store_verification") or {}
+@@ -143,6 +158,7 @@
+             "search_request_pinned_to_store": sp.request_location == self.loc.store_id,
+             "zipcode_matches": (not self.loc.zipcode) or st.zipcode == self.loc.zipcode,
+             "address_matches": (not self.loc.expected_address) or self.loc.expected_address.lower() in st.full_address.lower(),
++            "banner_matches": "mariano" in st.banner.lower(),
+             "prices_from_store": all(((sp.products.get(u, {}).get("data") or {}).get("price") or {}).get("storePrices", {})
+                                      .get("sourceLocationId") == self.loc.store_id for u in sp.upcs if u in sp.products),
+         }
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/src/mscraper/version.py C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/src/mscraper/version.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/src/mscraper/version.py	2026-10-28 08:29:38.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/src/mscraper/version.py	2026-10-29 08:38:36.000000000 +0500
+@@ -6,7 +6,7 @@
+ import sys
+ from pathlib import Path
+ 
+-__version__ = "1.1.5"
++__version__ = "1.1.6"
+ _SRC = Path(__file__).resolve().parent
+ _ROOT = _SRC.parents[1]
+ # release_sha256 covers everything that decides what a deployment does (client review 27 Oct: code_sha256 alone
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/tests/conftest.py C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/tests/conftest.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/tests/conftest.py	2026-10-28 08:24:52.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/tests/conftest.py	2026-10-29 08:38:36.000000000 +0500
+@@ -41,6 +41,11 @@
+     return s
+ 
+ 
++@pytest.fixture(autouse=True)
++def isolated_local_work(monkeypatch, tmp_path):
++    monkeypatch.setenv("MSCRAPER_LOCAL_WORK", str(tmp_path))
++
++
+ @pytest.fixture
+ def location():
+     return Location(key="test-544", store_id="53100544", zipcode="60014", expected_address="105 Northwest Hwy",
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/tests/test_v116_findings.py C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/tests/test_v116_findings.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.5-src\marianos-scraper/tests/test_v116_findings.py	1970-01-01 05:00:00.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\marianos-1.1.6-src\marianos-scraper/tests/test_v116_findings.py	2026-10-29 08:59:14.000000000 +0500
+@@ -0,0 +1,72 @@
++import asyncio
++from types import SimpleNamespace
++
++import pytest
++
++from conftest import ROOT
++from mscraper.config import Location, load_settings
++from mscraper.fetch import FetchError, FetchResult, Fetcher, realtime_payload
++from mscraper.parse import SearchPage, StoreInfo
++from mscraper.runner import Runner
++from mscraper.storage import LocalStorage
++
++
++def test_classic_search_maps_brand_and_rejects_unsupported_filters():
++    settings = load_settings(ROOT / "config" / "settings.yaml")
++    location = Location("test", "53100544")
++    base = "https://www.marianos.com/search?query=milk"
++    assert realtime_payload(settings, location, base)["source"] == "kroger_search"
++    assert realtime_payload(settings, location, base + "&brandName=Simple%20Truth")["brand"] == "Simple Truth"
++    for suffix in ("&savings=Coupons", "&page=2", "&unexpected=x"):
++        with pytest.raises(FetchError, match="unsupported on Classic kroger_search"):
++            realtime_payload(settings, location, base + suffix)
++
++
++def test_retailer_refusal_is_terminal_and_saved(tmp_path):
++    settings = load_settings(ROOT / "config" / "settings.yaml")
++    settings.raw["fetch"]["min_page_bytes"] = 0
++    location = Location("test", "53100544", zipcode="60014")
++
++    class Refused(Fetcher):
++        async def _fetch_once(self, url, render_js):
++            return FetchResult(url, 403, "<html>denied</html>", 0.01)
++
++    fetcher = Refused(settings, location)
++    runner = Runner(settings, location, LocalStorage(tmp_path / "output"), tmp_path / "state", fetcher=fetcher)
++    with pytest.raises(FetchError) as exc:
++        asyncio.run(fetcher.get("https://www.marianos.com/search?query=milk"))
++    assert exc.value.kind == "refused"
++    assert list((runner.dir / "evidence" / "refusals").glob("*.html.gz"))
++
++
++def test_non_marianos_banner_is_not_verified(tmp_path):
++    settings = load_settings(ROOT / "config" / "settings.yaml")
++    location = Location("test", "53100544", zipcode="60014")
++    store = StoreInfo(location_id="53100544", zipcode="60014", banner="Kroger")
++    search = SearchPage([], {}, {}, request_location="53100544", store=store)
++    html = "<html>" + ("x" * 1000) + "</html>"
++
++    class Page:
++        async def start(self):
++            return None
++
++        async def close(self):
++            return None
++
++        async def get(self, url, validate=None):
++            if validate:
++                validate(html)
++            return FetchResult(url, 200, html, 0.01)
++
++    import mscraper.runner as runner_module
++    original_extract, original_search = runner_module.parse.extract_state, runner_module.parse.search_page
++    runner_module.parse.extract_state = lambda _: {}
++    runner_module.parse.search_page = lambda _: search
++    try:
++        runner = Runner(settings, location, LocalStorage(tmp_path / "output"), tmp_path / "state", fetcher=Page())
++        result = asyncio.run(runner.verify_store())
++    finally:
++        runner_module.parse.extract_state, runner_module.parse.search_page = original_extract, original_search
++        runner.ck.close()
++    assert result["checks"]["banner_matches"] is False
++    assert result["verified"] is False

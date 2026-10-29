@@ -41,6 +41,11 @@ def settings():
     return s
 
 
+@pytest.fixture(autouse=True)
+def isolated_local_work(monkeypatch, tmp_path):
+    monkeypatch.setenv("MSCRAPER_LOCAL_WORK", str(tmp_path))
+
+
 @pytest.fixture
 def location():
     return Location(key="test-544", store_id="53100544", zipcode="60014", expected_address="105 Northwest Hwy",

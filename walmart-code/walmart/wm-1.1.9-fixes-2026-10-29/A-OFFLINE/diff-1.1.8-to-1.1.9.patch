@@ -1,0 +1,225 @@
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/MANIFEST.txt C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/MANIFEST.txt
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/MANIFEST.txt	2026-10-28 08:55:42.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/MANIFEST.txt	2026-10-29 09:00:54.000000000 +0500
+@@ -8,22 +8,22 @@
+ 9e24d0cf8f6d3dd311add980a6ec58de607ed0721ef445b8082af44e88f5062b  config/private_label_brands.txt
+ 22eb85dad12351b871aec4aebac6d068c6661e01f4babfeb6fd96954b1492ba7  config/settings.yaml
+ 2fccf3bc395f1c373d3910622c5f92c015246646ced304c0cf6f5b0fef55ce1c  deploy/azure/deploy.sh
+-991e01860342c139f2a611b52f43d154676b1d9c60d56b9b1258e4f2e65e6355  deploy/azure/main.bicep
++5ed9bcc32c75998ab2782a15a6e0193ec7d30e751c76065f75d4f6ca0b4bee5b  deploy/azure/main.bicep
+ 616667b013ed62134d9b7c50228a80a42983663d17e46a94b22764047c7b5ab2  deploy/azure/preflight.sh
+ 2d2cf2a1f0ad5f860dcbbe79d2e224057e4be78d9a9d9a3814dbdeb1a1e65a0c  deploy/azure/run_test.sh
+ 0143fd61f5cbe86731a4cc25fba1c55caa9f1a1f7ad249d4e503afffe1c56e9f  docs/ARCHITECTURE.md
+-25e9aa1de5d81d44063c376da6bfa00d61e08a7991e9277cbbdd7b0347b57b21  docs/CHANGES.md
++ddd8462d68555118e5a8b0706228033b3ab6a953aca49e0afc549109426eb2b8  docs/CHANGES.md
+ 8b478b6072e332952eaa322ce43c454fb939ad0b57fdf6a4fe8aa9b600cf402a  docs/COST.md
+ 6915712ab78b4ffe87703bdf2c2a0dd043ddc2304e6127c9c960780bb87a25dc  docs/OPERATIONS.md
+ 7233ef3b5e2dbae57c2bdb7b5495b8ed0ee41e10c6563314c70f3da8954e2453  requirements.txt
+-d6e22dc2eec8a7a1c9ace8866cdce3ef3e18ee683350333345eccd58dfd74afa  src/wmscraper/__init__.py
++d5b22877eb995070a8a99a84c68f03d783b0224695a87c09ef3268605a9de8cd  src/wmscraper/__init__.py
+ 4b1afbca74a10abc3cff7b4e5a11b558bf619e45b89709faf9225a474a2a250f  src/wmscraper/__main__.py
+ 2b55024af576a7e0b0aae56b8e4496c63601f729b4bd9461047541ef79c3ebca  src/wmscraper/budget.py
+ 6c5b75866c6bbdd790d206f797d5ead6b3019d2f4a2d9ebc06431397ddd0a83d  src/wmscraper/checkpoint.py
+ 29d169d3700b46eab73eeecf9054884023ead21be92d64953bbf4ed826b7bc30  src/wmscraper/cli.py
+ 9eb278b17636fa09356c2b6ab7c7ddc2c022c0afca0921896d0b28f537f8020f  src/wmscraper/config.py
+ 40638bd7c4a197e2a5f7ca9da939a61c1d6defb070630db4c80f3f94de23062c  src/wmscraper/fetch/__init__.py
+-7bb5824e94fb71b02dc11dc70448c1d4cfff220132e005121dd4dec1c803d785  src/wmscraper/fetch/base.py
++3fbc6cb5cc3b1e65a064512ca9b74fceeb250ffa0d11b04d218f4319c3b33890  src/wmscraper/fetch/base.py
+ 3644c2d152eed35e5095617a34b1daedf6333624949526e608da07b55663f1fd  src/wmscraper/lock.py
+ 0fc7a2b1edec5e3ad3df66fb9e15375fbf9edc7b512de2fe490274a70c3cadf8  src/wmscraper/logging_setup.py
+ dd462085a26bc1234f855dc3ce1bbb6aa7316af48ff21225aad241976cf5580f  src/wmscraper/models.py
+@@ -32,7 +32,7 @@
+ af8cc2d19da9267b1fcbe156ba22b028c25ea069fc6a3d96720dca418ec2b4ad  src/wmscraper/parse/text.py
+ bc37862c5c3575513fc340ffdeef492ba9227a6b4bf2b879bdbb2f5f52fa6e35  src/wmscraper/parse/walmart.py
+ 6f35439f227e1813234c7525ff4fbc641c47590113412d5d0fd04c486b739b47  src/wmscraper/report.py
+-10d2282d8d35849f4cf3d3015bbaa78c763d78331b4424815684a6606ff98bec  src/wmscraper/runner.py
++8438d9086df80140c140e808b20813e08379c2c66053e9fde6d69a458b9e3dc8  src/wmscraper/runner.py
+ 6b2a881425fb81cb7429b41592280b455acf5b59b7c5044978b55dcd3f9e286e  src/wmscraper/storage.py
+ eea48fdccfe094e16cc2e7df65f1a8e86ad11c0570f79e0aa48988fdaaffbbd1  src/wmscraper/validate.py
+ cb8ad1dd1fc3c4f475fee3a7204bf3e2a7af93fd2978f2e2a5930fd91efec1a5  src/wmscraper/version.py
+@@ -43,6 +43,7 @@
+ 522a67f743ddfb1de394f5dea476b050aa73a8c126a278783363c9e1360acdf1  tests/test_rules.py
+ a85c54a1162f5153aa7c9b406670daba8a1faae19245d3d2fc413049e4bd3657  tests/test_source_count.py
+ 9a2eb40a1ade0039b9f7a3ebea01934ca845539c958066ece59581ac19448fee  tests/test_v118_safety.py
++b2e3c34f6f7c29dbe1f2d305c8d83069f6843a0945d9d937c11737fe4a69ffae  tests/test_v119_findings.py
+ 80a421c64b2c7dc360e061acbbe281286f9519ee8566a116b40a93f8c6f06c33  tools/board_system.html
+ e31c539626d39f6000f828c53d403fa6f2967f4e57d4dcf51041a2990e220301  tools/make_evidence.py
+ 032f17dc8777d53d599b5fb5a1833cf3a62dc20de93809a8d98ce40f24feae12  tools/package_source.py
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/SOURCE_FINGERPRINT.txt C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/SOURCE_FINGERPRINT.txt
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/SOURCE_FINGERPRINT.txt	2026-10-28 08:55:42.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/SOURCE_FINGERPRINT.txt	2026-10-29 09:00:54.000000000 +0500
+@@ -1,2 +1,2 @@
+-version 1.1.8
+-source_sha256 f3396f3a237afd416fcd2c559425e66ca8e8152c6440e1de6e1d8d8910b8f4e0
++version 1.1.9
++source_sha256 52684258bd4665ab93f327dd0f824efd55a7d4f00a388c98c5505df6e0866651
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/deploy/azure/main.bicep C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/deploy/azure/main.bicep
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/deploy/azure/main.bicep	2026-10-28 08:42:22.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/deploy/azure/main.bicep	2026-10-29 08:38:36.000000000 +0500
+@@ -25,7 +25,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the walmart-scraper container) holding the delivered source package that the job runs.')
+-param releaseBlob string = 'releases/walmart-scraper-1.1.8-src.zip'
++param releaseBlob string = 'releases/walmart-scraper-1.1.9-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/docs/CHANGES.md C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/docs/CHANGES.md
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/docs/CHANGES.md	2026-10-28 08:55:40.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/docs/CHANGES.md	2026-10-29 08:58:54.000000000 +0500
+@@ -1,5 +1,14 @@
+ # Changes
+ 
++## 1.1.9 (2026-10-29) – lease safety and target refusal evidence
++
++1. The lease is checked again after pacing immediately before budget reservation and the provider send; a lost lease
++   raises terminal `lock` and makes zero provider calls.
++2. Target HTTP 401/403 responses inside provider results are terminal `refused` errors and are archived with raw body,
++   SHA-256, and returned store context. Provider 401/403 remain `auth`; 503 remains retryable.
++3. The Classic probe remains limited to `walmart_product` canaries. The listing route is unresolved; `walmart_search`
++   is a separate later evaluation and is not claimed to work.
++
+ ## 1.1.8 (2026-10-28) – client review of 28 Oct (budget safety, canary rules, fulfillment, evidence, --categories)
+ 
+ Offline only; no live or Azure request. Tests: `tests/test_v118_safety.py` (22 new, 71 in total).
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/src/wmscraper/__init__.py C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/src/wmscraper/__init__.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/src/wmscraper/__init__.py	2026-10-28 08:42:22.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/src/wmscraper/__init__.py	2026-10-29 08:38:36.000000000 +0500
+@@ -1,3 +1,3 @@
+ """Walmart location-specific product scraper for Microsoft Azure."""
+ 
+-__version__ = "1.1.8"
++__version__ = "1.1.9"
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/src/wmscraper/fetch/base.py C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/src/wmscraper/fetch/base.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/src/wmscraper/fetch/base.py	2026-10-28 08:35:26.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/src/wmscraper/fetch/base.py	2026-10-29 08:38:36.000000000 +0500
+@@ -28,12 +28,13 @@
+     status: int
+     html: str
+     elapsed: float
++    raw_response: str = ""
+ 
+ 
+ class FetchError(Exception):
+     def __init__(self, message: str, kind: str = "error"):
+         super().__init__(message)
+-        self.kind = kind  # http | challenge | timeout | error
++        self.kind = kind  # http | challenge | timeout | error | auth | refused | compat | lock
+ 
+ 
+ def fill(template, **values):
+@@ -52,7 +53,7 @@
+ 
+ # Never retried: a rejected credential (401/403) or an unsupported request (400/404/422) cannot be fixed by retrying;
+ # store/budget/lock failures stop the work. 429 / 5xx / timeouts / challenges stay retryable.
+-TERMINAL_KINDS = {"auth", "compat", "store", "budget", "lock"}
++TERMINAL_KINDS = {"auth", "compat", "refused", "store", "budget", "lock"}
+ 
+ 
+ def provider_error(status: int, text: str) -> "FetchError":
+@@ -102,6 +103,7 @@
+         self._lock = asyncio.Lock()
+         self.budget = int(settings.get("fetch.max_requests_per_run", 0))  # 0 = unlimited
+         self.total_budget = None  # persistent TotalBudget (budget.py), shared by every process of one approved test
++        self.on_refusal = None
+         self.stats = {"requests": 0, "retries": 0, "challenges": 0, "http_errors": 0, "slow": 0}
+ 
+     async def start(self):  # pragma: no cover - overridden where needed
+@@ -130,9 +132,13 @@
+                 raise FetchError(str(exc), "lock") from exc
+             if self.budget and self.stats["requests"] >= self.budget:
+                 raise FetchError(f"request budget of {self.budget} reached (fetch.max_requests_per_run)", "budget")
++            await self._pace()
++            try:
++                lock.check_active()             # re-check after pacing, immediately before reserving/sending
++            except lock.LockLost as exc:
++                raise FetchError(str(exc), "lock") from exc
+             if self.total_budget is not None:  # counted and saved before the request is sent, retries included
+                 self.total_budget.take(url, self.loc.store_id)
+-            await self._pace()
+             self.stats["requests"] += 1
+             try:
+                 res = await self._fetch_once(url)
+@@ -148,6 +154,10 @@
+                     log.warning("slow_response", extra={"url": url, "seconds": round(res.elapsed, 1)})
+                 if res.status >= 400:
+                     self.stats["http_errors"] += 1
++                    if res.status in (401, 403):
++                        if self.on_refusal:
++                            self.on_refusal(res)
++                        raise FetchError(f"target refused HTTP {res.status}", "refused")
+                     last_exc = FetchError(f"HTTP {res.status}", "http")
+                 elif detect_challenge(res.html, res.final_url):
+                     self.stats["challenges"] += 1
+@@ -194,7 +204,7 @@
+         res = (r.json().get("results") or [{}])[0]
+         content = res.get("content") or ""
+         return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200),
+-                           content if isinstance(content, str) else "", time.monotonic() - t0)
++                           content if isinstance(content, str) else "", time.monotonic() - t0, r.text)
+ 
+ 
+ class OxylabsWebApiFetcher(Fetcher):
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/src/wmscraper/runner.py C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/src/wmscraper/runner.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/src/wmscraper/runner.py	2026-10-28 08:37:14.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/src/wmscraper/runner.py	2026-10-29 08:58:42.000000000 +0500
+@@ -70,6 +70,8 @@
+         self.crawl_date = self.ck.get("crawl_date") or datetime.now(timezone.utc).date().isoformat()
+         self.ck.set("crawl_date", self.crawl_date)
+         self.store: dict = self.ck.get("store_verification") or {}
++        self.fetcher = build_fetcher(self.s, self.loc)
++        self.fetcher.on_refusal = lambda res: self._archive("refused", res, "target access denial", always=True)
+ 
+     # ------------------------------------------------------------------ helpers
+     def _archive(self, kind: str, res, note: str = "", always: bool = False) -> dict | None:
+@@ -143,7 +145,6 @@
+                                          "items_already_kept": self.ck.count_items(), **version_info()})
+             self.ck.event("session_start", {"resumed": resumed, "items_already_kept": self.ck.count_items(),
+                                             **version_info()})  # which exact source ran each part of the run
+-            self.fetcher = build_fetcher(self.s, self.loc)
+             await self.fetcher.start()
+             self.aborted = ""
+             try:
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/tests/test_v119_findings.py C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/tests/test_v119_findings.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.8-src\walmart-scraper/tests/test_v119_findings.py	1970-01-01 05:00:00.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\walmart-1.1.9-src\walmart-scraper/tests/test_v119_findings.py	2026-10-29 08:59:14.000000000 +0500
+@@ -0,0 +1,38 @@
++import asyncio
++
++import pytest
++
++from conftest import STORE
++from wmscraper.fetch import FetchError, FetchResult, provider_error
++from wmscraper.fetch.base import Fetcher
++from wmscraper import lock
++
++
++def test_lease_lost_after_pacing_does_not_send(monkeypatch, site):
++    settings = __import__("wmscraper.config", fromlist=["load_settings"]).load_settings(str(site))
++    location = settings.location("test-store")
++    calls = []
++
++    class Fake(Fetcher):
++        async def _fetch_once(self, url):
++            calls.append(url)
++            return FetchResult(url, url, 200, "x" * 3000, 0)
++
++    checks = {"n": 0}
++    def check():
++        checks["n"] += 1
++        if checks["n"] == 2:
++            raise lock.LockLost("lease lost")
++    monkeypatch.setattr(lock, "check_active", check)
++    fetcher = Fake(settings, location)
++    monkeypatch.setattr(fetcher, "_pace", lambda: asyncio.sleep(0))
++    with pytest.raises(FetchError) as exc:
++        asyncio.run(fetcher.get(f"https://www.walmart.com/store/{STORE}"))
++    assert exc.value.kind == "lock"
++    assert calls == []
++
++
++def test_provider_and_target_statuses_keep_distinct_kinds():
++    assert provider_error(401, "").kind == "auth"
++    assert FetchError("target refused", "refused").kind == "refused"
++    assert provider_error(503, "").kind == "http"
