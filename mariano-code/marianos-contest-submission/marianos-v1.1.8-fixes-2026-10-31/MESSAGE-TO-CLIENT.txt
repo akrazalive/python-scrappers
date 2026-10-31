@@ -1,0 +1,55 @@
+Mariano's v1.1.8 focused-fix delivery
+
+Attached file:
+  marianos-scraper-1.1.8-src.zip
+  ZIP SHA-256: a148672db08b6d91dac721e1c86aa121436cae3b20aec9e6c7a2770eb9ccfb8b
+
+Source fingerprints:
+  version: 1.1.8
+  code_sha256: b2399cc6de712dd51d58004011bc10ff7b3bf51cd7c190f26d781ea55ff22d27
+  release_sha256: 0aea057b37de31fe9bb0680ffba0733e60f61bbcd09a3685e2e49e90254cea27
+
+Focused corrections:
+1. verify-store now requires a genuine monetary regular or promotional price returned
+   by the configured store, not only sourceLocationId. It requires a non-empty source
+   ID and rejects mixed/conflicting source-location IDs.
+2. A first-request target refusal or provider/auth failure in probe now writes a
+   terminal probe.json, preserves the refusal evidence, and returns the original
+   nonzero error without a dom_upcs KeyError.
+
+Offline regression evidence:
+  Mariano focused tests: 9 passed
+  Mariano complete suite: 72 passed
+  New CLI-path cases cover first-request target HTTP 403 and provider HTTP 401.
+  No live retailer, Azure, entitlement, or charging-rate result is claimed.
+
+Revised bounded commands (run only after the existing test1 allowance is confirmed;
+do not reset or raise it):
+
+Store/source-price qualification, Crystal Lake (one request, no retry):
+  python -m mscraper --budget test1:19 verify-store --location marianos-544-crystal-lake --max-requests 1
+Success criterion: exit 0 and verified=true; fulfillment modality, store ID, request
+location, ZIP/address, Mariano's banner, and a monetary price sourced only from
+store 53100544 must all pass. Stopping point: after this single store page.
+
+Store/source-price qualification, Vernon Hills (one request, no retry):
+  python -m mscraper --budget test1:19 verify-store --location marianos-502-vernon-hills --max-requests 1
+Success criterion: the same checks, with source/store 53100502. Stopping point: after
+this single store page. The persistent test1 ledger remains capped at 19.
+
+Separate capability probe (not store qualification):
+  python -m mscraper --budget test1:19 probe --location marianos-544-crystal-lake --query Batteries --max-requests 15
+This tests page-2/JS/brand-filter behavior. On the Classic route, page=2 is rejected
+locally before dispatch; the expected terminal result is recorded in probe.json and
+must not be represented as successful pagination. Retries are bounded by the command
+cap and terminal auth/compat/refusal errors are not retried.
+
+Acceptance status:
+The two focused v1.1.7 findings are fixed and covered offline. This does not close
+the separate 500-genuine-product demonstration, complete uncapped coverage, offer
+evidence, live recovery, failed-publication protection, unattended Azure repeats, or
+the pending account-specific kroger_search entitlement/rate confirmation. No paid
+execution, deployment, budget increase, or award is requested.
+
+This delivery is available after the proposed Friday, October 30, 5:00 p.m. CDT
+checkpoint; that checkpoint is treated as missed and replaced by this dated delivery.

@@ -1,0 +1,34 @@
+WALMART #32/#38 — 1.1.10 focused corrected revision
+
+Offline-only correction package. No provider request, Azure deployment, paid run, or budget use was made.
+
+Implemented corrections:
+- Target refusals through Runner and command paths now retain the target HTML plus a sanitized provider
+  envelope with provider status, target status, request/job identifier when present, timestamp, URL,
+  byte count, and response hash. Credential-like fields are redacted.
+- The Classic and Web API adapters now carry the provider response envelope and provider HTTP status into
+  refusal evidence; target HTTP 403 inside a provider-200 envelope is retained as target refusal evidence.
+- Existing refusal behavior remains terminal and does not retry or publish.
+
+Offline validation:
+- Full Walmart test suite: 74 passed.
+- Source syntax checks: passed.
+- New regression coverage verifies provider/target status separation, request identifier retention,
+  and credential redaction in the archived refusal index.
+- The supplied post-pacing lease-loss regression remains passing.
+
+Bounded command and expected stopping point:
+  python -m wmscraper verify-store --location <configured-location> --max-requests 1
+This command stops nonzero at the first target refusal, provider/auth/compatibility failure, wrong-store
+or canary qualification failure, budget exhaustion, or lock loss; it does not claim a successful local
+listing route or source-price proof for store #100. A successful Walmart local listing route and source
+price context remain separate evidence requirements.
+
+Authoritative package:
+  walmart-scraper-1.1.10-src.zip
+  zip_sha256=a7d464166f210373472fbd5f2c97d643c78ee97a4af195f2f069ae787d735809
+  source_sha256=4424e76d1283149524860bb10e4364275d496d736c8106ddd89d658d77298ca9
+
+Owner-side walmart_product/kroger_search entitlement and rate confirmation, Azure counters, deployment,
+paid execution, live recovery, failed-publication protection, and unattended repeats remain unverified
+and are not authorized by this offline revision.

@@ -1,3 +1,3 @@
 """Walmart location-specific product scraper for Microsoft Azure."""
 
-__version__ = "1.1.9"
+__version__ = "1.1.10"

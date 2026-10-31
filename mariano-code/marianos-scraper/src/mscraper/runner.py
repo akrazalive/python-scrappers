@@ -28,6 +28,20 @@ from .validate import validate_run
 log = logging.getLogger("mscraper.run")
 
 
+def _has_monetary_price(store_prices: dict) -> bool:
+    """Return whether a store-price block contains a source-returned money value."""
+    for kind in ("regular", "promo"):
+        value = store_prices.get(kind)
+        if isinstance(value, dict):
+            for key in ("price", "nforPrice", "unitPrice", "defaultDescription"):
+                text = value.get(key)
+                if isinstance(text, (int, float)) and text >= 0:
+                    return True
+                if isinstance(text, str) and re.search(r"\d+(?:\.\d{1,2})?", text):
+                    return True
+    return False
+
+
 def _with_page(url: str, page: int) -> str:
     if page <= 1:
         return url
@@ -63,16 +77,7 @@ class Runner:
         self._raw_count: dict[str, int] = {}
 
     def _archive_refusal(self, res) -> None:
-        raw = res.html.encode("utf-8")
-        sha = hashlib.sha256(raw).hexdigest()
-        directory = self.dir / "evidence" / "refusals"
-        directory.mkdir(parents=True, exist_ok=True)
-        (directory / f"{sha}.html.gz").write_bytes(gzip.compress(raw))
-        (directory / f"{sha}.json").write_text(
-            json.dumps({"url": res.url, "status": res.status, "bytes": len(raw), "sha256": sha},
-                       indent=2),
-            encoding="utf-8",
-        )
+        evidence.save_refusal(self.dir, res)
 
     # ------------------------------------------------------------------ helpers
     def _ctx(self, category: str, sub: str) -> dict:
@@ -152,6 +157,15 @@ class Runner:
         for m in (((box["state"].get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []:
             modality = m.get("modalityType") or modality
         want_modality = self.s.get("store.expected_modality", "IN_STORE")
+        price_sources: set[str] = set()
+        priced_from_store = 0
+        for u in sp.upcs:
+            store_prices = (((sp.products.get(u) or {}).get("data") or {}).get("price") or {}).get("storePrices") or {}
+            source = str(store_prices.get("sourceLocationId") or "")
+            if source:
+                price_sources.add(source)
+            if source == self.loc.store_id and _has_monetary_price(store_prices):
+                priced_from_store += 1
         checks = {
             "fulfillment_modality_matches": modality == want_modality,
             "location_id_matches": st.location_id == self.loc.store_id,
@@ -159,8 +173,8 @@ class Runner:
             "zipcode_matches": (not self.loc.zipcode) or st.zipcode == self.loc.zipcode,
             "address_matches": (not self.loc.expected_address) or self.loc.expected_address.lower() in st.full_address.lower(),
             "banner_matches": "mariano" in st.banner.lower(),
-            "prices_from_store": all(((sp.products.get(u, {}).get("data") or {}).get("price") or {}).get("storePrices", {})
-                                     .get("sourceLocationId") == self.loc.store_id for u in sp.upcs if u in sp.products),
+            "prices_from_store": priced_from_store > 0,
+            "price_source_locations_match": bool(price_sources) and price_sources == {self.loc.store_id},
         }
         result = {"verified": all(checks.values()), "checks": checks, "configured_store_id": self.loc.store_id,
                   "selected_store_id": st.location_id, "store_name": st.name, "store_location": st.full_address,

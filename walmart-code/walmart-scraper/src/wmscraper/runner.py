@@ -94,8 +94,44 @@ class Run:
         except Exception as exc:  # archived even when unparsable – that is evidence too
             excerpt = [{"error": str(exc)}]
         index = self.storage.get_json(f"{self.prefix}/raw/index.json") or []
+        provider_envelope = {}
+        request_id = ""
+        if res.raw_response:
+            try:
+                provider_envelope = json.loads(res.raw_response)
+            except json.JSONDecodeError:
+                provider_envelope = {"raw": re.sub(r"(?i)(authorization|password|token|api[_-]?key)\s*[:=]\s*\S+",
+                                                    r"\1=[REDACTED]", res.raw_response)}
+
+            def sanitize(value):
+                if isinstance(value, dict):
+                    return {k: ("[REDACTED]" if re.search(r"(?i)(authorization|password|secret|token|api[_-]?key)", k)
+                                else sanitize(v)) for k, v in value.items()}
+                if isinstance(value, list):
+                    return [sanitize(v) for v in value]
+                return value
+
+            provider_envelope = sanitize(provider_envelope)
+            def find_request_id(value):
+                if isinstance(value, dict):
+                    for key, child in value.items():
+                        if re.search(r"(?i)(job|request|query|task|id)", key) and isinstance(child, (str, int)):
+                            return str(child)
+                        found = find_request_id(child)
+                        if found:
+                            return found
+                elif isinstance(value, list):
+                    for child in value:
+                        found = find_request_id(child)
+                        if found:
+                            return found
+                return ""
+            request_id = find_request_id(provider_envelope)
         index.append({"file": f"{name}.html.gz", "kind": kind, "url": res.url, "final_url": res.final_url,
                       "status": res.status, "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest(),
+                      "provider_status": res.provider_status, "request_id": request_id,
+                      "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                      "provider_envelope": provider_envelope,
                       "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "note": note,
                       "store_context": excerpt})
         self.storage.put_json(f"{self.prefix}/raw/index.json", index)

@@ -48,7 +48,8 @@ def test_target_refusal_is_archived_and_verify_store_fails(site, monkeypatch):
 
     async def refused(self, url):
         calls.append(url)
-        return FetchResult(url, url, 403, "<html>denied</html>", 0.01)
+        return FetchResult(url, url, 403, "<html>denied</html>", 0.01,
+                           '{"request_id":"req-456","password":"secret","results":[]}', 200)
 
     monkeypatch.setattr(FixtureFetcher, "_fetch_once", refused)
     rc = main(["--config", str(site), "verify-store", "--location", "test-store", "--max-requests", "1"])
@@ -63,4 +64,7 @@ def test_target_refusal_is_archived_and_verify_store_fails(site, monkeypatch):
     finally:
         run.ck.close()
     assert index[0]["kind"] == "refused"
+    assert index[0]["provider_status"] == 200 and index[0]["status"] == 403
+    assert index[0]["request_id"] == "req-456"
+    assert "secret" not in json.dumps(index[0])
     assert (index_path.parent / index[0]["file"]).exists()

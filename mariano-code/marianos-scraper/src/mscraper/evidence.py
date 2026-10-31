@@ -15,7 +15,9 @@ import gzip
 import hashlib
 import json
 import platform
+import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .version import __version__, code_sha256
@@ -68,3 +70,62 @@ def save_page(run_dir: Path, html: str, state: dict | None, keep_raw: bool) -> t
         if not rp.exists():
             rp.write_bytes(gzip.compress(raw))
     return sha, len(raw), rel
+
+
+_SECRET_KEYS = re.compile(r"(authorization|password|passwd|secret|token|api[_-]?key|credential)", re.I)
+_ID_KEYS = re.compile(r"(job|request|query|task|id)", re.I)
+
+
+def sanitize_provider_response(raw: str) -> tuple[object, str]:
+    """Keep provider metadata while removing credentials from refusal evidence."""
+    try:
+        value = json.loads(raw or "{}")
+    except json.JSONDecodeError:
+        return re.sub(r"(?i)(authorization|password|token|api[_-]?key)\s*[:=]\s*\S+", r"\1=[REDACTED]", raw), ""
+
+    def clean(item):
+        if isinstance(item, dict):
+            return {k: ("[REDACTED]" if _SECRET_KEYS.search(k) else clean(v)) for k, v in item.items()}
+        if isinstance(item, list):
+            return [clean(v) for v in item]
+        return item
+
+    def find_id(item):
+        if isinstance(item, dict):
+            for k, v in item.items():
+                if _ID_KEYS.search(k) and isinstance(v, (str, int)):
+                    return str(v)
+                found = find_id(v)
+                if found:
+                    return found
+        elif isinstance(item, list):
+            for v in item:
+                found = find_id(v)
+                if found:
+                    return found
+        return ""
+
+    cleaned = clean(value)
+    return cleaned, find_id(cleaned)
+
+
+def save_refusal(run_dir: Path, result) -> dict:
+    """Archive target HTML and a sanitized provider envelope for a terminal target refusal."""
+    raw = result.html.encode("utf-8")
+    sha = sha256_bytes(raw)
+    directory = run_dir / "evidence" / "refusals"
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f"{sha}.html.gz").write_bytes(gzip.compress(raw))
+    envelope, request_id = sanitize_provider_response(result.raw_response)
+    record = {
+        "url": result.url,
+        "target_status": result.status,
+        "provider_status": result.provider_status,
+        "request_id": request_id,
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "bytes": len(raw),
+        "sha256": sha,
+        "provider_envelope": envelope,
+    }
+    (directory / f"{sha}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
+    return record

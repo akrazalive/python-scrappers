@@ -25,6 +25,7 @@ class FetchResult:
     html: str
     elapsed: float
     raw_response: str = ""
+    provider_status: int | None = None
 
 
 class FetchError(Exception):
@@ -91,6 +92,9 @@ class Fetcher:
     async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:  # pragma: no cover
         raise NotImplementedError
 
+    def validate_request(self, url: str, render_js: bool = False) -> None:
+        return None
+
     async def _pace(self):
         async with self._lock:
             wait = self._last + random.uniform(self.min_delay, self.max_delay) - time.monotonic()
@@ -103,6 +107,7 @@ class Fetcher:
         last: Exception | None = None
         max_retries = self.retries if retries is None else retries
         for attempt in range(max_retries + 1):
+            self.validate_request(url, render_js)
             if self.budget and self.stats["requests"] >= self.budget:
                 raise FetchError(f"request budget of {self.budget} reached", "budget")
             async with self.sem:
@@ -186,7 +191,7 @@ class OxylabsKrogerFetcher(Fetcher):
         res = (r.json().get("results") or [{}])[0]
         meta = res.get("metadata") or {}
         status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
-        return FetchResult(url, status, res.get("html") or "", elapsed)
+        return FetchResult(url, status, res.get("html") or "", elapsed, r.text, r.status_code)
 
 
 class FixtureFetcher(Fetcher):
@@ -251,6 +256,9 @@ class OxylabsRealtimeFetcher(Fetcher):
     async def close(self):
         await self.client.aclose()
 
+    def validate_request(self, url: str, render_js: bool = False) -> None:
+        realtime_payload(self.s, self.loc, url)
+
     async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:
         body = realtime_payload(self.s, self.loc, url)
         if render_js:
@@ -266,7 +274,7 @@ class OxylabsRealtimeFetcher(Fetcher):
         res = (r.json().get("results") or [{}])[0]
         content = res.get("content") or ""
         status = int(res.get("status_code") or 200)
-        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text)
+        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text, r.status_code)
 
 
 def realtime_payload(settings, location, url: str) -> dict:

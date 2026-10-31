@@ -29,6 +29,7 @@ class FetchResult:
     html: str
     elapsed: float
     raw_response: str = ""
+    provider_status: int | None = None
 
 
 class FetchError(Exception):
@@ -204,7 +205,7 @@ class OxylabsFetcher(Fetcher):
         res = (r.json().get("results") or [{}])[0]
         content = res.get("content") or ""
         return FetchResult(url, res.get("url") or url, int(res.get("status_code") or 200),
-                           content if isinstance(content, str) else "", time.monotonic() - t0, r.text)
+                           content if isinstance(content, str) else "", time.monotonic() - t0, r.text, r.status_code)
 
 
 class OxylabsWebApiFetcher(Fetcher):
@@ -245,7 +246,8 @@ class OxylabsWebApiFetcher(Fetcher):
         res = (r.json().get("results") or [{}])[0]
         meta = res.get("metadata") or {}
         status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
-        return FetchResult(url, meta.get("url") or url, status, res.get("html") or "", time.monotonic() - t0)
+        return FetchResult(url, meta.get("url") or url, status, res.get("html") or "", time.monotonic() - t0,
+                           r.text, r.status_code)
 
 
 class ZyteFetcher(Fetcher):
@@ -273,7 +275,8 @@ class ZyteFetcher(Fetcher):
         if r.status_code >= 400:
             raise provider_error(r.status_code, r.text)
         data = r.json()
-        return FetchResult(url, data.get("url") or url, int(data.get("statusCode") or 200), data.get("browserHtml") or "", time.monotonic() - t0)
+        return FetchResult(url, data.get("url") or url, int(data.get("statusCode") or 200), data.get("browserHtml") or "",
+                           time.monotonic() - t0, json.dumps(data), 200)
 
 
 class PlaywrightFetcher(Fetcher):

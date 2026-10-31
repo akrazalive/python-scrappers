@@ -21,7 +21,7 @@ import os
 import sys
 from pathlib import Path
 
-from . import logging_setup
+from . import evidence, logging_setup
 from .budget import TotalBudget, parse_spec
 from .config import load_settings
 from .fetch import FetchError
@@ -205,6 +205,7 @@ def main(argv=None) -> int:
         loc = settings.location(args.location)
         out = _state_dir(settings) / loc.key / "probes" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         f = build_fetcher(settings, loc)
+        f.on_refusal = lambda res: evidence.save_refusal(out, res)
         f.budget = args.max_requests          # retries count too: the probe can never exceed this many requests
         f.retries = 1
         f.total_budget = _total_budget(args, settings, f"probe {loc.key}")
@@ -216,7 +217,11 @@ def main(argv=None) -> int:
             finally:
                 await f.close()
 
-        rep = asyncio.run(go())
+        try:
+            rep = asyncio.run(go())
+        except FetchError as exc:
+            print(json.dumps({"dir": str(out), "error": str(exc), "kind": exc.kind}, indent=2), file=sys.stderr)
+            return 2
         print(json.dumps({"dir": str(out), "findings": rep["findings"], "requests": rep["fetch_stats"]}, indent=2))
         return 0
 

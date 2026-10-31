@@ -1,0 +1,43 @@
+Walmart v1.1.10 corrected bounded-plan delivery
+
+Attached files:
+  walmart-scraper-1.1.10-src.zip
+  SHA256SUMS.txt
+  ZIP SHA-256: a7d464166f210373472fbd5f2c97d643c78ee97a4af195f2f069ae787d735809
+
+The v1.1.10 source and ZIP are unchanged by this clarification. The existing
+focused refusal-evidence correction remains credited. Offline Walmart suite:
+74 passed. No live retailer, Azure, entitlement, or charging-rate result is claimed.
+
+Corrected store qualification command (Bentonville store 100):
+  python -m wmscraper --budget probe:10 verify-store --location walmart-100-bentonville --max-requests 3
+
+Why the cap is 3:
+  request 1 = store page
+  request 2 = canary product 10450114
+  request 3 = canary product 43436773
+
+Success criterion: exit 0, the store response matches store 100 and its configured
+ZIP/address, and both canary responses independently match item identity, selected
+store/fulfillment context, store-sourced positive price, and the configured ZIP.
+The persistent probe identity remains 3/10 used with 7 remaining; this command must
+not reset or raise that identity.
+
+Stopping and retry behavior: the request cap counts every dispatched attempt,
+including retries. A target refusal, provider/auth failure, wrong context, or budget
+failure is terminal; no later canary is requested after a failed check. A transient
+failure may retry only while the same cap still has room, so a retry can consume one
+of the three slots and leave the qualification incomplete. This is a bounded
+qualification only; it is not listing-route qualification or fresh listing/price
+evidence.
+
+Separate outstanding work:
+  - qualify the listing route only after the account-specific walmart_product and
+    walmart_search entitlement/rate confirmation;
+  - obtain fresh store-100 listing/price evidence;
+  - run the 500-genuine-product, complete uncapped coverage, offer/PPM, recovery,
+    failed-publication, and unattended Azure acceptance demonstrations.
+
+No new paid execution, deployment, budget increase, or award is requested. The
+previous Friday, October 30, 5:00 p.m. CDT checkpoint has passed; this is the
+corrected plan and current evidence available on October 31, 2026.

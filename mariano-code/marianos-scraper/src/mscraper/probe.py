@@ -17,6 +17,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from . import evidence, parse
+from .fetch import FetchError
 
 _DOM_UPC = re.compile(r'href="/p/[^"/]+/(\d{13})"')
 
@@ -26,6 +27,27 @@ async def run_probe(fetcher, settings, loc, out_dir: Path, query: str, max_reque
     base = settings.get("base_url", "https://www.marianos.com").rstrip("/")
     q_url = f"{base}/search?query={quote(query)}&searchType=default_search"
     rows = []
+
+    def validate_probe_page(html, sp):
+        state = parse.extract_state(html)
+        store = sp.store
+        modalities = (((state.get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []
+        modality = next((m.get("modalityType") for m in modalities if m.get("modalityType")), "")
+        sources = {
+            str((((sp.products.get(u) or {}).get("data") or {}).get("price") or {}).get("storePrices", {}).get("sourceLocationId"))
+            for u in sp.upcs
+            if u in sp.products
+        } - {""}
+        checks = {
+            "store_matches": store.location_id == loc.store_id,
+            "request_store_matches": sp.request_location == loc.store_id,
+            "banner_matches": "mariano" in store.banner.lower(),
+            "fulfillment_modality_matches": modality == settings.get("store.expected_modality", "IN_STORE"),
+            "prices_from_store": bool(sources) and sources == {loc.store_id},
+        }
+        if not all(checks.values()):
+            exc = FetchError(f"probe qualification failed: {checks}", "store")
+            raise exc
 
     async def get(kind, url, js=False):
         box = {}
@@ -43,18 +65,27 @@ async def run_probe(fetcher, settings, loc, out_dir: Path, query: str, max_reque
                "store_location_id": sp.store.location_id, "request_location_id": sp.request_location,
                "reported_total": sp.total, "state_upcs": sp.upcs, "dom_upcs": dom, "brands": brands}
         rows.append(row)
+        validate_probe_page(res.html, box["sp"])
         return row
 
-    p1 = await get("page1_ssr", q_url)
-    p2 = await get("page2_ssr", f"{q_url}&page=2")
-    p2js = await get("page2_js", f"{q_url}&page=2", js=True)
+    failure = None
+    stopped = ""
+    try:
+        p1 = await get("page1_ssr", q_url)
+        p2 = await get("page2_ssr", f"{q_url}&page=2")
+        p2js = await get("page2_js", f"{q_url}&page=2", js=True)
+    except FetchError as exc:
+        failure = exc
+        stopped = f"stopped before paging completed: {exc}"
+        p1 = rows[0] if rows else {"brands": [], "state_upcs": [], "dom_upcs": [], "reported_total": 0}
+        p2 = p2js = p1
     slices = []
     budget_left = max(0, max_requests - 3)            # hard bound for the first test: 3 paging requests + slices
-    stopped = ""
-    for b in sorted({x for x in p1["brands"] if x})[:budget_left]:
+    for b in ([] if failure else sorted({x for x in p1["brands"] if x})[:budget_left]):
         try:
             r = await get("brand_slice", f"{q_url}&brandName={quote(b)}")
-        except Exception as exc:          # request cap or provider failure: stop, keep everything measured so far
+        except FetchError as exc:
+            failure = exc
             stopped = f"stopped before brand '{b}': {exc}"
             break
         share = (sum(1 for x in r["brands"] if x.lower() == b.lower()) / len(r["brands"])) if r["brands"] else 0
@@ -74,5 +105,9 @@ async def run_probe(fetcher, settings, loc, out_dir: Path, query: str, max_reque
            "probe_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "query": query,
            "store_id": loc.store_id, "fingerprints": evidence.fingerprints(settings), "findings": findings,
            "brand_slices": slices, "requests": rows, "fetch_stats": fetcher.stats}
+    if failure:
+        rep["failure"] = {"kind": failure.kind, "error": str(failure)}
     (out_dir / "probe.json").write_text(json.dumps(rep, indent=2, ensure_ascii=False), encoding="utf-8")
+    if failure:
+        raise failure
     return rep

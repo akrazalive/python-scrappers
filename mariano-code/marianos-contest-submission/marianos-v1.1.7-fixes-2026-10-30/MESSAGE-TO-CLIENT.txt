@@ -1,0 +1,41 @@
+MARIANO'S #69 — 1.1.7 focused corrected revision
+
+Offline-only correction package. No provider request, Azure deployment, paid run, or budget use was made.
+
+Implemented corrections:
+- Target refusals now preserve the target HTML and a sanitized provider envelope with provider status,
+  target status, request/job identifier when present, timestamp, URL, byte count, and response hash.
+  Credentials and credential-like fields are redacted.
+- The probe command now attaches the same durable refusal recorder used by Runner.
+- Probe terminal failures are written to probe.json with earlier measurements retained, then returned as
+  a nonzero CLI result. A failure during brand slices stops further slices without discarding earlier rows.
+- Classic unsupported search payloads are validated before request counting or persistent allowance reservation.
+  page=2, coupon/savings, and unknown parameters therefore record local compatibility rejection rather than
+  looking like a dispatched provider attempt.
+- Store qualification now requires positive, nonempty source-price evidence. The rule only qualifies a
+  store/canary response; it does not remove unavailable products from the production dataset.
+- Probe responses are checked for Mariano's banner, configured store/request location, expected fulfillment
+  modality, and nonempty source-price evidence. A wrong-store response is recorded and fails immediately.
+
+Focused offline validation:
+- Full Mariano's test suite: 68 passed.
+- Source syntax checks: passed.
+- New regression coverage verifies sanitized refusal metadata and zero request-count consumption for a
+  Classic page-two compatibility rejection.
+
+Bounded command and expected stopping point:
+  python -m mscraper bounded-test test1
+This remains a bounded probe only: it stops at the first terminal refusal, compatibility rejection,
+wrong-store/qualification failure, budget exhaustion, or lock loss; it does not claim full Test 1/2
+pagination or coupon coverage. Test 1 still explicitly verifies Crystal Lake and Vernon Hills before
+the Crystal Lake probe. Full pagination and coupons remain a later route-qualified implementation step.
+
+Authoritative package:
+  marianos-scraper-1.1.7-src.zip
+  zip_sha256=6ed1ca97335190511247381a1e0336c679a055db3e5d3da51985f543ca120b5e
+  code_sha256=d007bbfda4e7597fdc4f5c602b5351ef7071326e536b714ad7570a1b8ec3ff3e
+  release_sha256=c5551f8b37038b79a17773df94912a08d17d036c696bcef7108fd395c3b8d121
+  deploy_sha256=0382cb619b0ad5ee11c4e829c90837d8a1b5a5414b5623a599ed8cebb796d96c
+
+Owner-side Walmart/Kroger entitlement, live credentials, Azure counters, deployment, paid execution,
+and live route qualification remain unverified and are not authorized by this offline revision.
