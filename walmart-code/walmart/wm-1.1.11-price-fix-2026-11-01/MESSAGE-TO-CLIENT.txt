@@ -1,0 +1,52 @@
+Walmart #32/#38 — v1.1.11 canary price validation
+
+Thank you for confirming the top-five status. Yes, I can complete the
+remaining work once the account check is done.
+
+The canary path did have the same weakness: it stripped non-digits from a
+display string. v1.1.11 now prefers the numeric current-price field, requires
+a finite value strictly greater than zero, and accepts a displayed price only
+when it is an anchored dollar amount. Regression tests reject "2 pack",
+"Only 2 left", "Save $2", zero, negatives, infinity, and malformed/date
+strings. Offline validation passes: 86 tests.
+
+This delivery is offline only. No Azure deployment, live request, entitlement
+result, or charging-rate result is claimed. The persistent probe budget remains
+3 of 10 used. No budget was reset or increased.
+
+Work that can finish now, offline, by 2026-11-03 CST:
+  - walmart_search listing-route design with documented parameters and fixture tests;
+  - a 500-product demonstration pipeline tested on fixtures;
+  - UPC/PPM/offer field validation tests;
+  - publication-protection tests.
+
+Work needing account confirmation and the bounded live test:
+  - the three-request qualification: store page plus two canaries through
+    walmart_product, with the result within 2 hours of approval.
+
+Work needing approved budgets and Azure:
+  - fresh store-100 listing and price evidence;
+  - genuine 500-product demonstration;
+  - full category, subcategory, pagination, and detail coverage (about
+    17,000 requests);
+  - UPC/PPM/offers (UPC pass about 57,700 requests);
+  - same-version live recovery, failed-publication proof, and unattended
+    Azure repeats.
+
+Elapsed estimates after each approval: qualification the same day; listing
+route about 2 days; full acceptance about 5–7 working days.
+
+Exact assistance needed:
+  1. confirm walmart_product and walmart_search entitlement and the per-1,000 rate;
+  2. approve the three-request qualification;
+  3. approve budgets for listing, full traversal, and UPC;
+  4. provide an OK to redeploy.
+
+Candid risks:
+  - If walmart_search or walmart_product cannot pin store 100 on the plan,
+    category listings have no documented store route. Full coverage would be
+    blocked; I will report that rather than collect from the wrong store.
+  - The earlier #4376 results remain failures.
+
+Unavailable products and historical observations will remain clearly separated
+from fresh accepted offers.

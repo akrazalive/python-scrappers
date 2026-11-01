@@ -11,6 +11,7 @@ import gzip
 import hashlib
 import json
 import logging
+import math
 import re
 import time
 import uuid
@@ -28,18 +29,36 @@ from .validate import validate_run
 log = logging.getLogger("mscraper.run")
 
 
-def _has_monetary_price(store_prices: dict) -> bool:
-    """Return whether a store-price block contains a source-returned money value."""
+_DISPLAY_PRICE_RE = re.compile(r"^\s*\$\s*(\d+(?:\.\d{1,2})?)\s*(?:/[A-Za-z]+)?\s*$")
+
+
+def _positive_number(value) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
+
+
+def _has_monetary_price(store_prices: dict, expected_modality: str = "IN_STORE") -> bool:
+    """Return whether a store-price block contains a payable value for the selected modality."""
     for kind in ("regular", "promo"):
         value = store_prices.get(kind)
-        if isinstance(value, dict):
-            for key in ("price", "nforPrice", "unitPrice", "defaultDescription"):
-                text = value.get(key)
-                if isinstance(text, (int, float)) and text >= 0:
-                    return True
-                if isinstance(text, str) and re.search(r"\d+(?:\.\d{1,2})?", text):
-                    return True
+        if not isinstance(value, dict):
+            continue
+        mode = str(value.get("modality") or value.get("fulfillmentMode") or value.get("fulfillmentType") or "").upper()
+        if mode and mode != expected_modality.upper():
+            continue
+        for key in ("price", "amount", "nforPrice"):
+            if _positive_number(value.get(key)):
+                return True
+        text = value.get("defaultDescription")
+        if isinstance(text, str):
+            match = _DISPLAY_PRICE_RE.fullmatch(text)
+            if match and float(match.group(1)) > 0:
+                return True
     return False
+
+
+def _has_qualifying_store_price(store_prices: dict, source_location: str, configured_store: str,
+                                 expected_modality: str) -> bool:
+    return source_location == configured_store and _has_monetary_price(store_prices, expected_modality)
 
 
 def _with_page(url: str, page: int) -> str:
@@ -164,7 +183,7 @@ class Runner:
             source = str(store_prices.get("sourceLocationId") or "")
             if source:
                 price_sources.add(source)
-            if source == self.loc.store_id and _has_monetary_price(store_prices):
+            if _has_qualifying_store_price(store_prices, source, self.loc.store_id, want_modality):
                 priced_from_store += 1
         checks = {
             "fulfillment_modality_matches": modality == want_modality,

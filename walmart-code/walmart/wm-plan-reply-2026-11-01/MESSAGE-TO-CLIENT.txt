@@ -1,0 +1,34 @@
+Walmart #32/#38 — candid bounded-plan reply
+
+Thank you for the top-five status. Yes, I can complete the remaining work once
+the account check is done.
+
+Offline work I can finish by 2026-11-03 CST:
+  - walmart_search listing-route design with documented parameters and fixture tests;
+  - a 500-product demonstration pipeline tested on fixtures;
+  - UPC/PPM/offer field validation tests;
+  - publication-protection tests.
+
+The account-dependent bounded qualification is three requests: the store page
+plus two canaries via walmart_product, with retries using those same slots. I
+will report the result within 2 hours of approval.
+
+After approved budgets and Azure access, I will provide fresh store-100
+listing/price evidence, the genuine 500-product demonstration, full category,
+subcategory, pagination and detail coverage (about 17,000 requests), UPC/PPM/
+offers (UPC pass about 57,700 requests), same-version live recovery,
+failed-publication proof, and unattended Azure repeats. Estimated elapsed time
+is qualification the same day, the listing route about 2 days, and full
+acceptance about 5–7 working days after the relevant approvals.
+
+Please provide:
+  1. walmart_product and walmart_search entitlement and per-1,000 rate;
+  2. approval for the three-request qualification;
+  3. budget approvals for listing, full traversal, and UPC;
+  4. an OK to redeploy.
+
+Risk: if the two routes cannot pin store 100 on the plan, category listings
+have no documented store route. Full coverage is then blocked, and I will
+report that instead of collecting from the wrong store. The earlier #4376
+results remain failures. Unavailable products and historical observations
+will remain separate from fresh accepted offers.

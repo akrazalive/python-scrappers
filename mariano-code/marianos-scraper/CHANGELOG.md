@@ -3,6 +3,13 @@
 All times UTC. `code_sha256` = SHA-256 over every `src/mscraper/*.py` file (path + bytes, sorted), as computed by
 `mscraper.version.code_sha256()` and printed by `tools/package_source.py`.
 
+## 1.1.9 (2026-11-01 CST) - strict qualification price validation
+
+Store qualification now accepts only finite, positive source numeric prices or anchored payable display prices,
+scoped to the configured store and selected fulfilment modality. Unrelated digits such as savings, quantities,
+stock counts and dates are no longer sufficient. Production collection still retains unavailable and no-price
+products unchanged.
+
 ## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
 
 1. Retailer HTTP 401/403 responses inside provider-200 results are terminal `refused` errors and are archived under

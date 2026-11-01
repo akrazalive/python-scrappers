@@ -16,6 +16,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import math
 import re
 import time
 import uuid
@@ -325,8 +326,11 @@ class Run:
                 probs.append(f"no PICKUP option for store {want} in fulfillmentSummary {p.fulfillment_options}")
         if (p.fulfillment_type or "").upper() != "STORE":
             probs.append(f"fulfillmentType {p.fulfillment_type or '-'} (expected STORE: store-sourced offer)")
-        shown = re.sub(r"[^0-9.]", "", p.current_price or "")
-        if not ((p.price_value or 0) > 0 or (shown and float(shown or 0) > 0)):
+        shown_match = re.fullmatch(r"\s*\$\s*(\d+(?:\.\d{1,2})?)\s*", p.current_price or "")
+        numeric_ok = isinstance(p.price_value, (int, float)) and not isinstance(p.price_value, bool) \
+            and math.isfinite(p.price_value) and p.price_value > 0
+        shown_ok = bool(shown_match and float(shown_match.group(1)) > 0)
+        if not (numeric_ok or shown_ok):
             probs.append("no current price on the store offer")
         if self.loc.zipcode and loc.get("postalCode") and loc.get("postalCode") != self.loc.zipcode:
             probs.append(f"postalCode {loc.get('postalCode')} != {self.loc.zipcode}")

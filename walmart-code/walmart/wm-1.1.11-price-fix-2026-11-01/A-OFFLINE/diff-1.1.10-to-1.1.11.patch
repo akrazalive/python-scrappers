@@ -1,0 +1,129 @@
+﻿diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/MANIFEST.txt C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/MANIFEST.txt
+--- C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/MANIFEST.txt	2026-10-30 08:15:12.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/MANIFEST.txt	2026-11-01 13:09:04.000000000 +0500
+@@ -8,7 +8,7 @@
+ 9e24d0cf8f6d3dd311add980a6ec58de607ed0721ef445b8082af44e88f5062b  config/private_label_brands.txt
+ 22eb85dad12351b871aec4aebac6d068c6661e01f4babfeb6fd96954b1492ba7  config/settings.yaml
+ 2fccf3bc395f1c373d3910622c5f92c015246646ced304c0cf6f5b0fef55ce1c  deploy/azure/deploy.sh
+-5ed9bcc32c75998ab2782a15a6e0193ec7d30e751c76065f75d4f6ca0b4bee5b  deploy/azure/main.bicep
++52247f32e3a401f7430cabb9eead01a5ac87b61ef36e599207d49f52a1c75340  deploy/azure/main.bicep
+ 616667b013ed62134d9b7c50228a80a42983663d17e46a94b22764047c7b5ab2  deploy/azure/preflight.sh
+ 2d2cf2a1f0ad5f860dcbbe79d2e224057e4be78d9a9d9a3814dbdeb1a1e65a0c  deploy/azure/run_test.sh
+ 0143fd61f5cbe86731a4cc25fba1c55caa9f1a1f7ad249d4e503afffe1c56e9f  docs/ARCHITECTURE.md
+@@ -16,7 +16,7 @@
+ 8b478b6072e332952eaa322ce43c454fb939ad0b57fdf6a4fe8aa9b600cf402a  docs/COST.md
+ 6915712ab78b4ffe87703bdf2c2a0dd043ddc2304e6127c9c960780bb87a25dc  docs/OPERATIONS.md
+ 7233ef3b5e2dbae57c2bdb7b5495b8ed0ee41e10c6563314c70f3da8954e2453  requirements.txt
+-7e86cd43cce25f952407202738189a190b4555a699a61cd0a9da7316d56bc11c  src/wmscraper/__init__.py
++02924761d20daabf2005e125cd17671469a562930cbe03b73d4f1d723ddaaab7  src/wmscraper/__init__.py
+ 4b1afbca74a10abc3cff7b4e5a11b558bf619e45b89709faf9225a474a2a250f  src/wmscraper/__main__.py
+ 2b55024af576a7e0b0aae56b8e4496c63601f729b4bd9461047541ef79c3ebca  src/wmscraper/budget.py
+ 6c5b75866c6bbdd790d206f797d5ead6b3019d2f4a2d9ebc06431397ddd0a83d  src/wmscraper/checkpoint.py
+@@ -32,7 +32,7 @@
+ af8cc2d19da9267b1fcbe156ba22b028c25ea069fc6a3d96720dca418ec2b4ad  src/wmscraper/parse/text.py
+ bc37862c5c3575513fc340ffdeef492ba9227a6b4bf2b879bdbb2f5f52fa6e35  src/wmscraper/parse/walmart.py
+ 6f35439f227e1813234c7525ff4fbc641c47590113412d5d0fd04c486b739b47  src/wmscraper/report.py
+-c9bf2f2e60ee68fcc5be7fbd4d55eec0d1b8ca0190bc2a9787cfde8ff74f3e5d  src/wmscraper/runner.py
++c54c340cbc829197ec4320b8e9992031d44b96a7863ce4aaa7bcf87e378cb776  src/wmscraper/runner.py
+ 6b2a881425fb81cb7429b41592280b455acf5b59b7c5044978b55dcd3f9e286e  src/wmscraper/storage.py
+ eea48fdccfe094e16cc2e7df65f1a8e86ad11c0570f79e0aa48988fdaaffbbd1  src/wmscraper/validate.py
+ cb8ad1dd1fc3c4f475fee3a7204bf3e2a7af93fd2978f2e2a5930fd91efec1a5  src/wmscraper/version.py
+@@ -42,6 +42,7 @@
+ ac2dae29130821a6579d3a09510f88d368a56ad846e10f123b880e0ae4d3b453  tests/test_pipeline.py
+ 522a67f743ddfb1de394f5dea476b050aa73a8c126a278783363c9e1360acdf1  tests/test_rules.py
+ a85c54a1162f5153aa7c9b406670daba8a1faae19245d3d2fc413049e4bd3657  tests/test_source_count.py
++20c053c87531327dbe202b79f58db611c7469b17f68480b16fe39693ceb3003a  tests/test_v111_price.py
+ 9a2eb40a1ade0039b9f7a3ebea01934ca845539c958066ece59581ac19448fee  tests/test_v118_safety.py
+ b60089ef339557d0863c123300765c5fa07aabd7ec5d92b331dfc6d85d0362fa  tests/test_v119_findings.py
+ 80a421c64b2c7dc360e061acbbe281286f9519ee8566a116b40a93f8c6f06c33  tools/board_system.html
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/SOURCE_FINGERPRINT.txt C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/SOURCE_FINGERPRINT.txt
+--- C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/SOURCE_FINGERPRINT.txt	2026-10-30 08:15:12.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/SOURCE_FINGERPRINT.txt	2026-11-01 13:09:04.000000000 +0500
+@@ -1,2 +1,2 @@
+-version 1.1.10
+-source_sha256 4424e76d1283149524860bb10e4364275d496d736c8106ddd89d658d77298ca9
++version 1.1.11
++source_sha256 1a65eaed672385777b15b193259a1ae66df37746fd9c5ff9b1b72e07dd43d00a
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/deploy/azure/main.bicep C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/deploy/azure/main.bicep
+--- C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/deploy/azure/main.bicep	2026-10-29 08:38:36.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/deploy/azure/main.bicep	2026-11-01 13:07:08.000000000 +0500
+@@ -25,7 +25,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the walmart-scraper container) holding the delivered source package that the job runs.')
+-param releaseBlob string = 'releases/walmart-scraper-1.1.9-src.zip'
++param releaseBlob string = 'releases/walmart-scraper-1.1.11-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/src/wmscraper/__init__.py C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/src/wmscraper/__init__.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/src/wmscraper/__init__.py	2026-10-30 08:15:04.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/src/wmscraper/__init__.py	2026-11-01 13:07:08.000000000 +0500
+@@ -1,3 +1,3 @@
+ """Walmart location-specific product scraper for Microsoft Azure."""
+ 
+-__version__ = "1.1.10"
++__version__ = "1.1.11"
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/src/wmscraper/runner.py C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/src/wmscraper/runner.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/src/wmscraper/runner.py	2026-10-30 08:10:54.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/src/wmscraper/runner.py	2026-11-01 13:06:52.000000000 +0500
+@@ -16,6 +16,7 @@
+ import asyncio
+ import json
+ import logging
++import math
+ import re
+ import time
+ import uuid
+@@ -325,8 +326,11 @@
+                 probs.append(f"no PICKUP option for store {want} in fulfillmentSummary {p.fulfillment_options}")
+         if (p.fulfillment_type or "").upper() != "STORE":
+             probs.append(f"fulfillmentType {p.fulfillment_type or '-'} (expected STORE: store-sourced offer)")
+-        shown = re.sub(r"[^0-9.]", "", p.current_price or "")
+-        if not ((p.price_value or 0) > 0 or (shown and float(shown or 0) > 0)):
++        shown_match = re.fullmatch(r"\s*\$\s*(\d+(?:\.\d{1,2})?)\s*", p.current_price or "")
++        numeric_ok = isinstance(p.price_value, (int, float)) and not isinstance(p.price_value, bool) \
++            and math.isfinite(p.price_value) and p.price_value > 0
++        shown_ok = bool(shown_match and float(shown_match.group(1)) > 0)
++        if not (numeric_ok or shown_ok):
+             probs.append("no current price on the store offer")
+         if self.loc.zipcode and loc.get("postalCode") and loc.get("postalCode") != self.loc.zipcode:
+             probs.append(f"postalCode {loc.get('postalCode')} != {self.loc.zipcode}")
+diff -ruN --strip-trailing-cr C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/tests/test_v111_price.py C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/tests/test_v111_price.py
+--- C:\Users\IZACOM~1\AppData\Local\Temp\w110/walmart-scraper/tests/test_v111_price.py	1970-01-01 05:00:00.000000000 +0500
++++ C:\Users\IZACOM~1\AppData\Local\Temp\w111/walmart-scraper/tests/test_v111_price.py	2026-11-01 13:08:56.000000000 +0500
+@@ -0,0 +1,34 @@
++import math
++from types import SimpleNamespace
++
++import pytest
++
++from wmscraper.runner import Run
++
++
++def checker(price_text, numeric=None):
++    run = Run.__new__(Run)
++    run.loc = SimpleNamespace(store_id="1234", fulfillment="pickup", zipcode="72712")
++    product = SimpleNamespace(
++        item_id="901", location={"pickupStoreId": "1234", "storeIds": ["1234"], "intent": "PICKUP",
++        "postalCode": "72712"}, fulfillment_options=[("PICKUP", "1234")],
++        fulfillment_type="STORE", current_price=price_text, price_value=numeric)
++    return run.canary_problems(product, "901")
++
++
++@pytest.mark.parametrize("value", ["2 pack", "Only 2 left", "Save $2", "0", "-1.99", "2026-11-01"])
++def test_unrelated_or_nonpositive_display_prices_fail(value):
++    assert "no current price on the store offer" in checker(value)
++
++
++def test_finite_positive_numeric_price_passes():
++    assert "no current price on the store offer" not in checker("not a price", 3.49)
++
++
++@pytest.mark.parametrize("value", [0, -1.99, math.inf, math.nan])
++def test_nonfinite_or_nonpositive_numeric_price_fails(value):
++    assert "no current price on the store offer" in checker("not a price", value)
++
++
++def test_anchored_display_price_passes():
++    assert "no current price on the store offer" not in checker("$3.49")

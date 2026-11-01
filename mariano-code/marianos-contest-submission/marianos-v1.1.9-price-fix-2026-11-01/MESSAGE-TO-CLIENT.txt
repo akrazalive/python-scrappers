@@ -1,0 +1,40 @@
+Mariano's #69 — v1.1.9 strict qualification-price correction
+
+Attached:
+  marianos-scraper-1.1.9-src.zip
+  SOURCE_FINGERPRINT-1.1.9.txt
+  SHA256SUMS.txt
+  offline evidence and normalized 1.1.8-to-1.1.9 diff
+
+The only code change is in store qualification. It now prefers source numeric
+regular/promo amounts and accepts displayed prices only when anchored as a
+payable price such as $3.49 or $3.49/lb. Values must be finite and strictly
+greater than zero, and the source store and selected IN_STORE fulfilment
+context must match store 53100544.
+
+The regression tests reject: "2 pack", "Only 2 left", "Save $2", zero,
+negative values, infinity, NaN, date text, a wrong store, and a wrong
+fulfilment mode. Regular and promo controls still pass. The full offline suite
+passes: 89 tests. Production retention of unavailable/no-price products is
+unchanged.
+
+Fingerprints:
+  code_sha256 015016b9beae17a0193223a87bc4bee81b84709692cd23fdb1bb7e7366a6b639
+  release_sha256 ba3e45a0eeea4b9c512e67d0035b79e8f3442a9f68775394d0edd1fdae20957e
+  deploy_sha256 65a8eb1c5370e5c3da31846cc7ecdf8af1643a24809e5e6cbfc966206f09ad9a
+  ZIP SHA-256 8d5b8639403b0660a654583bfcbc75086fe8fee4affaae76860be268266de6d5
+
+The persistent test1 budget remains 0 of 19. Nothing was deployed and no
+provider or live retailer request was run. The classic page-two refusal
+remains a stated limitation; it is not pagination evidence.
+
+Next offline milestone: 2026-11-03 CST, prepare the bounded acceptance
+checklist while the account check is pending.
+
+Please confirm that `kroger_search` is entitled on the account and provide
+its rate. After that confirmation:
+  1. redeploy and run the zero-request selfcheck within 2 hours of your OK;
+  2. run the two one-request store/price checks within 2 hours of approval;
+  3. run the capability probe;
+  4. run Test 2, Test 3, recovery, publication, and the unattended repeat as
+     separate acceptance items.
