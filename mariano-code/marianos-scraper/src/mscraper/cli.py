@@ -97,11 +97,11 @@ def cmd_selfcheck(settings) -> dict:
 # of them by a persistent TotalBudget, so re-running a test can never exceed its total.
 BOUNDED_TESTS = {
     "test1": {"total": 19, "steps": [
-        ["verify-store", "--location", "marianos-544-crystal-lake", "--max-requests", "2"],
+        ["verify-store", "--location", "marianos-544-crystal-lake", "--max-requests", "2"],  # diagnostic only
         ["verify-store", "--location", "marianos-502-vernon-hills", "--max-requests", "2"],
         ["probe", "--location", "marianos-544-crystal-lake", "--query", "Batteries", "--max-requests", "15"]]},
     "test2": {"total": 300, "steps": [
-        ["run", "--location", "marianos-544-crystal-lake", "--categories", "Batteries,Light Bulbs",
+        ["run", "--location", "marianos-502-vernon-hills", "--categories", "Batteries,Light Bulbs",
          "--max-requests", "300", "--no-publish", "--resume"]]},
 }
 
@@ -262,7 +262,8 @@ def main(argv=None) -> int:
                 print(f"{args.test}: total of {b.total} requests used up – step not started: {' '.join(step)}")
                 rc = 4
                 break
-            print(f"{args.test}: step {i}: {' '.join(step)}  (total used {b.used}/{b.total})", flush=True)
+            label = " [DIAGNOSTIC ONLY; disabled for acceptance]" if "marianos-544-crystal-lake" in step else ""
+            print(f"{args.test}: step {i}: {' '.join(step)}{label}  (total used {b.used}/{b.total})", flush=True)
             try:
                 step_rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
                                "--budget", spec] + step)

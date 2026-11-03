@@ -80,6 +80,7 @@ def test_bounded_test_plans_match_the_proposal():
     assert sum(caps) == 19
     t2 = cli.BOUNDED_TESTS["test2"]
     assert t2["total"] == 300 and "--no-publish" in t2["steps"][0]
+    assert "marianos-502-vernon-hills" in t2["steps"][0]
 
 
 def test_crawl_queue_starts_new_requests_without_waiting_for_slow_ones(settings, location, storage, fetcher, tmp_path):

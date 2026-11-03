@@ -58,6 +58,7 @@ class Location:
     enabled: bool = True
     categories: tuple[str, ...] = ()
     limit_per_category: int = 0
+    expected_modality: str = "IN_STORE"
 
 
 @dataclass
@@ -114,7 +115,8 @@ def _load_locations(path: Path) -> list[Location]:
             expected_address=str(item.get("expected_address") or ""),
             canary_query=str(canary.get("query") or ""), canary_upcs=tuple(str(x) for x in canary.get("upcs") or ()),
             enabled=bool(item.get("enabled", True)), categories=tuple(str(x) for x in item.get("categories") or ()),
-            limit_per_category=int(item.get("limit_per_category") or 0)))
+            limit_per_category=int(item.get("limit_per_category") or 0),
+            expected_modality=str(item.get("expected_modality") or "IN_STORE").upper()))
     return out
 
 

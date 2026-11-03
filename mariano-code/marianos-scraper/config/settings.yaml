@@ -23,7 +23,7 @@ fetch:
     # The documented source targets kroger.com; whether kroger.com serves the Mariano's store 53100544 with its own
     # in-store prices is UNVERIFIED and is exactly what Test 1 checks (store, modality and price source are read from
     # the returned page, never assumed). Delete this block to send search pages as "url" alone.
-    search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: in_store}
+    search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: "{fulfillment_type}"}
   concurrency: 4               # parallel page requests (env MSCRAPER_CONCURRENCY overrides; set from the Test 2 measurement)
   max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
   timeout_seconds: 120

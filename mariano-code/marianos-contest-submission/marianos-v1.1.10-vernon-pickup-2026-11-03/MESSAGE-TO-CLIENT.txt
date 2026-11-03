@@ -1,0 +1,33 @@
+Mariano's v1.1.10 is ready for review.
+
+Scope: Vernon Hills is the enabled acceptance location (store_id 53100502,
+1720 N Milwaukee Ave, Vernon Hills, IL 60061) and requires PICKUP. Crystal Lake
+(53100544) remains disabled and explicitly diagnostic-only.
+
+The proposed Classic request body for a Vernon Hills search is exactly:
+{"source":"kroger_search","query":"<q>","store_id":"53100502","fulfillment_type":"pickup"}
+(`query` is the requested search term). This is derived from the location
+configuration, not a global store setting.
+
+Caveat: whether Classic `kroger_search` actually serves Vernon Hills pickup
+prices is still unverified. One request decides qualification: the returned
+response must prove store ID 53100502, Mariano's banner, address, ZIP 60061,
+PICKUP modality, and a finite positive price sourced from 53100502. No
+collection is accepted on assumptions.
+
+Validation: 92 tests passed. Test 1 is unchanged at 0/19 requests and was not
+deployed or run. The new v1.1.10 tests are:
+- test_enabled_acceptance_location_and_disabled_diagnostic_are_explicit
+- test_realtime_payload_is_pinned_to_location_store_and_pickup
+- test_bounded_scope_keeps_test1_cap_stop_rule_and_uses_vernon_for_test2
+
+No Azure or Oxylabs requests were made and nothing was deployed/run. Next
+milestone: 2026-11-04 CST — perform the single approved Vernon Hills pickup
+qualification request, then decide whether acceptance can proceed.
+
+Hashes:
+code_sha256=94d4da6a6dc2256fb8010c2c5810b440cc9d8d23f994845fe7d33c06ee936400
+release_sha256=e8e1412b861a680e2e5e94c3afcc14d725ed4e9bf16d8f84f364722d393fa30e
+deploy_sha256=356861f4f8623a6de4c43c270084ee0c569e337bdae1a18d9724d1afb52dd29a
+
+See the source ZIP, fingerprint, patch, offline output, and SHA256SUMS.

@@ -1,0 +1,9 @@
+Walmart Nov 3 offline work is complete for the finished scope.
+
+Implemented and tested the opt-in `walmart_search` payload route, added offline identity/PPM/store-offer
+publication gates, and verified the existing 500-product demonstration fixture. Version 1.1.12 is packaged
+with the source hash, ZIP hash, diff, and test report.
+
+Validation: 89 tests passed (including 500-product, route, UPC/PPM/offer, and failed-run publication
+protection tests). No Azure deployment, Oxylabs request, budget change, or Mariano change was made.
+The target remains store #100 pickup; #4376 failures remain retained evidence.

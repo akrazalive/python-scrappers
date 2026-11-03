@@ -1,0 +1,4 @@
+﻿version 1.1.12
+source_sha256 be5c04697eca10934e68d88f4f2aa7c896a0c5a0ce9032ac1115973f7a9511a8
+zip_sha256 0182c094ef0ce53daf3b346f72a72a09dad5ada612682a0954b9b2a61121974c
+package dist\walmart-scraper-1.1.12-src.zip

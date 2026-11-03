@@ -10,6 +10,15 @@ scoped to the configured store and selected fulfilment modality. Unrelated digit
 stock counts and dates are no longer sufficient. Production collection still retains unavailable and no-price
 products unchanged.
 
+## 1.1.10 (2026-11-03 CST) - Vernon Hills pickup acceptance
+
+Vernon Hills (store `53100502`, ZIP `60061`, 1720 N Milwaukee Ave) is the
+enabled acceptance location and requires `PICKUP` responses with positive
+store-sourced prices. Crystal Lake (`53100544`) remains a clearly labelled,
+disabled diagnostic location. Location configuration now carries the expected
+fulfillment modality; realtime payloads derive `store_id` and pickup mode from
+that location rather than global settings.
+
 ## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
 
 1. Retailer HTTP 401/403 responses inside provider-200 results are terminal `refused` errors and are archived under

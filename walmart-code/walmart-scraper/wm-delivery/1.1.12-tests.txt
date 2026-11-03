@@ -1,0 +1,13 @@
+﻿Walmart offline validation — 1.1.12
+
+Focused: 33 passed
+Full suite: 89 passed
+
+Coverage:
+- walmart_search payload route is store/ZIP/pickup pinned and query decoded offline.
+- 500-product fixture has exactly 500 records, pipeline-owned fields remain empty, and all records pass identity/offer shape validation.
+- malformed UPC/GTIN, PPM, and sale-without-regular-offer block publication through validate_run.
+- Existing failed-run publication protection remains covered by test_pipeline.py.
+
+No Azure deployment, Oxylabs request, budget change, or Mariano changes were made.
+Target remains store #100 pickup; existing #4376 failures are retained as historical evidence.

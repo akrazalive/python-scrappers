@@ -172,10 +172,10 @@ class Runner:
         sp, html = box["sp"], res.html
         sha = self._record_page("store_verification", {"query": q}, url, html, box["state"], sp=sp)
         st = sp.store
-        modality = ""
-        for m in (((box["state"].get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []:
-            modality = m.get("modalityType") or modality
-        want_modality = self.s.get("store.expected_modality", "IN_STORE")
+        modalities = (((box["state"].get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []
+        want_modality = self.loc.expected_modality
+        returned_modalities = [str(m.get("modalityType") or "").upper() for m in modalities]
+        modality = next((m for m in returned_modalities if m == want_modality), returned_modalities[-1] if returned_modalities else "")
         price_sources: set[str] = set()
         priced_from_store = 0
         for u in sp.upcs:

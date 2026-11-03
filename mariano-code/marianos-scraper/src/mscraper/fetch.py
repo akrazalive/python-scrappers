@@ -301,7 +301,14 @@ def realtime_payload(settings, location, url: str) -> dict:
     tpl = settings.get("fetch.oxylabs_realtime.search_payload") if is_search else None
     if not tpl:
         tpl = settings.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
-    body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
+    modality = str(getattr(location, "expected_modality", "IN_STORE") or "IN_STORE").lower()
+    body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode,
+                 modality=modality, fulfillment_type=modality)
+    # Keep the location pin and pickup mode authoritative even when a minimal
+    # customer template omitted either field.
+    if is_search:
+        body.setdefault("store_id", location.store_id)
+        body.setdefault("fulfillment_type", modality)
     brand = (params.get("brandName") or [""])[0]
     if is_search and brand:
         body["brand"] = brand

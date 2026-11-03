@@ -42,6 +42,14 @@ fetch:
       store_id: "{store_id}"
       delivery_zip: "{zipcode}"
       fulfillment_type: pickup
+    # Optional search listing route for offline/approved probes. Category crawling
+    # remains on store-pinned Walmart HTML until this route is explicitly selected.
+    search_payload:
+      source: walmart_search
+      query: "{query}"
+      store_id: "{store_id}"
+      delivery_zip: "{zipcode}"
+      fulfillment_type: pickup
   zyte:
     payload:
       url: "{url}"

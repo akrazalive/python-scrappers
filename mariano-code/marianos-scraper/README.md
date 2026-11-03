@@ -31,7 +31,7 @@ python -m mscraper run --location marianos-544-crystal-lake                     
 python -m mscraper run --location marianos-544-crystal-lake --resume                                # continue an interrupted run
 python -m mscraper summary --location marianos-544-crystal-lake
 python -m mscraper probe --location marianos-544-crystal-lake --query Batteries                 # live paging / brand-filter check
-python -m mscraper bounded-test test1        # live Test 1: both stores + probe, TOTAL <= 19 requests (enforced)
+python -m mscraper bounded-test test1        # live Test 1: diagnostic Crystal Lake + Vernon Hills probe, TOTAL <= 19
 python -m mscraper bounded-test test2        # live Test 2: Batteries + Light Bulbs, no publish, TOTAL <= 300 (enforced)
 python -m mscraper budget-status             # requests used / remaining per bounded test
 ./deploy/azure/run_test.sh <sub> <rg> test1  # the same test as one MANUAL Azure job execution, evidence downloaded

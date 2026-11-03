@@ -13,9 +13,34 @@ threshold blocks publication.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import re
 
 from .models import FIELD_ORDER
 from .parse.text import is_approximate_weight
+
+_GTIN_RE = re.compile(r"^\d{8,14}$")
+_PRICE_RE = re.compile(r"^\d+(?:\.\d{1,2})?$")
+_PPM_RE = re.compile(r"^\s*\$?\d+(?:\.\d+)?\s*¢?\s*/\s*\S+")
+
+
+def validate_record_contract(records: list[dict]) -> list[str]:
+    """Validate identity and store-offer field shapes without recalculating PPM."""
+    errors: list[str] = []
+    for index, record in enumerate(records):
+        prefix = f"record {index}"
+        upc = record.get("upc", "")
+        if upc and not _GTIN_RE.fullmatch(str(upc)):
+            errors.append(f"{prefix}: invalid UPC/GTIN")
+        for field in ("regular_price", "sale_price", "volume_deals_price", "digital_deals_price"):
+            value = record.get(field, "")
+            if value and not _PRICE_RE.fullmatch(str(value)):
+                errors.append(f"{prefix}: invalid {field}")
+        ppm = record.get("ppm", "")
+        if ppm and not _PPM_RE.match(str(ppm)):
+            errors.append(f"{prefix}: invalid PPM")
+        if record.get("sale_price") and not record.get("regular_price"):
+            errors.append(f"{prefix}: sale price has no regular-price offer")
+    return errors
 
 
 @dataclass
@@ -42,6 +67,9 @@ def completeness(records: list[dict]) -> dict[str, float]:
 
 def validate_run(settings, ck, records: list[dict], categories, previous_report: dict | None) -> Validation:
     v = Validation()
+
+    for error in validate_record_contract(records):
+        v.fail(error)
 
     # 1. store context
     store = ck.get("store_verification") or {}

@@ -9,6 +9,8 @@
 # limit_per_category  optional: cap products per category (demo / smoke runs only; 0 = no cap)
 
 locations:
+  # Diagnostic only: intentionally disabled in v1.1.10. It remains configured so a
+  # response accidentally returned for Crystal Lake cannot be mistaken for acceptance.
   - key: marianos-544-crystal-lake
     store_id: "53100544"
     zipcode: "60014"
@@ -16,13 +18,14 @@ locations:
     canary:
       query: milk
       upcs: ["0001111050438", "0001111082556"]   # Simple Truth Organic 2% milk, Kroger lactose-free 2% milk
-    enabled: true
+    expected_modality: "IN_STORE"
+    enabled: false
 
   # Client-supplied store: Mariano's Vernon Hills, 1720 N Milwaukee Ave, Vernon Hills, IL 60061.
   # store_id 53100502 is a CANDIDATE taken from the public store page URL (marianos.com/stores/grocery/il/vernon-hills/
   # marianos-vernon-hills/531/00502). It is NOT verified until `verify-store --location marianos-502-vernon-hills`
   # shows, from Mariano's own responses, location id 53100502 + ZIP 60061 + "1720 N Milwaukee" + store-sourced prices.
-  # Kept disabled until then; its results are always labelled with the store details read from its own responses.
+  # Enabled acceptance location for v1.1.10. Results are labelled with response-derived store details.
   - key: marianos-502-vernon-hills
     store_id: "53100502"
     zipcode: "60061"
@@ -30,7 +33,8 @@ locations:
     canary:
       query: milk
       upcs: []          # set after verification (UPCs priced at this store)
-    enabled: false
+    expected_modality: "PICKUP"
+    enabled: true
 
   # Example of another store (disabled). Fill zipcode/expected_address from verify-store before enabling.
   - key: marianos-539-bronzeville

@@ -4,7 +4,7 @@
 #
 #   run_test.sh <sub> <rg> selfcheck         # 0 provider requests: Key Vault credentials present, blob + state write/read
 #   run_test.sh <sub> <rg> test1             # <= 19 provider requests in total (both stores + probe)
-#   run_test.sh <sub> <rg> test2             # <= 300 in total (Batteries + Light Bulbs, Crystal Lake, no publish)
+#   run_test.sh <sub> <rg> test2             # <= 300 in total (Batteries + Light Bulbs, Vernon Hills, no publish)
 #   run_test.sh <sub> <rg> full <cap>        # Test 3: all CSV rows, Crystal Lake, total <= <cap> (client-approved);
 #                                            # the same command resumes the unfinished run from its checkpoint
 #   run_test.sh <sub> <rg> stop              # forced interruption of the running execution (kill/resume test)

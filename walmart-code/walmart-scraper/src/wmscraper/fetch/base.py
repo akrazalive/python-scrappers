@@ -14,6 +14,7 @@ import re
 import random
 import time
 from dataclasses import dataclass
+from urllib.parse import parse_qs, urlparse
 
 from ..config import Location, Settings
 from ..parse.walmart import detect_challenge
@@ -81,6 +82,10 @@ def classic_payload(settings, location, url: str) -> dict:
     Product pages: the documented `walmart_product` source with store localisation (store_id, delivery_zip,
     fulfillment_type) when `fetch.oxylabs.product_payload` is configured; everything else: `fetch.oxylabs.payload`."""
     m = _IP_RE.search(url)
+    if "/search" in urlparse(url).path and settings.get("fetch.oxylabs.search_payload") is not None:
+        tpl = settings.get("fetch.oxylabs.search_payload")
+        query = (parse_qs(urlparse(url).query).get("q") or [""])[0]
+        return fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
     tpl = settings.get("fetch.oxylabs.product_payload") if m else None
     if tpl:
         return fill(tpl, url=url, product_id=m.group(1), store_id=location.store_id, zipcode=location.zipcode)
