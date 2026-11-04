@@ -1,5 +1,31 @@
 # Changes
 
+## 1.1.13 (2026-11-04) - corrections from the client's static review of 1.1.12
+
+Offline only: no Oxylabs request, no Azure deployment, no budget change (probe budget stays 3 of 10).
+Tests: `tests/test_v113_corrections.py` (52 cases) + `test_detection.py::test_no_offer_collection_for_walmart`;
+the 6 deal-classification tests are removed with `parse/deals.py`. Full suite 136 passed.
+1. **Search route keeps page and filters** (`fetch/base.search_payload`). `/search` URLs map `page` -> `start_page`
+   and `min_price` / `max_price` -> the same payload keys, whole numbers only (`fetch.oxylabs.search_params`), as in
+   Oxylabs' Walmart search parameter table (checked 2026-11-04; it lists no `pages` and no `delivery_zip`).
+   Any other parameter (facet, sort, cat_id, a different `stores`, an invalid or fractional value) is refused as terminal `compat`,
+   never dropped. A listing page with exactly the previous page's products fails the listing ("pagination not
+   honoured") so a repeated page one is never counted as traversal. Category browsing stays on `/browse` and does
+   not use this helper. The route itself is still PROPOSED and not run.
+2. **Walmart offer fields always empty; no offer collection.** `runner._record` no longer calls `deals.classify`;
+   `parse/deals.py`, the promotion-text parsing, the offer census and the deal examples in `report.json` are removed. `Record` and
+   `models.enforce_empty_fields` (applied in `Run.finish` to fresh and carried-forward records) blank all four
+   volume/digital fields. `validate_record_contract` fails a run if any of them is non-empty.
+3. **Whole-token listing prices** (`parse/text.listing_price`). Listing `current_price` / `was_price` are validated
+   before normalisation, so "Only 2 left", "Save $2", "2 for $5", ranges, zero, NaN and negatives give `""`
+   (identity kept, price never invented; `price_rejected` event). The validator also requires prices > 0.
+4. **Listing context and offer chain.** `_check_context` now requires the selected `storeId` (and `pickupStore` when
+   present), intent PICKUP and the configured ZIP, each present, and no other location block on the page that
+   disagrees. Items need a store-bound offer: not in Walmart's shipping stack, no other store in the fulfillment
+   summary, and a summary entry for this store, unless the store item is unavailable (identity kept).
+5. **Fixture packaged.** `walmart-500-demo.json` is now in the source ZIP. It is an existing offline fixture, not a
+   genuine 500-product demonstration.
+
 ## 1.1.9 (2026-10-29) – lease safety and target refusal evidence
 
 1. The lease is checked again after pacing immediately before budget reservation and the provider send; a lost lease

@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import re
 
-from .models import FIELD_ORDER
+from .models import FIELD_ORDER, WALMART_EMPTY_OFFER_FIELDS
 from .parse.text import is_approximate_weight
 
 _GTIN_RE = re.compile(r"^\d{8,14}$")
@@ -31,10 +31,13 @@ def validate_record_contract(records: list[dict]) -> list[str]:
         upc = record.get("upc", "")
         if upc and not _GTIN_RE.fullmatch(str(upc)):
             errors.append(f"{prefix}: invalid UPC/GTIN")
-        for field in ("regular_price", "sale_price", "volume_deals_price", "digital_deals_price"):
+        for field in ("regular_price", "sale_price"):
             value = record.get(field, "")
-            if value and not _PRICE_RE.fullmatch(str(value)):
+            if value and not (_PRICE_RE.fullmatch(str(value)) and float(value) > 0):
                 errors.append(f"{prefix}: invalid {field}")
+        for field in WALMART_EMPTY_OFFER_FIELDS:
+            if record.get(field, "") != "":
+                errors.append(f"{prefix}: {field} must be empty for Walmart")
         ppm = record.get("ppm", "")
         if ppm and not _PPM_RE.match(str(ppm)):
             errors.append(f"{prefix}: invalid PPM")

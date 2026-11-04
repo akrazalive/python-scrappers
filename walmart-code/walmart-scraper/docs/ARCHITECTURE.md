@@ -8,7 +8,7 @@
         3 canary:start  known items must show a local Walmart offer at this store
         4 discovery     category pages → subcategory listings (CSV exclusions applied)
         5 listings      every page: shape check · store check · filters · dedup → checkpoint
-        6 enrichment    product page: UPC, size, store re-check, marketplace re-check, deals
+        6 enrichment    product page: UPC, size, store re-check, marketplace re-check
         7 canary:end
         8 validate      all checks pass → publish latest/  ·  otherwise keep last good data
    Fetch layer: pacing · retries + backoff · challenge / tiny-page / latency detection
@@ -32,8 +32,8 @@
 | PPM | Walmart's displayed `UNIT_PRICE` price line copied verbatim (e.g. `10.2 ¢/fl oz`); empty when not shown; never computed. |
 | UPC / GUPC | UPC from the product page, never altered. `gupc` always `""`. |
 | unit_price | Always `""` (downstream pipeline). |
-| Prices | `regular_price` = was-price when on sale, else current; `sale_price` = current when a was-price exists. Two-decimal strings. |
-| Volume vs digital deals | `parse/deals.py`: clip / coupon / activate / add offer → digital; N for $X, BOGO, mix & match, must buy, buy N → volume. Wording preserved; price only when displayed; Walmart Cash / cashback / rebates never treated as price reductions. |
+| Prices | Each listing price field must be one whole price token (`parse/text.listing_price`: typed number > 0, or e.g. `$4.98`; never a number found inside "Only 2 left" / "Save $2"). Rejected values are logged as `price_rejected`. `regular_price` = was-price when on sale, else current; `sale_price` = current when a valid was-price exists. Two-decimal strings. |
+| Volume vs digital deals | Walmart: all four fields (`volume_deals_description`, `volume_deals_price`, `digital_deals_description`, `digital_deals_price`) are always `""` (client decision, 1.1.13). Enforced in `models.enforce_empty_fields` on every export path and by validation. Walmart offers are not collected at all: no promotion text is parsed, there is no offer census and no deal examples in `report.json` (`parse/deals.py` removed). |
 | Private label | `config/private_label_brands.txt` matched against brand and title start → `store_brand` = `yes` / `no`. |
 
 ## Category discovery

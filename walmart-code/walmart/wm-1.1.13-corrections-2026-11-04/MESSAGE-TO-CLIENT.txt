@@ -1,0 +1,46 @@
+Walmart 1.1.13: offline corrections for your 1.1.12 static review
+
+Thank you for the detailed review. All five points are corrected offline in Walmart 1.1.13. Nothing live was run.
+There was no Oxylabs request, no Azure deployment and no budget change, and the Walmart probe balance is still 3/10.
+Mariano's is in a separate message.
+
+1. Search pagination and filters: page=1 and page=2 now build different requests ("page" becomes "start_page").
+   min_price and max_price are carried as whole numbers, as in Oxylabs' Walmart search parameter table. Any
+   parameter the route cannot express (facet, sort, cat_id, a different store, an invalid or fractional value) is
+   refused, not dropped. If a page returns exactly the previous page's products, the listing fails, so a repeated
+   page one is never counted as traversal. Category browsing stays on its own /browse route, and the search route
+   remains proposed and not run.
+2. Offer fields: all four Walmart volume/digital fields are "" on fresh and carried-forward records, and validation
+   fails a run if any of them is filled. Walmart offers are no longer collected at all: deals.py, promotion-text
+   parsing, the offer census and the deal examples in the report are removed. Live-offer collection is removed from
+   the Walmart completion list.
+3. Listing prices: each listing price field must be one whole price token before normalisation. "Only 2 left",
+   "Save $2", "2 for $5", ranges, zero, negatives and NaN are rejected on collection, not only on canaries. The
+   product identity is kept, no price is invented, and each rejection is logged.
+4. Listing context: pages must show the selected store, PICKUP and ZIP 72712, with no disagreeing location block.
+   Items must have a store-bound offer, so shipping-stack, other-store and unbound items are rejected, while
+   unavailable store items keep their identity. Checked offline against our 37 archived store-100 listing pages: all
+   pass, and the 1,714 real price values are unaffected. One STORE-typed item in Walmart's shipping stack, which 1.1.12
+   would have accepted, is now rejected.
+5. Fixture: the existing walmart-500-demo.json is attached unchanged and is now in the ZIP. The recorded 1.1.12
+   output and a re-run of the delivered 1.1.12 ZIP are included: 1 failed without the fixture, 3 passed with it.
+   It is offline evidence only, not a genuine 500-product demonstration.
+
+Tests: 136 passed, also from a clean extract of the ZIP (53 new cases; the 6 deal-classification tests were removed
+with deals.py). Source fingerprint f9e02ced...; ZIP sha256 48382c21... (full hashes in SHA256SUMS.txt).
+
+Readable files (no ZIP needed):
+  00-CORRECTION-TO-TEST-MAP.md         each finding -> file:line -> test names
+  READABLE-CHANGED-FILES-1.1.13.txt    every changed source/test file in one text file, with path, sha256, line numbers
+  B-DIFF/diff-1.1.12-to-1.1.13.patch   normalized diff (UTF-8, LF) built from the two delivered ZIPs
+  C-TESTS/                             full and focused pytest output
+  D-FIXTURE/                           the fixture and its recorded test output
+  PREVIEW-TXT/                         .txt copies of the .md and .patch files, for preview in Freelancer
+
+Documentation check: the classic walmart_search page returned HTTP 500. The Walmart search table I could read
+(Oxylabs API reference, /walmart/search) lists start_page, min_price, max_price (integers), store_id and
+fulfillment_type. It lists no "pages", so none is sent, and no "delivery_zip", which is kept from 1.1.12 but marked
+unconfirmed. Account support for the route is unverified, and it is not claimed to work.
+
+Next checkpoint: Thursday 2026-11-05, 10:00 CST, offline reply to any findings on 1.1.13. No live work is scheduled.
+Qualification, budgets, redeployment and any execution stay with your decision.

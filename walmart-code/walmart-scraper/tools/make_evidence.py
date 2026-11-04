@@ -272,14 +272,10 @@ def section_live(out: Path, loc, st, kill_after: int, max_requests: int = 0) -> 
     ex = {"schema_field_order": list(FIELD_ORDER), "all_records_match_schema": keys_ok,
           "ppm_examples": [r for r in records if r["ppm"]][:5],
           "upc_examples": [r for r in records if r["upc"]][:5],
-          "volume_deal_examples": [r for r in records if r["volume_deals_description"]][:5],
-          "digital_deal_examples": [r for r in records if r["digital_deals_description"]][:5],
-          "no_deal_examples": [r for r in records if not (r["volume_deals_description"] or r["digital_deals_description"]
-                                                          or r["sale_price"])][:5]}
+          "sale_price_examples": [r for r in records if r["sale_price"]][:5]}  # Walmart offer fields are always ""
     (d / "13-schema-and-field-examples.json").write_text(json.dumps(ex, indent=2, ensure_ascii=False), encoding="utf-8")
 
     export_traces(d / "06-structured-log.jsonl", d / "15-product-identity-trace.csv")
-    (d / "16-offer-census.json").write_text(json.dumps(rep["offer_census"], indent=2, ensure_ascii=False), encoding="utf-8")
     sh([PY, "tools/results_board.py", str(run_dir)], d / "14-results-board.log")
     if (ROOT / "entry" / "02-results-board.png").exists():
         shutil.copy(ROOT / "entry" / "02-results-board.png", d / "14-results-board.png")
@@ -313,8 +309,7 @@ def write_index(out: Path, loc, live: dict | None, azure_dir: Path | None):
           "| Real repeat collection | `B2-live-repeat-run/` (second fresh run, validated against the first published run) |",
           "| Production traversal beyond 25 pages | `E-production-traversal/05-listing-exhaustion.csv` (exhaustion + price partitioning) |",
           "| Product identity / variants | `B-live-walmart/15-product-identity-trace.csv` (request → response id/name/UPC → output) |",
-          "| Offers displayed by Walmart | `B-live-walmart/16-offer-census.json` (every label, classified) |",
-          "| PPM, UPC, offer terms as scraped | `B-live-walmart/13-schema-and-field-examples.json`, raw responses in `07-…` |",
+          "| PPM, UPC as scraped (Walmart offer fields always empty) | `B-live-walmart/13-schema-and-field-examples.json`, raw responses in `07-…` |",
           "| Azure scheduled publishing | `C-azure-deployed/` |" if azure_dir else "| Azure scheduled publishing | (pending) |",
           "| Deployment, schedule, operations, cost | source ZIP → `docs/OPERATIONS.md`, `docs/COST.md`, `deploy/azure/` |",
           "", "## File checksums", "", "| file | sha256 |", "|---|---|"]

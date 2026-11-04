@@ -42,14 +42,24 @@ fetch:
       store_id: "{store_id}"
       delivery_zip: "{zipcode}"
       fulfillment_type: pickup
-    # Optional search listing route for offline/approved probes. Category crawling
-    # remains on store-pinned Walmart HTML until this route is explicitly selected.
+    # Optional search listing route (/search URLs only) for offline/approved probes - PROPOSED, not run. Category
+    # browsing stays on the store-pinned /browse route and never uses this helper.
+    # Checked 2026-11-04 against Oxylabs' Walmart search parameter table (developers.oxylabs.io > API reference >
+    # Commerce scrapers > /walmart/search): query, start_page, min_price / max_price (integers), store_id,
+    # fulfillment_type, sort_by, fulfillment_speed. That table lists no "pages" and no "delivery_zip"; the
+    # classic-source page for walmart_search could not be loaded, so delivery_zip (kept from 1.1.12) is unconfirmed.
     search_payload:
       source: walmart_search
       query: "{query}"
       store_id: "{store_id}"
       delivery_zip: "{zipcode}"
       fulfillment_type: pickup
+    # Walmart /search URL parameter -> payload key. Any other URL parameter (facet, sort, cat_id, ...) is REFUSED,
+    # never dropped.
+    search_params:
+      page: start_page
+      min_price: min_price
+      max_price: max_price
   zyte:
     payload:
       url: "{url}"

@@ -33,6 +33,18 @@ FIELD_ORDER: tuple[str, ...] = (
 )
 
 PIPELINE_OWNED = ("gupc", "unit_price")  # never populated by the scraper
+# Walmart scope: volume / digital offer fields are always "" (client decision; offers are not collected for Walmart)
+WALMART_EMPTY_OFFER_FIELDS = ("volume_deals_description", "volume_deals_price",
+                              "digital_deals_description", "digital_deals_price")
+ALWAYS_EMPTY = PIPELINE_OWNED + WALMART_EMPTY_OFFER_FIELDS
+
+
+def enforce_empty_fields(records: list[dict]) -> list[dict]:
+    """Every export path (fresh, carried-forward, re-validated) passes through here before it is written."""
+    for r in records:
+        for name in ALWAYS_EMPTY:
+            r[name] = ""
+    return records
 
 
 @dataclass
@@ -65,7 +77,7 @@ class Record:
         for name in FIELD_ORDER:
             value = getattr(self, name)
             out[name] = "" if value is None else str(value)
-        for name in PIPELINE_OWNED:
+        for name in ALWAYS_EMPTY:
             out[name] = ""
         return out
 

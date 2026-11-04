@@ -5,7 +5,7 @@ import json
 import pytest
 
 from wmscraper.config import load_settings
-from wmscraper.models import FIELD_ORDER
+from wmscraper.models import FIELD_ORDER, WALMART_EMPTY_OFFER_FIELDS
 from wmscraper.runner import Run
 from wmscraper.storage import build_storage
 
@@ -44,15 +44,10 @@ def test_full_run_publishes_valid_data(site):
     assert gv["store_brand"] == "yes" and gv["upc"] == "078742351865" and gv["ppm"] == "2.7 ¢/fl oz" and gv["weight"] == "1 gal"
     fl = by["Fairlife 2% Milk, 52 fl oz"]
     assert (fl["regular_price"], fl["sale_price"]) == ("5.48", "4.98")
-    assert (fl["volume_deals_description"], fl["volume_deals_price"]) == ("2 for $9", "9.00")
-    assert by["Horizon Organic Milk, 0.5 gal"]["digital_deals_description"] == "Clip Coupon: Save $1.00"
-    assert by["Horizon Organic Milk, 0.5 gal"]["digital_deals_price"] == ""
-    lays = by["Lay's Classic Chips, 8 oz"]
-    assert lays["digital_deals_price"] == "3.50"
+    # Walmart: all four volume / digital offer fields are "" even where the listing shows "2 for $9" / coupons
+    for r in recs:
+        assert all(r[f] == "" for f in WALMART_EMPTY_OFFER_FIELDS), r
     assert "Shipping Only Milk 12 pack" not in by  # online-only offer: not part of the store assortment
-    dor = by["Doritos Nacho, 9.25 oz"]
-    assert dor["volume_deals_description"] == "Buy 1, Get 1 Free" and dor["volume_deals_price"] == ""
-    assert "Walmart Cash" not in dor["digital_deals_description"]
 
 
 def test_store_mismatch_blocks_publication(site):

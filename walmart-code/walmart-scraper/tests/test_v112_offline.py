@@ -1,38 +1,38 @@
-"""Offline acceptance checks for the 1.1.12 Walmart handoff."""
+"""Offline acceptance checks for the 1.1.12 Walmart handoff (route test corrected in 1.1.13)."""
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
+from wmscraper.config import load_settings
 from wmscraper.fetch import classic_payload
+from wmscraper.models import WALMART_EMPTY_OFFER_FIELDS
 from wmscraper.validate import validate_record_contract
 
 
 def test_walmart_search_route_builds_store_pinned_payload(site):
-    settings = __import__("wmscraper.config", fromlist=["load_settings"]).load_settings(str(site))
-    settings.raw["fetch"]["oxylabs"]["search_payload"] = {
-        "source": "walmart_search",
-        "query": "{query}",
-        "store_id": "{store_id}",
-        "delivery_zip": "{zipcode}",
-        "fulfillment_type": "pickup",
-    }
+    settings = load_settings(str(site))
     location = settings.location("test-store")
     payload = classic_payload(settings, location, "https://www.walmart.com/search?q=whole%20milk&page=2")
+    # 1.1.12 dropped page=2 here; the page is now carried as start_page
     assert payload == {
         "source": "walmart_search",
         "query": "whole milk",
         "store_id": "1234",
         "delivery_zip": "72712",
         "fulfillment_type": "pickup",
+        "start_page": 2,
     }
 
 
-def test_500_product_fixture_is_complete_and_not_published_by_demo():
+def test_500_product_fixture_passes_offline_contract():
+    """walmart-500-demo.json is an existing OFFLINE fixture (records retained from the earlier v1.1.0 run data).
+    It is offline evidence of record shape only - not a genuine 500-product demonstration."""
     path = Path(__file__).parents[1] / "walmart-500-demo.json"
     records = json.loads(path.read_text(encoding="utf-8"))
     assert len(records) == 500
     assert all(record["gupc"] == "" and record["unit_price"] == "" for record in records)
+    assert all(record[f] == "" for record in records for f in WALMART_EMPTY_OFFER_FIELDS)
     assert all(not validate_record_contract([record]) for record in records)
 
 

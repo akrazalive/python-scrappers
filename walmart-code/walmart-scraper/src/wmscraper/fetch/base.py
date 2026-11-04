@@ -77,15 +77,46 @@ def require_live_lock(fetcher) -> None:
 _IP_RE = re.compile(r"walmart\.com/ip/(?:[^/?#]+/)?(\d+)")
 
 
+_SEARCH_INT = re.compile(r"^\d+$")  # start_page, min_price, max_price are integers in the provider contract
+
+
+def search_payload(settings, location, url: str) -> dict:
+    """`walmart_search` body for a /search URL. Every URL parameter is either carried into the payload through
+    `fetch.oxylabs.search_params` (URL name -> payload key, e.g. page -> start_page; whole numbers only), consumed (q; stores equal to
+    the configured store), or the request is REFUSED: a filter or page the route cannot express is never silently
+    dropped (that would turn page 2 into a repeat of page 1). Category browsing does not use this route."""
+    u = urlparse(url)
+    params = parse_qs(u.query, keep_blank_values=True)
+    mapping = settings.get("fetch.oxylabs.search_params") or {}
+    query = (params.pop("q", None) or [""])[0].strip()
+    if not query:
+        raise FetchError(f"search route: no query in {url}", "compat")
+    stores = params.pop("stores", None)
+    if stores and stores != [location.store_id]:
+        raise FetchError(f"search route: stores={stores} differs from configured store {location.store_id}", "compat")
+    params.pop("povid", None)  # Walmart click-tracking id, not a filter
+    extra: dict = {}
+    for name, values in params.items():
+        if name not in mapping:
+            raise FetchError(f"search route: unsupported parameter '{name}' in {url} (refused, not dropped)", "compat")
+        if len(values) != 1 or not _SEARCH_INT.fullmatch(values[0]):
+            raise FetchError(f"search route: {name}={values} is not one whole number in {url}", "compat")
+        value = int(values[0])
+        if name == "page" and value < 1:
+            raise FetchError(f"search route: invalid page {values[0]} in {url}", "compat")
+        extra[mapping[name]] = value
+    body = fill(settings.get("fetch.oxylabs.search_payload"), url=url, query=query,
+                store_id=location.store_id, zipcode=location.zipcode)
+    return {**body, **extra}
+
+
 def classic_payload(settings, location, url: str) -> dict:
     """Classic Web Scraper API body (realtime.oxylabs.io/v1/queries).
     Product pages: the documented `walmart_product` source with store localisation (store_id, delivery_zip,
     fulfillment_type) when `fetch.oxylabs.product_payload` is configured; everything else: `fetch.oxylabs.payload`."""
     m = _IP_RE.search(url)
-    if "/search" in urlparse(url).path and settings.get("fetch.oxylabs.search_payload") is not None:
-        tpl = settings.get("fetch.oxylabs.search_payload")
-        query = (parse_qs(urlparse(url).query).get("q") or [""])[0]
-        return fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
+    if urlparse(url).path.rstrip("/") == "/search" and settings.get("fetch.oxylabs.search_payload") is not None:
+        return search_payload(settings, location, url)
     tpl = settings.get("fetch.oxylabs.product_payload") if m else None
     if tpl:
         return fill(tpl, url=url, product_id=m.group(1), store_id=location.store_id, zipcode=location.zipcode)

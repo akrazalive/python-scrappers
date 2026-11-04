@@ -127,13 +127,21 @@ def store_context_excerpt(data: Any, limit: int = 40) -> list[dict]:
 def page_location(data: Any) -> dict:
     """The page's SELECTED location (explicit path, not 'a store id anywhere in the response')."""
     initial = dig(data, "props", "pageProps", "initialData") or {}
+    found = []
     for path in (("pageMetadata", "location"), ("contentLayout", "pageMetadata", "location"),
                  ("searchResult", "pageMetadata", "location"), ("data", "contentLayout", "pageMetadata", "location")):
         loc = dig(initial, *path)
         if isinstance(loc, dict) and loc.get("storeId"):
-            return {"storeId": str(loc.get("storeId")), "intent": clean_text(loc.get("intent")),
-                    "postalCode": clean_text(loc.get("postalCode")), "path": "initialData." + ".".join(path)}
-    return {}
+            found.append({"storeId": str(loc.get("storeId")), "intent": clean_text(loc.get("intent")),
+                          "postalCode": clean_text(loc.get("postalCode")),
+                          "pickupStore": str(loc.get("pickupStore") or ""), "path": "initialData." + ".".join(path)})
+    if not found:
+        return {}
+    out = dict(found[0])
+    # every selected-location block on the page must agree (store, intent, ZIP); otherwise the context is conflicting
+    keys = ("storeId", "intent", "postalCode")
+    out["conflicts"] = [f for f in found[1:] if any(f[k] and out[k] and f[k] != out[k] for k in keys)]
+    return out
 
 
 # ----------------------------------------------------------------------------- listing
@@ -151,7 +159,6 @@ class ListingItem:
     seller_id: str
     sponsored: bool
     fulfillment_texts: list[str]
-    promo_texts: list[str]
     upc: str = ""
     raw: dict = field(default_factory=dict, repr=False)
     pickup_store_ids: set = field(default_factory=set)   # stores offering PICKUP / IN_STORE for this item
@@ -178,6 +185,18 @@ class ListingItem:
         if self.store_ids_any:
             return store_id in self.store_ids_any
         return True
+
+    def store_offer_problem(self, store_id: str) -> str:
+        """'' when this store item's price is bound to the selected store's own offer: not in Walmart's shipping
+        stack, no other store in its fulfillment summary, and either a summary entry for this store or an
+        unavailable store item (Walmart drops the summary when out of stock - identity kept, never dropped)."""
+        if self.secondary_stack:
+            return "shipping_context_not_store_offer"
+        if self.store_ids_any - {store_id}:
+            return "conflicting_store_offer"
+        if not self.store_ids_any and self.availability_value in ("", "IN_STOCK"):
+            return "store_offer_unbound"
+        return ""
 
     @property
     def is_marketplace(self) -> bool:
@@ -261,11 +280,6 @@ def _item_from(d: dict) -> ListingItem | None:
     image = dig(d, "imageInfo", "thumbnailUrl") or d.get("image") or ""
     if isinstance(image, dict):
         image = image.get("url", "")
-    promo = []
-    promo += _texts(d.get("badges") or {})
-    for key in ("promoDiscount", "promoData", "groupMetaData", "eaPricingText", "volumePricing", "offerText", "couponInfo"):
-        if d.get(key):
-            promo += _texts(d.get(key)) if not isinstance(d[key], str) else [clean_text(d[key])]
     fulfil = _texts(d.get("fulfillmentBadgeGroups") or []) + _texts(d.get("fulfillmentBadges") or [])
     if isinstance(d.get("fulfillmentBadge"), str):
         fulfil.append(clean_text(d["fulfillmentBadge"]))
@@ -280,8 +294,6 @@ def _item_from(d: dict) -> ListingItem | None:
             pickup_stores.add(str(fs["storeId"]))
     badge_texts = _texts((d.get("badges") or {}).get("groupsV2") or [])
     fulfil += [t for t in badge_texts if any(k in t.lower() for k in ("pickup", "shipping", "delivery", "in store", "in-store"))]
-    if isinstance(d.get("discountsRaw"), dict):
-        promo += _texts(d["discountsRaw"].get("discountMetaData") or [])
     return ListingItem(
         item_id=item_id,
         title=title,
@@ -295,7 +307,6 @@ def _item_from(d: dict) -> ListingItem | None:
         seller_id=clean_text(d.get("sellerId")),
         sponsored=bool(d.get("isSponsoredFlag") or d.get("sponsoredProduct") or d.get("isSponsored")),
         fulfillment_texts=fulfil,
-        promo_texts=promo,
         upc=clean_text(d.get("upc")),
         raw=d,
         pickup_store_ids=pickup_stores,
@@ -412,7 +423,6 @@ class ProductDetail:
     seller_id: str
     store_ids: set[str]
     fulfillment_texts: list[str]
-    promo_texts: list[str]
     image_url: str
     location: dict = field(default_factory=dict)   # product's selected pickup location (explicit)
     fulfillment_type: str = ""
@@ -442,10 +452,6 @@ def parse_product(html: str, final_url: str = "") -> ProductDetail:
     for opt in product.get("fulfillmentSummary") or []:
         if isinstance(opt, dict) and opt.get("fulfillment"):
             fulfil.append(str(opt["fulfillment"]))
-    promo = (_texts(product.get("badges") or {}) + _texts(product.get("promoDiscount") or {})
-             + _texts(product.get("offerPromotions") or []) + _texts(product.get("discounts") or {}))
-    if isinstance(product.get("topPromoText"), str):
-        promo.append(clean_text(product["topPromoText"]))
     return ProductDetail(
         item_id=str(product.get("usItemId")),
         name=clean_text(product.get("name")),
@@ -459,7 +465,6 @@ def parse_product(html: str, final_url: str = "") -> ProductDetail:
         seller_id=clean_text(product.get("sellerId")),
         store_ids=store_ids_in(data),
         fulfillment_texts=fulfil,
-        promo_texts=promo,
         image_url=str(image),
         location={"storeIds": [str(x) for x in dig(product, "location", "storeIds") or []],
                   "pickupStoreId": str(dig(product, "location", "pickupLocation", "storeId") or ""),

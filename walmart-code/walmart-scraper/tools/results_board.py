@@ -114,9 +114,7 @@ pre{{font-size:11.5px;line-height:1.5;color:#c9d6f2;background:#0a1322;border:1p
 </div>
 <div class="g">
  <div class="card"><h2><i>PPM</i> Price per measure (as displayed)</h2><table><tr><th>product_title</th><th>regular_price</th><th>ppm</th></tr>{ex_rows(ex.get('ppm', []), ['product_title', 'regular_price', 'ppm'])}</table></div>
- <div class="card"><h2><i>VOLUME</i> Volume deals</h2><table><tr><th>product_title</th><th>volume_deals_description</th><th>volume_deals_price</th></tr>{ex_rows(ex.get('volume_deals', []), ['product_title', 'volume_deals_description', 'volume_deals_price'])}</table></div>
- <div class="card"><h2><i>DIGITAL</i> Digital deals</h2><table><tr><th>product_title</th><th>digital_deals_description</th><th>digital_deals_price</th></tr>{ex_rows(ex.get('digital_deals', []), ['product_title', 'digital_deals_description', 'digital_deals_price'])}</table></div>
- <div class="card"><h2><i>PLAIN</i> Sale price &amp; no-deal products</h2><table><tr><th>product_title</th><th>regular_price</th><th>sale_price</th></tr>{ex_rows(ex.get('sale_price', [])[:2] + ex.get('no_deals', [])[:2], ['product_title', 'regular_price', 'sale_price'], 4)}</table></div>
+ <div class="card"><h2><i>PLAIN</i> Sale price &amp; regular-price products</h2><table><tr><th>product_title</th><th>regular_price</th><th>sale_price</th></tr>{ex_rows(ex.get('sale_price', [])[:2] + ex.get('no_sale_price', [])[:2], ['product_title', 'regular_price', 'sale_price'], 4)}</table></div>
 </div>
 <div class="g"><div class="card" style="grid-column:1/-1"><h2><i>JSON</i> First record, exact field order</h2><pre>{esc(sample)}</pre></div></div>
 <div class="foot"><span>records.json sha256 {sha[:32]}…</span><span>requests {rep['fetch_stats'].get('requests')} · retries {rep['fetch_stats'].get('retries')} · challenges {rep['fetch_stats'].get('challenges')}</span></div>

@@ -1,0 +1,1080 @@
+# Normalized diff (UTF-8, LF line endings) between delivered packages
+# old: walmart-scraper-1.1.12-src.zip  sha256 0182c094ef0ce53daf3b346f72a72a09dad5ada612682a0954b9b2a61121974c
+# new: walmart-scraper-1.1.13-src.zip  sha256 48382c21f633fea818aed53329a440398fb774bb977fb72b704dd2a538188835
+# files changed: 21
+#   modified  config/settings.yaml (+12 -2)
+#   modified  docs/ARCHITECTURE.md (+3 -3)
+#   modified  docs/CHANGES.md (+26 -0)
+#   modified  src/wmscraper/__init__.py (+1 -1)
+#   modified  src/wmscraper/fetch/base.py (+35 -4)
+#   modified  src/wmscraper/models.py (+13 -1)
+#   removed   src/wmscraper/parse/deals.py (+0 -80)
+#   modified  src/wmscraper/parse/text.py (+22 -0)
+#   modified  src/wmscraper/parse/walmart.py (+23 -18)
+#   modified  src/wmscraper/report.py (+1 -20)
+#   modified  src/wmscraper/runner.py (+44 -31)
+#   modified  src/wmscraper/validate.py (+6 -3)
+#   modified  tests/test_detection.py (+9 -8)
+#   modified  tests/test_pipeline.py (+4 -9)
+#   modified  tests/test_rules.py (+0 -37)
+#   modified  tests/test_v112_offline.py (+10 -10)
+#   added     tests/test_v113_corrections.py (+226 -0)
+#   modified  tools/make_evidence.py (+2 -7)
+#   modified  tools/package_source.py (+2 -1)
+#   modified  tools/results_board.py (+1 -3)
+#   added     walmart-500-demo.json (data file, 604287 bytes, not shown; sha256 434f2ceb9877de68f22f959e700949723beaab2a2c4985246190ceb836e24a30)
+
+--- a/config/settings.yaml
++++ b/config/settings.yaml
+@@ -42,14 +42,24 @@
+       store_id: "{store_id}"
+       delivery_zip: "{zipcode}"
+       fulfillment_type: pickup
+-    # Optional search listing route for offline/approved probes. Category crawling
+-    # remains on store-pinned Walmart HTML until this route is explicitly selected.
++    # Optional search listing route (/search URLs only) for offline/approved probes - PROPOSED, not run. Category
++    # browsing stays on the store-pinned /browse route and never uses this helper.
++    # Checked 2026-11-04 against Oxylabs' Walmart search parameter table (developers.oxylabs.io > API reference >
++    # Commerce scrapers > /walmart/search): query, start_page, min_price / max_price (integers), store_id,
++    # fulfillment_type, sort_by, fulfillment_speed. That table lists no "pages" and no "delivery_zip"; the
++    # classic-source page for walmart_search could not be loaded, so delivery_zip (kept from 1.1.12) is unconfirmed.
+     search_payload:
+       source: walmart_search
+       query: "{query}"
+       store_id: "{store_id}"
+       delivery_zip: "{zipcode}"
+       fulfillment_type: pickup
++    # Walmart /search URL parameter -> payload key. Any other URL parameter (facet, sort, cat_id, ...) is REFUSED,
++    # never dropped.
++    search_params:
++      page: start_page
++      min_price: min_price
++      max_price: max_price
+   zyte:
+     payload:
+       url: "{url}"
+--- a/docs/ARCHITECTURE.md
++++ b/docs/ARCHITECTURE.md
+@@ -8,7 +8,7 @@
+         3 canary:start  known items must show a local Walmart offer at this store
+         4 discovery     category pages → subcategory listings (CSV exclusions applied)
+         5 listings      every page: shape check · store check · filters · dedup → checkpoint
+-        6 enrichment    product page: UPC, size, store re-check, marketplace re-check, deals
++        6 enrichment    product page: UPC, size, store re-check, marketplace re-check
+         7 canary:end
+         8 validate      all checks pass → publish latest/  ·  otherwise keep last good data
+    Fetch layer: pacing · retries + backoff · challenge / tiny-page / latency detection
+@@ -32,8 +32,8 @@
+ | PPM | Walmart's displayed `UNIT_PRICE` price line copied verbatim (e.g. `10.2 ¢/fl oz`); empty when not shown; never computed. |
+ | UPC / GUPC | UPC from the product page, never altered. `gupc` always `""`. |
+ | unit_price | Always `""` (downstream pipeline). |
+-| Prices | `regular_price` = was-price when on sale, else current; `sale_price` = current when a was-price exists. Two-decimal strings. |
+-| Volume vs digital deals | `parse/deals.py`: clip / coupon / activate / add offer → digital; N for $X, BOGO, mix & match, must buy, buy N → volume. Wording preserved; price only when displayed; Walmart Cash / cashback / rebates never treated as price reductions. |
++| Prices | Each listing price field must be one whole price token (`parse/text.listing_price`: typed number > 0, or e.g. `$4.98`; never a number found inside "Only 2 left" / "Save $2"). Rejected values are logged as `price_rejected`. `regular_price` = was-price when on sale, else current; `sale_price` = current when a valid was-price exists. Two-decimal strings. |
++| Volume vs digital deals | Walmart: all four fields (`volume_deals_description`, `volume_deals_price`, `digital_deals_description`, `digital_deals_price`) are always `""` (client decision, 1.1.13). Enforced in `models.enforce_empty_fields` on every export path and by validation. Walmart offers are not collected at all: no promotion text is parsed, there is no offer census and no deal examples in `report.json` (`parse/deals.py` removed). |
+ | Private label | `config/private_label_brands.txt` matched against brand and title start → `store_brand` = `yes` / `no`. |
+ 
+ ## Category discovery
+--- a/docs/CHANGES.md
++++ b/docs/CHANGES.md
+@@ -1,4 +1,30 @@
+ # Changes
++
++## 1.1.13 (2026-11-04) - corrections from the client's static review of 1.1.12
++
++Offline only: no Oxylabs request, no Azure deployment, no budget change (probe budget stays 3 of 10).
++Tests: `tests/test_v113_corrections.py` (52 cases) + `test_detection.py::test_no_offer_collection_for_walmart`;
++the 6 deal-classification tests are removed with `parse/deals.py`. Full suite 136 passed.
++1. **Search route keeps page and filters** (`fetch/base.search_payload`). `/search` URLs map `page` -> `start_page`
++   and `min_price` / `max_price` -> the same payload keys, whole numbers only (`fetch.oxylabs.search_params`), as in
++   Oxylabs' Walmart search parameter table (checked 2026-11-04; it lists no `pages` and no `delivery_zip`).
++   Any other parameter (facet, sort, cat_id, a different `stores`, an invalid or fractional value) is refused as terminal `compat`,
++   never dropped. A listing page with exactly the previous page's products fails the listing ("pagination not
++   honoured") so a repeated page one is never counted as traversal. Category browsing stays on `/browse` and does
++   not use this helper. The route itself is still PROPOSED and not run.
++2. **Walmart offer fields always empty; no offer collection.** `runner._record` no longer calls `deals.classify`;
++   `parse/deals.py`, the promotion-text parsing, the offer census and the deal examples in `report.json` are removed. `Record` and
++   `models.enforce_empty_fields` (applied in `Run.finish` to fresh and carried-forward records) blank all four
++   volume/digital fields. `validate_record_contract` fails a run if any of them is non-empty.
++3. **Whole-token listing prices** (`parse/text.listing_price`). Listing `current_price` / `was_price` are validated
++   before normalisation, so "Only 2 left", "Save $2", "2 for $5", ranges, zero, NaN and negatives give `""`
++   (identity kept, price never invented; `price_rejected` event). The validator also requires prices > 0.
++4. **Listing context and offer chain.** `_check_context` now requires the selected `storeId` (and `pickupStore` when
++   present), intent PICKUP and the configured ZIP, each present, and no other location block on the page that
++   disagrees. Items need a store-bound offer: not in Walmart's shipping stack, no other store in the fulfillment
++   summary, and a summary entry for this store, unless the store item is unavailable (identity kept).
++5. **Fixture packaged.** `walmart-500-demo.json` is now in the source ZIP. It is an existing offline fixture, not a
++   genuine 500-product demonstration.
+ 
+ ## 1.1.9 (2026-10-29) – lease safety and target refusal evidence
+ 
+--- a/src/wmscraper/__init__.py
++++ b/src/wmscraper/__init__.py
+@@ -1,3 +1,3 @@
+ """Walmart location-specific product scraper for Microsoft Azure."""
+ 
+-__version__ = "1.1.12"
++__version__ = "1.1.13"
+--- a/src/wmscraper/fetch/base.py
++++ b/src/wmscraper/fetch/base.py
+@@ -77,15 +77,46 @@
+ _IP_RE = re.compile(r"walmart\.com/ip/(?:[^/?#]+/)?(\d+)")
+ 
+ 
++_SEARCH_INT = re.compile(r"^\d+$")  # start_page, min_price, max_price are integers in the provider contract
++
++
++def search_payload(settings, location, url: str) -> dict:
++    """`walmart_search` body for a /search URL. Every URL parameter is either carried into the payload through
++    `fetch.oxylabs.search_params` (URL name -> payload key, e.g. page -> start_page; whole numbers only), consumed (q; stores equal to
++    the configured store), or the request is REFUSED: a filter or page the route cannot express is never silently
++    dropped (that would turn page 2 into a repeat of page 1). Category browsing does not use this route."""
++    u = urlparse(url)
++    params = parse_qs(u.query, keep_blank_values=True)
++    mapping = settings.get("fetch.oxylabs.search_params") or {}
++    query = (params.pop("q", None) or [""])[0].strip()
++    if not query:
++        raise FetchError(f"search route: no query in {url}", "compat")
++    stores = params.pop("stores", None)
++    if stores and stores != [location.store_id]:
++        raise FetchError(f"search route: stores={stores} differs from configured store {location.store_id}", "compat")
++    params.pop("povid", None)  # Walmart click-tracking id, not a filter
++    extra: dict = {}
++    for name, values in params.items():
++        if name not in mapping:
++            raise FetchError(f"search route: unsupported parameter '{name}' in {url} (refused, not dropped)", "compat")
++        if len(values) != 1 or not _SEARCH_INT.fullmatch(values[0]):
++            raise FetchError(f"search route: {name}={values} is not one whole number in {url}", "compat")
++        value = int(values[0])
++        if name == "page" and value < 1:
++            raise FetchError(f"search route: invalid page {values[0]} in {url}", "compat")
++        extra[mapping[name]] = value
++    body = fill(settings.get("fetch.oxylabs.search_payload"), url=url, query=query,
++                store_id=location.store_id, zipcode=location.zipcode)
++    return {**body, **extra}
++
++
+ def classic_payload(settings, location, url: str) -> dict:
+     """Classic Web Scraper API body (realtime.oxylabs.io/v1/queries).
+     Product pages: the documented `walmart_product` source with store localisation (store_id, delivery_zip,
+     fulfillment_type) when `fetch.oxylabs.product_payload` is configured; everything else: `fetch.oxylabs.payload`."""
+     m = _IP_RE.search(url)
+-    if "/search" in urlparse(url).path and settings.get("fetch.oxylabs.search_payload") is not None:
+-        tpl = settings.get("fetch.oxylabs.search_payload")
+-        query = (parse_qs(urlparse(url).query).get("q") or [""])[0]
+-        return fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
++    if urlparse(url).path.rstrip("/") == "/search" and settings.get("fetch.oxylabs.search_payload") is not None:
++        return search_payload(settings, location, url)
+     tpl = settings.get("fetch.oxylabs.product_payload") if m else None
+     if tpl:
+         return fill(tpl, url=url, product_id=m.group(1), store_id=location.store_id, zipcode=location.zipcode)
+--- a/src/wmscraper/models.py
++++ b/src/wmscraper/models.py
+@@ -33,6 +33,18 @@
+ )
+ 
+ PIPELINE_OWNED = ("gupc", "unit_price")  # never populated by the scraper
++# Walmart scope: volume / digital offer fields are always "" (client decision; offers are not collected for Walmart)
++WALMART_EMPTY_OFFER_FIELDS = ("volume_deals_description", "volume_deals_price",
++                              "digital_deals_description", "digital_deals_price")
++ALWAYS_EMPTY = PIPELINE_OWNED + WALMART_EMPTY_OFFER_FIELDS
++
++
++def enforce_empty_fields(records: list[dict]) -> list[dict]:
++    """Every export path (fresh, carried-forward, re-validated) passes through here before it is written."""
++    for r in records:
++        for name in ALWAYS_EMPTY:
++            r[name] = ""
++    return records
+ 
+ 
+ @dataclass
+@@ -65,7 +77,7 @@
+         for name in FIELD_ORDER:
+             value = getattr(self, name)
+             out[name] = "" if value is None else str(value)
+-        for name in PIPELINE_OWNED:
++        for name in ALWAYS_EMPTY:
+             out[name] = ""
+         return out
+ 
+--- a/src/wmscraper/parse/deals.py
++++ /dev/null
+@@ -1,80 +0,0 @@
+-"""Separates Walmart's displayed promotions into volume deals and digital deals.
+-
+-Rules (from the contest specification):
+-* Volume deal  = no clipping/activation needed (2 for $5, BOGO, Mix & Match, "must buy 4").
+-* Digital deal = requires clip / activate / save / add an offer.
+-* Wording is preserved exactly. A price is stored ONLY when Walmart displays it;
+-  nothing is calculated (no BOGO price, no "save $1" -> final price).
+-* Walmart Cash, cash back, rebates and manufacturer mail-in offers are NOT treated as
+-  immediate digital price reductions; they are logged and excluded.
+-"""
+-from __future__ import annotations
+-
+-import re
+-from dataclasses import dataclass
+-
+-from .text import clean_text, format_price
+-
+-_REWARD_RE = re.compile(r"walmart\s*cash|cash\s*back|cashback|rebate|mail[-\s]?in|manufacturer\s+offer", re.I)
+-_DIGITAL_RE = re.compile(r"\bclip\b|clipped|\bcoupon\b|digital|\bactivate\b|add\s+(?:the\s+)?offer|save\s+(?:the\s+)?offer|\bload\b.*\boffer\b", re.I)
+-_VOLUME_RE = re.compile(
+-    r"\b\d+\s*for\s*\$\s*\d|\bbuy\s+\d+\b|\bget\s+\d+\s+(?:free|for)|\bbogo\b|mix\s*(?:&|and|or)\s*match|"
+-    r"must\s+buy\s+\d+|when\s+you\s+buy\s+\d+|\b\d+\s*/\s*\$\s*\d",
+-    re.I,
+-)
+-# Price explicitly displayed as the promotional price.
+-_N_FOR_PRICE_RE = re.compile(r"\b(\d+)\s*(?:for|/)\s*\$\s*(\d+(?:\.\d{1,2})?)", re.I)
+-_EACH_PRICE_RE = re.compile(r"\$\s*(\d+(?:\.\d{1,2})?)\s*(?:each|ea\.?)\b", re.I)
+-_MUST_BUY_RE = re.compile(r"must\s+buy\s+\d+\s*[:@]?\s*(?:at\s*)?\$\s*(\d+(?:\.\d{1,2})?)", re.I)
+-_DIGITAL_FINAL_RE = re.compile(r"\$\s*(\d+(?:\.\d{1,2})?)\s*(?:each\s*)?(?:with|w/)\s*(?:a\s+)?(?:digital\s+)?(?:clipped\s+)?coupon", re.I)
+-
+-
+-@dataclass
+-class DealResult:
+-    volume_description: str = ""
+-    volume_price: str = ""
+-    digital_description: str = ""
+-    digital_price: str = ""
+-    ignored_rewards: tuple[str, ...] = ()
+-
+-
+-def classify(texts: list[str]) -> DealResult:
+-    """Classify a list of promotion strings displayed for one product."""
+-    volume, digital, rewards = [], [], []
+-    seen = set()
+-    for raw in texts:
+-        t = clean_text(raw)
+-        if not t or t.lower() in seen:
+-            continue
+-        seen.add(t.lower())
+-        if _REWARD_RE.search(t):
+-            rewards.append(t)
+-        elif _DIGITAL_RE.search(t):
+-            digital.append(t)
+-        elif _VOLUME_RE.search(t):
+-            volume.append(t)
+-
+-    res = DealResult(ignored_rewards=tuple(rewards))
+-    if volume:
+-        res.volume_description = " | ".join(volume)
+-        res.volume_price = _volume_price(volume[0])
+-    if digital:
+-        res.digital_description = " | ".join(digital)
+-        res.digital_price = _digital_price(digital[0])
+-    return res
+-
+-
+-def _volume_price(text: str) -> str:
+-    for rx in (_MUST_BUY_RE, _EACH_PRICE_RE):
+-        m = rx.search(text)
+-        if m:
+-            return format_price(m.group(1))
+-    m = _N_FOR_PRICE_RE.search(text)
+-    if m:
+-        return format_price(m.group(2))  # displayed price for the bundle, e.g. "2 for $5" -> 5.00
+-    return ""  # e.g. BOGO with no displayed price – never calculated
+-
+-
+-def _digital_price(text: str) -> str:
+-    m = _DIGITAL_FINAL_RE.search(text)
+-    return format_price(m.group(1)) if m else ""  # "Save $2" alone -> no price
+--- a/src/wmscraper/parse/text.py
++++ b/src/wmscraper/parse/text.py
+@@ -33,6 +33,28 @@
+     if num < 0:
+         return ""
+     return f"{num.quantize(Decimal('0.01'))}"
++
++
++# A listing price field must be ONE whole price token ("$1,299.50", "4.98", 4.98, "27 ¢") - never a number found
++# inside other wording ("Only 2 left", "Save $2", "2 for $5", "$3.48 - $5.00").
++_WHOLE_PRICE_RE = re.compile(r"^\s*\$?\s*(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d{1,2})?\s*$")
++
++
++def listing_price(value) -> str:
++    """Typed / whole-token validation of a listing price field BEFORE normalisation. '' when it is not a price."""
++    if value is None or isinstance(value, bool):
++        return ""
++    if isinstance(value, (int, float, Decimal)):
++        try:
++            num = Decimal(str(value))
++        except InvalidOperation:
++            return ""
++        return format_price(num) if num.is_finite() and num > 0 else ""
++    text = str(value)
++    if not (_WHOLE_PRICE_RE.match(text) or _CENTS_RE.match(text)):
++        return ""
++    out = format_price(text)
++    return out if out and Decimal(out) > 0 else ""
+ 
+ 
+ # Approximate / variable-weight wording. Matches "approx", "approximately", "avg wt",
+--- a/src/wmscraper/parse/walmart.py
++++ b/src/wmscraper/parse/walmart.py
+@@ -127,13 +127,21 @@
+ def page_location(data: Any) -> dict:
+     """The page's SELECTED location (explicit path, not 'a store id anywhere in the response')."""
+     initial = dig(data, "props", "pageProps", "initialData") or {}
++    found = []
+     for path in (("pageMetadata", "location"), ("contentLayout", "pageMetadata", "location"),
+                  ("searchResult", "pageMetadata", "location"), ("data", "contentLayout", "pageMetadata", "location")):
+         loc = dig(initial, *path)
+         if isinstance(loc, dict) and loc.get("storeId"):
+-            return {"storeId": str(loc.get("storeId")), "intent": clean_text(loc.get("intent")),
+-                    "postalCode": clean_text(loc.get("postalCode")), "path": "initialData." + ".".join(path)}
+-    return {}
++            found.append({"storeId": str(loc.get("storeId")), "intent": clean_text(loc.get("intent")),
++                          "postalCode": clean_text(loc.get("postalCode")),
++                          "pickupStore": str(loc.get("pickupStore") or ""), "path": "initialData." + ".".join(path)})
++    if not found:
++        return {}
++    out = dict(found[0])
++    # every selected-location block on the page must agree (store, intent, ZIP); otherwise the context is conflicting
++    keys = ("storeId", "intent", "postalCode")
++    out["conflicts"] = [f for f in found[1:] if any(f[k] and out[k] and f[k] != out[k] for k in keys)]
++    return out
+ 
+ 
+ # ----------------------------------------------------------------------------- listing
+@@ -151,7 +159,6 @@
+     seller_id: str
+     sponsored: bool
+     fulfillment_texts: list[str]
+-    promo_texts: list[str]
+     upc: str = ""
+     raw: dict = field(default_factory=dict, repr=False)
+     pickup_store_ids: set = field(default_factory=set)   # stores offering PICKUP / IN_STORE for this item
+@@ -178,6 +185,18 @@
+         if self.store_ids_any:
+             return store_id in self.store_ids_any
+         return True
++
++    def store_offer_problem(self, store_id: str) -> str:
++        """'' when this store item's price is bound to the selected store's own offer: not in Walmart's shipping
++        stack, no other store in its fulfillment summary, and either a summary entry for this store or an
++        unavailable store item (Walmart drops the summary when out of stock - identity kept, never dropped)."""
++        if self.secondary_stack:
++            return "shipping_context_not_store_offer"
++        if self.store_ids_any - {store_id}:
++            return "conflicting_store_offer"
++        if not self.store_ids_any and self.availability_value in ("", "IN_STOCK"):
++            return "store_offer_unbound"
++        return ""
+ 
+     @property
+     def is_marketplace(self) -> bool:
+@@ -261,11 +280,6 @@
+     image = dig(d, "imageInfo", "thumbnailUrl") or d.get("image") or ""
+     if isinstance(image, dict):
+         image = image.get("url", "")
+-    promo = []
+-    promo += _texts(d.get("badges") or {})
+-    for key in ("promoDiscount", "promoData", "groupMetaData", "eaPricingText", "volumePricing", "offerText", "couponInfo"):
+-        if d.get(key):
+-            promo += _texts(d.get(key)) if not isinstance(d[key], str) else [clean_text(d[key])]
+     fulfil = _texts(d.get("fulfillmentBadgeGroups") or []) + _texts(d.get("fulfillmentBadges") or [])
+     if isinstance(d.get("fulfillmentBadge"), str):
+         fulfil.append(clean_text(d["fulfillmentBadge"]))
+@@ -280,8 +294,6 @@
+             pickup_stores.add(str(fs["storeId"]))
+     badge_texts = _texts((d.get("badges") or {}).get("groupsV2") or [])
+     fulfil += [t for t in badge_texts if any(k in t.lower() for k in ("pickup", "shipping", "delivery", "in store", "in-store"))]
+-    if isinstance(d.get("discountsRaw"), dict):
+-        promo += _texts(d["discountsRaw"].get("discountMetaData") or [])
+     return ListingItem(
+         item_id=item_id,
+         title=title,
+@@ -295,7 +307,6 @@
+         seller_id=clean_text(d.get("sellerId")),
+         sponsored=bool(d.get("isSponsoredFlag") or d.get("sponsoredProduct") or d.get("isSponsored")),
+         fulfillment_texts=fulfil,
+-        promo_texts=promo,
+         upc=clean_text(d.get("upc")),
+         raw=d,
+         pickup_store_ids=pickup_stores,
+@@ -412,7 +423,6 @@
+     seller_id: str
+     store_ids: set[str]
+     fulfillment_texts: list[str]
+-    promo_texts: list[str]
+     image_url: str
+     location: dict = field(default_factory=dict)   # product's selected pickup location (explicit)
+     fulfillment_type: str = ""
+@@ -442,10 +452,6 @@
+     for opt in product.get("fulfillmentSummary") or []:
+         if isinstance(opt, dict) and opt.get("fulfillment"):
+             fulfil.append(str(opt["fulfillment"]))
+-    promo = (_texts(product.get("badges") or {}) + _texts(product.get("promoDiscount") or {})
+-             + _texts(product.get("offerPromotions") or []) + _texts(product.get("discounts") or {}))
+-    if isinstance(product.get("topPromoText"), str):
+-        promo.append(clean_text(product["topPromoText"]))
+     return ProductDetail(
+         item_id=str(product.get("usItemId")),
+         name=clean_text(product.get("name")),
+@@ -459,7 +465,6 @@
+         seller_id=clean_text(product.get("sellerId")),
+         store_ids=store_ids_in(data),
+         fulfillment_texts=fulfil,
+-        promo_texts=promo,
+         image_url=str(image),
+         location={"storeIds": [str(x) for x in dig(product, "location", "storeIds") or []],
+                   "pickupStoreId": str(dig(product, "location", "pickupLocation", "storeId") or ""),
+--- a/src/wmscraper/report.py
++++ b/src/wmscraper/report.py
+@@ -32,22 +32,6 @@
+     return {"by_status": dict(by_status), "by_price_source": dict(by_price),
+             "carried_forward": ck.get("carried_forward", 0),
+             "examples": {s: [r for r in rows if r["status"] == s][:3] for s in by_status}}
+-
+-
+-def _offer_census(census: dict) -> dict:
+-    """Classify every displayed label with the same rules used for the output fields."""
+-    from .parse import deals
+-
+-    rows = []
+-    for text, e in sorted(census.items(), key=lambda kv: -kv[1]["count"]):
+-        d = deals.classify([text])
+-        kind = ("volume_deal" if d.volume_description else "digital_deal" if d.digital_description
+-                else "reward_not_a_price_reduction" if d.ignored_rewards else "other_label")
+-        rows.append({"label": text, "classified_as": kind, **e})
+-    totals = {}
+-    for r in rows:
+-        totals[r["classified_as"]] = totals.get(r["classified_as"], 0) + r["count"]
+-    return {"distinct_labels": len(rows), "occurrences_by_class": totals, "labels": rows}
+ 
+ 
+ def _examples(records, predicate, n=5):
+@@ -87,13 +71,10 @@
+         "category_completeness": _category_completeness(listings, records),
+         "examples": {
+             "ppm": _examples(records, lambda r: r["ppm"]),
+-            "volume_deals": _examples(records, lambda r: r["volume_deals_description"]),
+-            "digital_deals": _examples(records, lambda r: r["digital_deals_description"]),
+             "sale_price": _examples(records, lambda r: r["sale_price"]),
+-            "no_deals": _examples(records, lambda r: not (r["volume_deals_description"] or r["digital_deals_description"] or r["sale_price"])),
++            "no_sale_price": _examples(records, lambda r: not r["sale_price"]),
+             "private_label": _examples(records, lambda r: r["store_brand"] == "yes"),
+         },
+-        "offer_census": _offer_census(ck.get("offer_census", {})),
+         "availability": _availability(ck),
+         "count_reconciliation": [{k: l.get(k) for k in ("category", "sub_category", "url", "expected_store_total",
+                                                           "store_available", "store_oos", "stop_reason", "next_page",
+--- a/src/wmscraper/runner.py
++++ b/src/wmscraper/runner.py
+@@ -7,7 +7,7 @@
+   4. discovery     – category pages → subcategory listings (CSV exclusions applied)
+   5. listings      – paginate every listing; per page: shape check, store check,
+                      filter sponsored / marketplace / shipping-only / approx-weight, dedup
+-  6. enrichment    – product pages: UPC, size, store-level offer re-check, deals
++  6. enrichment    – product pages: UPC, size, store-level offer re-check
+   7. canary:end
+   8. validate      – publish to latest/ only if every check passes
+ """
+@@ -27,9 +27,8 @@
+ from .config import Category, Location, Settings
+ from .fetch import FetchError, build_fetcher
+ from .lock import run_lock
+-from .models import Record
+-from .parse import deals
+-from .parse.text import clean_text, extract_weight, format_price, is_approximate_weight, is_private_label
++from .models import Record, enforce_empty_fields
++from .parse.text import clean_text, extract_weight, is_approximate_weight, is_private_label, listing_price
+ from .parse.walmart import (ChallengeError, ListingItem, ShapeError, category_id_of, children_of, department_children,
+                             discover_links, next_data, parse_listing, parse_product, parse_store, store_context_excerpt)
+ from .report import build_report
+@@ -234,7 +233,7 @@
+     def finish(self, runtime: float) -> dict:
+         if not getattr(self, "aborted", ""):
+             self._carry_forward()
+-        records = self.ck.records()
++        records = enforce_empty_fields(self.ck.records())  # fresh AND carried-forward records
+         previous = self.storage.get_json(f"{self.loc.key}/latest/report.json")
+         validation = validate_run(self.s, self.ck, records, self.categories, previous)
+         if getattr(self, "aborted", ""):
+@@ -293,14 +292,30 @@
+             raise RuntimeError(self.store["reason"])
+ 
+     # ------------------------------------------------------------------ context checks (explicit)
++    def context_problems(self, location: dict) -> list[str]:
++        """The page's SELECTED location (explicit path) must be the configured store, the configured fulfillment
++        intent and the configured ZIP - each present, each matching, and no other location block disagreeing."""
++        probs = []
++        if location.get("storeId") != self.loc.store_id:
++            probs.append(f"storeId {location.get('storeId') or '-'} (expected {self.loc.store_id})")
++        if location.get("pickupStore") and location["pickupStore"] != self.loc.store_id:
++            probs.append(f"pickupStore {location['pickupStore']} (expected {self.loc.store_id})")
++        if self.loc.fulfillment == "pickup" and (location.get("intent") or "").upper() != "PICKUP":
++            probs.append(f"intent {location.get('intent') or '-'} (expected PICKUP)")
++        if self.loc.zipcode and location.get("postalCode") != self.loc.zipcode:
++            probs.append(f"postalCode {location.get('postalCode') or '-'} (expected {self.loc.zipcode})")
++        for other in location.get("conflicts") or []:
++            probs.append(f"conflicting selected location at {other.get('path')}: {other}")
++        return probs
++
+     def _check_context(self, location: dict, where: str) -> bool:
+-        """The page's SELECTED location must be the configured store (explicit path), not merely contain its id."""
+-        if location.get("storeId") == self.loc.store_id:
++        probs = self.context_problems(location)
++        if not probs:
+             self.ck.set("store_verified_pages", self.ck.get("store_verified_pages", 0) + 1)
+             return True
+         self.ck.set("store_mismatches", self.ck.get("store_mismatches", 0) + 1)
+-        self.ck.event("store_mismatch", {"where": where, "selected_location": location})
+-        log.error("store_context_mismatch", extra={"where": where, "selected_location": location})
++        self.ck.event("store_mismatch", {"where": where, "selected_location": location, "problems": probs})
++        log.error("store_context_mismatch", extra={"where": where, "selected_location": location, "problems": probs})
+         return False
+ 
+     def _product_context_ok(self, p) -> bool:
+@@ -770,13 +785,20 @@
+         """Keep the store's own offers on one verified page, update reconciliation counters, decide stop.
+         Returns True when the listing is finished (exhausted or capped)."""
+         self._archive("listing", res, f"{category} / {sub} page {page}")
++        ids = [it.item_id for it in lp.items]
++        last = self.ck.get(f"last_page_ids:{category}:{url}") or {}
++        if page > 1 and ids and last.get("page") == page - 1 and last.get("ids") == ids:
++            # the route ignored the page parameter: a repeated page one is never counted as traversal
++            self.ck.event("repeated_page", {"category": category, "url": url, "page": page})
++            self.ck.fail_listing(category, url, f"page {page}: same products as page {page - 1} "
++                                                f"(pagination not honoured - unsupported coverage)")
++            return True
++        self.ck.set(f"last_page_ids:{category}:{url}", {"page": page, "ids": ids})
+         row = self.ck.listing_row(category, url)
+         expected = int(row.get("expected_store_total") or 0)
+         streak = int(row.get("zero_streak") or 0)
+         need_empty = int(self.crawl.get("store_exhausted_empty_pages", 1))
+         accepted, skipped, avail = [], [], []
+-        self._census([(it.item_id, t) for it in lp.items if it.is_store_item(self.loc.store_id)
+-                      for t in it.promo_texts], "listing")
+         now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+         n_avail = n_oos = 0
+         for it in lp.items:
+@@ -810,20 +832,6 @@
+         self._sync_checkpoint()
+         return stop or capped
+ 
+-    def _census(self, pairs: list[tuple[str, str]], where: str) -> None:
+-        """Offer census: every promotion / badge label Walmart displayed on store offers, with counts and examples."""
+-        if not pairs:
+-            return
+-        census = self.ck.get("offer_census", {})
+-        for item_id, text in pairs:
+-            e = census.setdefault(text, {"count": 0, "examples": [], "seen_on": []})
+-            e["count"] += 1
+-            if len(e["examples"]) < 3 and item_id not in e["examples"]:
+-                e["examples"].append(item_id)
+-            if where not in e["seen_on"]:
+-                e["seen_on"].append(where)
+-        self.ck.set("offer_census", census)
+-
+     def _listing_params(self) -> dict:
+         return {k: str(v).replace("{store_id}", self.loc.store_id) for k, v in (self.crawl.get("listing_params") or {}).items()}
+ 
+@@ -833,22 +841,27 @@
+             return "marketplace_seller"
+         if not it.is_store_item(self.loc.store_id):
+             return "not_store_assortment_online_only"
++        problem = it.store_offer_problem(self.loc.store_id)
++        if problem:
++            return problem
+         if it.approx_weight or is_approximate_weight(it.title):
+             return "approximate_weight"
+         return ""
+ 
+     def _record(self, it: ListingItem, category: str, sub: str) -> dict:
+-        """Prices, PPM and promotions come ONLY from this store offer on the store-pinned listing."""
+-        regular, sale = (it.was_price, it.current_price) if it.was_price else (it.current_price, "")
+-        d = deals.classify(it.promo_texts)
++        """Prices and PPM come ONLY from this store offer on the store-pinned listing. Each price field is validated
++        as one whole price token before normalisation. Walmart volume / digital offer fields stay "" (models)."""
++        current, was = listing_price(it.current_price), listing_price(it.was_price)
++        for name, raw, ok in (("current_price", it.current_price, current), ("was_price", it.was_price, was)):
++            if raw not in ("", None) and not ok:
++                self.ck.event("price_rejected", {"item_id": it.item_id, "field": name, "value": str(raw)})
++        regular, sale = (was, current) if was and current else (current, "")
+         rec = Record(
+             zipcode=self.store.get("zipcode", self.loc.zipcode), store_name=self.store.get("store_name", ""),
+             store_location=self.store.get("store_location", ""), store_logo=self.s.get("store_logo_url", ""),
+             store_brand="yes" if is_private_label(it.brand, it.title, self.s.private_label_brands) else "no",
+             category=category, sub_category=sub, product_title=it.title, weight=extract_weight(it.title),
+-            regular_price=format_price(regular), sale_price=format_price(sale),
+-            volume_deals_description=d.volume_description, volume_deals_price=d.volume_price,
+-            digital_deals_description=d.digital_description, digital_deals_price=d.digital_price,
++            regular_price=regular, sale_price=sale,
+             image_url=it.image_url, url=it.url, upc=it.upc, ppm=it.ppm, crawl_date=self.crawl_date,
+         )
+         return rec.to_ordered_dict()
+--- a/src/wmscraper/validate.py
++++ b/src/wmscraper/validate.py
+@@ -15,7 +15,7 @@
+ from dataclasses import dataclass, field
+ import re
+ 
+-from .models import FIELD_ORDER
++from .models import FIELD_ORDER, WALMART_EMPTY_OFFER_FIELDS
+ from .parse.text import is_approximate_weight
+ 
+ _GTIN_RE = re.compile(r"^\d{8,14}$")
+@@ -31,10 +31,13 @@
+         upc = record.get("upc", "")
+         if upc and not _GTIN_RE.fullmatch(str(upc)):
+             errors.append(f"{prefix}: invalid UPC/GTIN")
+-        for field in ("regular_price", "sale_price", "volume_deals_price", "digital_deals_price"):
++        for field in ("regular_price", "sale_price"):
+             value = record.get(field, "")
+-            if value and not _PRICE_RE.fullmatch(str(value)):
++            if value and not (_PRICE_RE.fullmatch(str(value)) and float(value) > 0):
+                 errors.append(f"{prefix}: invalid {field}")
++        for field in WALMART_EMPTY_OFFER_FIELDS:
++            if record.get(field, "") != "":
++                errors.append(f"{prefix}: {field} must be empty for Walmart")
+         ppm = record.get("ppm", "")
+         if ppm and not _PPM_RE.match(str(ppm)):
+             errors.append(f"{prefix}: invalid PPM")
+--- a/tests/test_detection.py
++++ b/tests/test_detection.py
+@@ -196,13 +196,14 @@
+     assert rep["product_identity"]["variant_mismatches"] == 1
+ 
+ 
+-def test_offer_census_reports_displayed_labels(site):
+-    s = load_settings(site)
+-    rep = asyncio.run(Run(s, s.location("test-store")).execute())
+-    labels = {r["label"]: r["classified_as"] for r in rep["offer_census"]["labels"]}
+-    assert labels["2 for $9"] == "volume_deal"
+-    assert labels["Clip Coupon: Save $1.00"] == "digital_deal"
+-    assert labels["Earn $1 Walmart Cash"] == "reward_not_a_price_reduction"
++def test_no_offer_collection_for_walmart(site):
++    """Walmart offers are out of scope: no offer census, no deal examples, all four offer fields empty."""
++    s = load_settings(site)
++    run = Run(s, s.location("test-store"))
++    rep = asyncio.run(run.execute())
++    assert "offer_census" not in rep and run.ck.get("offer_census") is None
++    assert not {"volume_deals", "digital_deals"} & set(rep["examples"])
++    assert rep["field_completeness"]["volume_deals_description"] == rep["field_completeness"]["digital_deals_price"] == 0
+ 
+ 
+ def test_oversize_listing_without_subcategories_is_price_partitioned(site):
+@@ -333,7 +334,7 @@
+     recs = {r["product_title"]: r for r in build_storage(s).get_json("test-store/latest/records.json")}
+     dor = recs["Doritos Nacho, 9.25 oz"]
+     assert dor["ppm"] == "" and dor["regular_price"] == "4.98"      # listing store offer had no PPM -> stays empty
+-    assert dor["volume_deals_description"] == "Buy 1, Get 1 Free"  # listing offer terms, not the product page's
++    assert dor["volume_deals_description"] == dor["volume_deals_price"] == ""  # Walmart offer fields always empty
+     assert "Shipping Only Milk 12 pack" not in recs
+     assert rep["excluded"]["not_store_assortment_online_only"] == 1
+ 
+--- a/tests/test_pipeline.py
++++ b/tests/test_pipeline.py
+@@ -5,7 +5,7 @@
+ import pytest
+ 
+ from wmscraper.config import load_settings
+-from wmscraper.models import FIELD_ORDER
++from wmscraper.models import FIELD_ORDER, WALMART_EMPTY_OFFER_FIELDS
+ from wmscraper.runner import Run
+ from wmscraper.storage import build_storage
+ 
+@@ -44,15 +44,10 @@
+     assert gv["store_brand"] == "yes" and gv["upc"] == "078742351865" and gv["ppm"] == "2.7 ¢/fl oz" and gv["weight"] == "1 gal"
+     fl = by["Fairlife 2% Milk, 52 fl oz"]
+     assert (fl["regular_price"], fl["sale_price"]) == ("5.48", "4.98")
+-    assert (fl["volume_deals_description"], fl["volume_deals_price"]) == ("2 for $9", "9.00")
+-    assert by["Horizon Organic Milk, 0.5 gal"]["digital_deals_description"] == "Clip Coupon: Save $1.00"
+-    assert by["Horizon Organic Milk, 0.5 gal"]["digital_deals_price"] == ""
+-    lays = by["Lay's Classic Chips, 8 oz"]
+-    assert lays["digital_deals_price"] == "3.50"
++    # Walmart: all four volume / digital offer fields are "" even where the listing shows "2 for $9" / coupons
++    for r in recs:
++        assert all(r[f] == "" for f in WALMART_EMPTY_OFFER_FIELDS), r
+     assert "Shipping Only Milk 12 pack" not in by  # online-only offer: not part of the store assortment
+-    dor = by["Doritos Nacho, 9.25 oz"]
+-    assert dor["volume_deals_description"] == "Buy 1, Get 1 Free" and dor["volume_deals_price"] == ""
+-    assert "Walmart Cash" not in dor["digital_deals_description"]
+ 
+ 
+ def test_store_mismatch_blocks_publication(site):
+--- a/tests/test_rules.py
++++ b/tests/test_rules.py
+@@ -1,5 +1,4 @@
+ from wmscraper.models import FIELD_ORDER, Record
+-from wmscraper.parse import deals
+ from wmscraper.parse.text import extract_weight, format_price, is_approximate_weight, is_private_label
+ 
+ 
+@@ -47,39 +46,3 @@
+     assert not is_private_label("Horizon", "Horizon Organic Milk", brands)
+ 
+ 
+-def test_volume_deals_preserve_wording_and_displayed_price_only():
+-    r = deals.classify(["2 for $5"])
+-    assert r.volume_description == "2 for $5" and r.volume_price == "5.00"
+-    r = deals.classify(["Buy 1, Get 1 Free"])
+-    assert r.volume_description == "Buy 1, Get 1 Free" and r.volume_price == ""  # BOGO: never calculated
+-    r = deals.classify(["Must buy 4 at $1.99 each"])
+-    assert r.volume_price == "1.99"
+-    r = deals.classify(["Mix or Match 5 for $10"])
+-    assert r.volume_price == "10.00"
+-
+-
+-def test_digital_deals():
+-    r = deals.classify(["Clip Coupon: Save $2"])
+-    assert r.digital_description == "Clip Coupon: Save $2" and r.digital_price == ""  # no final price displayed
+-    r = deals.classify(["$3.99 each with Digital Coupon"])
+-    assert r.digital_price == "3.99" and r.volume_description == ""
+-    r = deals.classify(["Save $5 when you buy 5 with Digital Coupon"])
+-    assert r.digital_description and not r.volume_description
+-    r = deals.classify(["20% off with clipped coupon"])
+-    assert r.digital_price == ""
+-
+-
+-def test_rewards_not_treated_as_digital_reduction():
+-    r = deals.classify(["Earn $1 Walmart Cash", "$2 cash back", "Manufacturer offer: mail-in rebate"])
+-    assert r.digital_description == "" and r.digital_price == "" and len(r.ignored_rewards) == 3
+-
+-
+-def test_volume_and_digital_together():
+-    r = deals.classify(["2 for $6", "Clip Coupon: Save $1"])
+-    assert r.volume_description == "2 for $6" and r.digital_description == "Clip Coupon: Save $1"
+-
+-
+-def test_pack_labels_are_not_promotions():
+-    for t in ("(6 pack)", "6 Pack", "12 ct, 2 Pack", "Family Size", "Value Pack", "Bulk 24 Count"):
+-        r = deals.classify([t])
+-        assert not r.volume_description and not r.digital_description, t
+--- a/tests/test_v112_offline.py
++++ b/tests/test_v112_offline.py
+@@ -1,38 +1,38 @@
+-"""Offline acceptance checks for the 1.1.12 Walmart handoff."""
++"""Offline acceptance checks for the 1.1.12 Walmart handoff (route test corrected in 1.1.13)."""
+ from __future__ import annotations
+ 
+ import json
+ from pathlib import Path
+ 
++from wmscraper.config import load_settings
+ from wmscraper.fetch import classic_payload
++from wmscraper.models import WALMART_EMPTY_OFFER_FIELDS
+ from wmscraper.validate import validate_record_contract
+ 
+ 
+ def test_walmart_search_route_builds_store_pinned_payload(site):
+-    settings = __import__("wmscraper.config", fromlist=["load_settings"]).load_settings(str(site))
+-    settings.raw["fetch"]["oxylabs"]["search_payload"] = {
+-        "source": "walmart_search",
+-        "query": "{query}",
+-        "store_id": "{store_id}",
+-        "delivery_zip": "{zipcode}",
+-        "fulfillment_type": "pickup",
+-    }
++    settings = load_settings(str(site))
+     location = settings.location("test-store")
+     payload = classic_payload(settings, location, "https://www.walmart.com/search?q=whole%20milk&page=2")
++    # 1.1.12 dropped page=2 here; the page is now carried as start_page
+     assert payload == {
+         "source": "walmart_search",
+         "query": "whole milk",
+         "store_id": "1234",
+         "delivery_zip": "72712",
+         "fulfillment_type": "pickup",
++        "start_page": 2,
+     }
+ 
+ 
+-def test_500_product_fixture_is_complete_and_not_published_by_demo():
++def test_500_product_fixture_passes_offline_contract():
++    """walmart-500-demo.json is an existing OFFLINE fixture (records retained from the earlier v1.1.0 run data).
++    It is offline evidence of record shape only - not a genuine 500-product demonstration."""
+     path = Path(__file__).parents[1] / "walmart-500-demo.json"
+     records = json.loads(path.read_text(encoding="utf-8"))
+     assert len(records) == 500
+     assert all(record["gupc"] == "" and record["unit_price"] == "" for record in records)
++    assert all(record[f] == "" for record in records for f in WALMART_EMPTY_OFFER_FIELDS)
+     assert all(not validate_record_contract([record]) for record in records)
+ 
+ 
+--- /dev/null
++++ b/tests/test_v113_corrections.py
+@@ -0,0 +1,226 @@
++"""1.1.13 corrections from the client's static review of 1.1.12 (offline; synthetic fixtures, no provider request).
++
++  1. search route keeps page / filter parameters, refuses what it cannot express; repeated page one is not traversal
++  2. the four Walmart volume / digital offer fields are "" on every export path and validation enforces it
++  3. listing price fields are whole-token validated before normalisation (collection, not only canaries)
++  4. listing pages need the selected store + PICKUP + ZIP context; listing items need a store-bound offer chain
++"""
++from __future__ import annotations
++
++import asyncio
++import json
++
++import pytest
++
++import conftest as c
++from wmscraper.config import load_settings
++from wmscraper.fetch import FetchError, classic_payload
++from wmscraper.models import WALMART_EMPTY_OFFER_FIELDS, Record, enforce_empty_fields
++from wmscraper.parse.text import listing_price
++from wmscraper.parse.walmart import page_location, next_data, parse_listing
++from wmscraper.runner import Run
++from wmscraper.storage import build_storage
++from wmscraper.validate import validate_record_contract
++
++SEARCH = "https://www.walmart.com/search?q=whole%20milk"
++MILK = f"{c.BROWSE}976759_9176907{c.Q}"
++MILK_P2 = f"{c.BROWSE}976759_9176907?page=2&{c.Q[1:]}"
++
++
++def _fixtures(site):
++    fx = site.parent.parent / "fixtures"
++    return fx, json.loads((fx / "map.json").read_text())
++
++
++def _run(site):
++    s = load_settings(site)
++    rep = asyncio.run(Run(s, s.location("test-store")).execute())
++    st = build_storage(s)
++    return s, rep, st, st.get_json(f"test-store/runs/{rep['run_id']}/records.json")
++
++
++def _events(s, rep, kind):
++    run = Run(s, s.location("test-store"), run_id=rep["run_id"])
++    return [json.loads(d) for k, d in run.ck.db.execute("SELECT kind, detail FROM events") if k == kind]
++
++
++# ---------------------------------------------------------------- 1. search route: pagination / filter contract
++def _payload(site, url):
++    s = load_settings(site)
++    return classic_payload(s, s.location("test-store"), url)
++
++
++def test_search_pages_build_distinct_requests(site):
++    p1, p2 = _payload(site, f"{SEARCH}&page=1"), _payload(site, f"{SEARCH}&page=2")
++    assert p1 != p2
++    assert (p1["start_page"], p2["start_page"]) == (1, 2) and "pages" not in p1  # no "pages" in the provider table
++    assert _payload(site, SEARCH).get("start_page") is None  # no page parameter -> provider default (page 1)
++
++
++def test_search_price_filters_are_carried(site):
++    p = _payload(site, f"{SEARCH}&min_price=5&max_price=10&page=3&stores=1234")
++    assert (p["min_price"], p["max_price"], p["start_page"]) == (5, 10, 3)
++    assert p["store_id"] == "1234" and p["delivery_zip"] == "72712" and p["fulfillment_type"] == "pickup"
++
++
++@pytest.mark.parametrize("extra", ["&facet=fulfillment_method%3APickup", "&sort=price_low", "&cat_id=976759",
++                                   "&stores=9999", "&page=0", "&page=two", "&page=1&page=2", "&min_price=-1",
++                                   "&min_price=5.5", "&page=2.0"])
++def test_search_unsupported_or_invalid_parameters_are_refused(site, extra):
++    with pytest.raises(FetchError) as exc:
++        _payload(site, SEARCH + extra)
++    assert exc.value.kind == "compat"  # terminal: refused, never retried, never silently dropped
++
++
++def test_category_browse_does_not_use_search_route(site):
++    p = _payload(site, f"{c.BROWSE}976759_9176907?page=2&stores=1234")
++    assert p.get("source") != "walmart_search" and "page=2" in p.get("url", "")
++
++
++def test_repeated_page_one_is_not_traversal(site):
++    fx, m = _fixtures(site)
++    (fx / m[MILK_P2]).write_text((fx / m[MILK]).read_text(encoding="utf-8"), encoding="utf-8")  # page 2 == page 1
++    _s, rep, _st, _recs = _run(site)
++    assert not rep["validation"]["ok"] and rep["published"] is None
++    assert any("pagination not honoured" in e for e in rep["validation"]["errors"])
++
++
++# ---------------------------------------------------------------- 2. Walmart volume / digital offer fields
++def test_offer_fields_empty_on_fresh_records_despite_displayed_offers(site):
++    _s, rep, st, recs = _run(site)   # fixtures show "2 for $9", "Clip Coupon", "$3.50 each with Digital Coupon"
++    assert rep["validation"]["ok"], rep["validation"]
++    for r in recs + st.get_json("test-store/latest/records.json"):
++        assert all(r[f] == "" for f in WALMART_EMPTY_OFFER_FIELDS), r
++
++
++def test_offer_fields_empty_on_carried_forward_records(site):
++    s, rep, st, _ = _run(site)
++    old = st.get_json("test-store/latest/records.json")
++    for r in old:   # a previous dataset written by an older version that filled offer fields
++        r.update(volume_deals_description="2 for $9", volume_deals_price="9.00",
++                 digital_deals_description="Clip Coupon", digital_deals_price="1.00")
++    st.put_json("test-store/latest/records.json", old)
++    fx, m = _fixtures(site)
++    (fx / m[f"{c.BROWSE}976759_976787{c.Q}"]).write_text(c.listing([
++        c.item(201, "Lay's Classic Chips, 8 oz", "$4.28", ppm="53.5 ¢/oz"),
++        c.item(102, "Fairlife 2% Milk, 52 fl oz", "$4.98", was="$5.48")]), encoding="utf-8")
++    (fx / m[f"{c.BROWSE}976759_976787?facet=fulfillment_method%3APickup&stores=1234"]).write_text(
++        c.listing([], total=2), encoding="utf-8")
++    _s, rep2, _st, recs = _run(site)
++    assert rep2["availability"]["carried_forward"] == 1   # Doritos carried from the old dataset
++    assert all(r[f] == "" for r in recs for f in WALMART_EMPTY_OFFER_FIELDS)
++
++
++def test_offer_fields_contract_in_model_and_validation():
++    rec = Record(volume_deals_description="2 for $5", digital_deals_price="1.00").to_ordered_dict()
++    assert all(rec[f] == "" for f in WALMART_EMPTY_OFFER_FIELDS)
++    for f in WALMART_EMPTY_OFFER_FIELDS:
++        errors = validate_record_contract([{f: "x"}])
++        assert any(f in e and "must be empty" in e for e in errors)
++    assert all(r[f] == "" for r in enforce_empty_fields([{f: "x" for f in WALMART_EMPTY_OFFER_FIELDS}])
++               for f in WALMART_EMPTY_OFFER_FIELDS)
++
++
++# ---------------------------------------------------------------- 3. whole-token listing prices
++@pytest.mark.parametrize("raw", ["Only 2 left", "Save $2", "2 for $5", "$3.48 - $5.00", "Now $4.98", "from $1.99",
++                                 "$0.00", "0", "-1.00", "1.999", "$", "", None, True, float("nan"), float("inf"), 0, -3])
++def test_listing_price_rejects_non_prices(raw):
++    assert listing_price(raw) == ""
++
++
++@pytest.mark.parametrize("raw,out", [("$4.98", "4.98"), ("4.98", "4.98"), ("$1,299.5", "1299.50"), (" $ 12 ", "12.00"),
++                                     (8.96, "8.96"), (3, "3.00"), ("27 ¢", "0.27")])
++def test_listing_price_accepts_whole_price_tokens(raw, out):
++    assert listing_price(raw) == out
++
++
++def test_collection_rejects_text_in_listing_price_fields(site):
++    fx, m = _fixtures(site)
++    (fx / m[MILK]).write_text(c.listing([
++        c.item(101, "Great Value Whole Milk, 1 gal", "Only 2 left", ppm="2.7 ¢/fl oz"),
++        c.item(102, "Fairlife 2% Milk, 52 fl oz", "$4.98", was="Save $2"),
++        c.item(107, "Lactaid Milk, 64 fl oz", "2 for $5"),
++        c.item(108, "Silk Almond Milk, 64 fl oz", "$3.48", was="$3.98"),
++    ], max_page=2), encoding="utf-8")
++    s, rep, _st, recs = _run(site)
++    by = {r["product_title"]: r for r in recs}
++    assert by["Great Value Whole Milk, 1 gal"]["regular_price"] == ""          # identity kept, no invented price
++    assert (by["Fairlife 2% Milk, 52 fl oz"]["regular_price"], by["Fairlife 2% Milk, 52 fl oz"]["sale_price"]) == ("4.98", "")
++    assert by["Lactaid Milk, 64 fl oz"]["regular_price"] == ""
++    assert (by["Silk Almond Milk, 64 fl oz"]["regular_price"], by["Silk Almond Milk, 64 fl oz"]["sale_price"]) == ("3.98", "3.48")
++    rejected = {(e["item_id"], e["value"]) for e in _events(s, rep, "price_rejected")}
++    assert {("101", "Only 2 left"), ("102", "Save $2"), ("107", "2 for $5")} <= rejected
++
++
++# ---------------------------------------------------------------- 4. listing context + store-bound offer chain
++LOC = '"pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP", "postalCode": "72712"}}'
++
++
++@pytest.mark.parametrize("replacement,problem", [
++    ('"pageMetadata": {"location": {"storeId": "1234", "postalCode": "72712"}}', "intent -"),
++    ('"pageMetadata": {"location": {"storeId": "1234", "intent": "SHIPPING", "postalCode": "72712"}}', "intent SHIPPING"),
++    ('"pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP"}}', "postalCode -"),
++    ('"pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP", "postalCode": "10001"}}', "postalCode 10001"),
++    ('"pageMetadata": {"location": {"intent": "PICKUP", "postalCode": "72712"}}', "storeId -"),
++    ('"contentLayout": {"pageMetadata": {"location": {"storeId": "9999", "intent": "PICKUP", "postalCode": "72712"}}}, '
++     + LOC, "conflicting selected location"),
++])
++def test_listing_context_requires_store_pickup_and_zip(site, replacement, problem):
++    fx, m = _fixtures(site)
++    p = fx / m[MILK]
++    html = p.read_text(encoding="utf-8")
++    assert LOC in html
++    p.write_text(html.replace(LOC, replacement), encoding="utf-8")
++    s, rep, st, _ = _run(site)
++    assert not rep["validation"]["ok"] and rep["published"] is None and st.get_json("test-store/latest/records.json") is None
++    assert any("store context" in e for e in rep["validation"]["errors"])
++    assert any(problem in pr for e in _events(s, rep, "store_mismatch") for pr in e["problems"])
++
++
++def test_real_listing_location_shape_passes(site):
++    """Shape of the selected location on archived real store-#100 listings (two agreeing blocks)."""
++    loc = {"pickupStore": "1234", "deliveryStore": "1234", "intent": "PICKUP", "postalCode": "72712", "storeId": "1234"}
++    data = {"props": {"pageProps": {"initialData": {"pageMetadata": {"location": loc},
++                                                    "contentLayout": {"pageMetadata": {"location": loc}}}}}}
++    got = page_location(next_data(c.page(data)))
++    assert got["conflicts"] == []
++    s = load_settings(site)
++    assert Run(s, s.location("test-store")).context_problems(got) == []
++
++
++def _items(site, stacks):
++    s = load_settings(site)
++    run = Run(s, s.location("test-store"))
++    data = {"props": {"pageProps": {"initialData": {"searchResult": {"itemStacks": stacks, "paginationV2": {"maxPage": 1}},
++                                                    "pageMetadata": {"location": {"storeId": c.STORE, "intent": "PICKUP",
++                                                                                  "postalCode": c.ZIP}}}}}}
++    return run, {it.item_id: it for it in parse_listing(c.page(data)).items}
++
++
++def test_listing_items_need_store_bound_offer_chain(site):
++    bound = c.item(1, "Bound Milk, 1 gal", "$3.48")
++    conflicting = c.item(2, "Conflict Milk, 1 gal", "$3.48")
++    conflicting["fulfillmentSummary"] = [{"fulfillment": "PICKUP", "storeId": c.STORE}, {"fulfillment": "PICKUP", "storeId": "5555"}]
++    unbound = c.item(3, "Unbound Milk, 1 gal", "$3.48")
++    unbound["fulfillmentSummary"] = []                                   # in stock, but no entry for any store
++    unavailable = c.item(4, "Unavailable Milk, 1 gal", "$3.48", availability="OUT_OF_STOCK")
++    shipped = c.item(5, "Shipping Stack Milk, 1 gal", "$3.48")           # STORE-typed, but in the shipping stack
++    run, items = _items(site, [{"items": [bound, conflicting, unbound, unavailable]},
++                               {"meta": {"fulfillmentIntent": "SHIPPING"}, "items": [shipped]}])
++    reasons = {i: run._reject_reason(it) for i, it in items.items()}
++    assert reasons == {"1": "", "2": "conflicting_store_offer", "3": "store_offer_unbound", "4": "",
++                       "5": "shipping_context_not_store_offer"}
++    assert items["4"].availability(c.STORE) == "out_of_stock"           # eligible unavailable identity preserved
++
++
++def test_unavailable_store_item_identity_preserved_in_run(site):
++    fx, m = _fixtures(site)
++    (fx / m[f"{c.BROWSE}976759_976787{c.Q}"]).write_text(c.listing([
++        c.item(201, "Lay's Classic Chips, 8 oz", "$4.28", ppm="53.5 ¢/oz", availability="OUT_OF_STOCK"),
++        c.item(203, "Doritos Nacho, 9.25 oz", "$4.98")]), encoding="utf-8")
++    (fx / m[f"{c.BROWSE}976759_976787?facet=fulfillment_method%3APickup&stores=1234"]).write_text(
++        c.listing([], total=1), encoding="utf-8")
++    _s, rep, _st, recs = _run(site)
++    assert rep["validation"]["ok"], rep["validation"]
++    lays = next(r for r in recs if r["product_title"].startswith("Lay's"))
++    assert lays["upc"] == "028400090858" and lays["regular_price"] == "4.28"
+--- a/tools/make_evidence.py
++++ b/tools/make_evidence.py
+@@ -272,14 +272,10 @@
+     ex = {"schema_field_order": list(FIELD_ORDER), "all_records_match_schema": keys_ok,
+           "ppm_examples": [r for r in records if r["ppm"]][:5],
+           "upc_examples": [r for r in records if r["upc"]][:5],
+-          "volume_deal_examples": [r for r in records if r["volume_deals_description"]][:5],
+-          "digital_deal_examples": [r for r in records if r["digital_deals_description"]][:5],
+-          "no_deal_examples": [r for r in records if not (r["volume_deals_description"] or r["digital_deals_description"]
+-                                                          or r["sale_price"])][:5]}
++          "sale_price_examples": [r for r in records if r["sale_price"]][:5]}  # Walmart offer fields are always ""
+     (d / "13-schema-and-field-examples.json").write_text(json.dumps(ex, indent=2, ensure_ascii=False), encoding="utf-8")
+ 
+     export_traces(d / "06-structured-log.jsonl", d / "15-product-identity-trace.csv")
+-    (d / "16-offer-census.json").write_text(json.dumps(rep["offer_census"], indent=2, ensure_ascii=False), encoding="utf-8")
+     sh([PY, "tools/results_board.py", str(run_dir)], d / "14-results-board.log")
+     if (ROOT / "entry" / "02-results-board.png").exists():
+         shutil.copy(ROOT / "entry" / "02-results-board.png", d / "14-results-board.png")
+@@ -313,8 +309,7 @@
+           "| Real repeat collection | `B2-live-repeat-run/` (second fresh run, validated against the first published run) |",
+           "| Production traversal beyond 25 pages | `E-production-traversal/05-listing-exhaustion.csv` (exhaustion + price partitioning) |",
+           "| Product identity / variants | `B-live-walmart/15-product-identity-trace.csv` (request → response id/name/UPC → output) |",
+-          "| Offers displayed by Walmart | `B-live-walmart/16-offer-census.json` (every label, classified) |",
+-          "| PPM, UPC, offer terms as scraped | `B-live-walmart/13-schema-and-field-examples.json`, raw responses in `07-…` |",
++          "| PPM, UPC as scraped (Walmart offer fields always empty) | `B-live-walmart/13-schema-and-field-examples.json`, raw responses in `07-…` |",
+           "| Azure scheduled publishing | `C-azure-deployed/` |" if azure_dir else "| Azure scheduled publishing | (pending) |",
+           "| Deployment, schedule, operations, cost | source ZIP → `docs/OPERATIONS.md`, `docs/COST.md`, `deploy/azure/` |",
+           "", "## File checksums", "", "| file | sha256 |", "|---|---|"]
+--- a/tools/package_source.py
++++ b/tools/package_source.py
+@@ -21,7 +21,8 @@
+ from wmscraper import __version__  # noqa: E402
+ from wmscraper.version import fingerprint, source_files  # noqa: E402
+ 
+-EXTRA = ["README.md", ".env.example", ".gitignore", ".dockerignore", "docs"]
++EXTRA = ["README.md", ".env.example", ".gitignore", ".dockerignore", "docs",
++         "walmart-500-demo.json"]  # offline fixture read by tests/test_v112_offline.py
+ 
+ 
+ def main() -> Path:
+--- a/tools/results_board.py
++++ b/tools/results_board.py
+@@ -114,9 +114,7 @@
+ </div>
+ <div class="g">
+  <div class="card"><h2><i>PPM</i> Price per measure (as displayed)</h2><table><tr><th>product_title</th><th>regular_price</th><th>ppm</th></tr>{ex_rows(ex.get('ppm', []), ['product_title', 'regular_price', 'ppm'])}</table></div>
+- <div class="card"><h2><i>VOLUME</i> Volume deals</h2><table><tr><th>product_title</th><th>volume_deals_description</th><th>volume_deals_price</th></tr>{ex_rows(ex.get('volume_deals', []), ['product_title', 'volume_deals_description', 'volume_deals_price'])}</table></div>
+- <div class="card"><h2><i>DIGITAL</i> Digital deals</h2><table><tr><th>product_title</th><th>digital_deals_description</th><th>digital_deals_price</th></tr>{ex_rows(ex.get('digital_deals', []), ['product_title', 'digital_deals_description', 'digital_deals_price'])}</table></div>
+- <div class="card"><h2><i>PLAIN</i> Sale price &amp; no-deal products</h2><table><tr><th>product_title</th><th>regular_price</th><th>sale_price</th></tr>{ex_rows(ex.get('sale_price', [])[:2] + ex.get('no_deals', [])[:2], ['product_title', 'regular_price', 'sale_price'], 4)}</table></div>
++ <div class="card"><h2><i>PLAIN</i> Sale price &amp; regular-price products</h2><table><tr><th>product_title</th><th>regular_price</th><th>sale_price</th></tr>{ex_rows(ex.get('sale_price', [])[:2] + ex.get('no_sale_price', [])[:2], ['product_title', 'regular_price', 'sale_price'], 4)}</table></div>
+ </div>
+ <div class="g"><div class="card" style="grid-column:1/-1"><h2><i>JSON</i> First record, exact field order</h2><pre>{esc(sample)}</pre></div></div>
+ <div class="foot"><span>records.json sha256 {sha[:32]}…</span><span>requests {rep['fetch_stats'].get('requests')} · retries {rep['fetch_stats'].get('retries')} · challenges {rep['fetch_stats'].get('challenges')}</span></div>

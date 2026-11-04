@@ -21,7 +21,8 @@ sys.path.insert(0, str(ROOT / "src"))
 from wmscraper import __version__  # noqa: E402
 from wmscraper.version import fingerprint, source_files  # noqa: E402
 
-EXTRA = ["README.md", ".env.example", ".gitignore", ".dockerignore", "docs"]
+EXTRA = ["README.md", ".env.example", ".gitignore", ".dockerignore", "docs",
+         "walmart-500-demo.json"]  # offline fixture read by tests/test_v112_offline.py
 
 
 def main() -> Path:

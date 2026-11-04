@@ -1,0 +1,80 @@
+walmart-500-demo.json - recorded test output
+The fixture is an EXISTING offline file (records retained from the earlier v1.1.0 run data). It is offline evidence of
+record shape only, not a genuine 500-product demonstration. It was not recreated or modified.
+sha256 434f2ceb9877de68f22f959e700949723beaab2a2c4985246190ceb836e24a30  walmart-500-demo.json
+
+---- 1. Recorded 1.1.12 test report as sent on 2026-11-03 (wm-delivery/1.1.12-tests.txt) ----
+Walmart offline validation — 1.1.12
+
+Focused: 33 passed
+Full suite: 89 passed
+
+Coverage:
+- walmart_search payload route is store/ZIP/pickup pinned and query decoded offline.
+- 500-product fixture has exactly 500 records, pipeline-owned fields remain empty, and all records pass identity/offer shape validation.
+- malformed UPC/GTIN, PPM, and sale-without-regular-offer block publication through validate_run.
+- Existing failed-run publication protection remains covered by test_pipeline.py.
+
+No Azure deployment, Oxylabs request, budget change, or Mariano changes were made.
+Target remains store #100 pickup; existing #4376 failures are retained as historical evidence.
+
+
+---- 2. Re-run on 2026-11-04 of tests/test_v112_offline.py from the delivered 1.1.12 ZIP (sha256 0182c094...) ----
+Confirms the review finding: the ZIP did not contain the fixture, so its fixture test fails; with the existing
+fixture added unchanged the same 1.1.12 tests pass. 1.1.13 packages the fixture.
+
+## A. 1.1.12 package as delivered (fixture absent)
+============================= test session starts =============================
+collecting ... collected 3 items
+
+tests/test_v112_offline.py::test_walmart_search_route_builds_store_pinned_payload PASSED [ 33%]
+tests/test_v112_offline.py::test_500_product_fixture_is_complete_and_not_published_by_demo FAILED [ 66%]
+tests/test_v112_offline.py::test_identity_and_offer_validation_blocks_publication PASSED [100%]
+
+================================== FAILURES ===================================
+_______ test_500_product_fixture_is_complete_and_not_published_by_demo ________
+
+    def test_500_product_fixture_is_complete_and_not_published_by_demo():
+        path = Path(__file__).parents[1] / "walmart-500-demo.json"
+>       records = json.loads(path.read_text(encoding="utf-8"))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_v112_offline.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\..\..\..\Programs\Python\Python313\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\..\..\..\Programs\Python\Python313\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/claude/d--PROJECTS-python-scrappers/e1d2df19-a316-4c26-83d2-9961ffa38fd5/scratchpad/wm112/walmart-scraper/walmart-500-demo.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\iZa Computers\\AppData\\Local\\Temp\\claude\\d--PROJECTS-python-scrappers\\e1d2df19-a316-4c26-83d2-9961ffa38fd5\\scratchpad\\wm112\\walmart-scraper\\walmart-500-demo.json'
+
+..\..\..\..\..\..\..\Programs\Python\Python313\Lib\pathlib\_local.py:537: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_v112_offline.py::test_500_product_fixture_is_complete_and_not_published_by_demo
+========================= 1 failed, 2 passed in 0.53s =========================
+
+## B. same 1.1.12 package + walmart-500-demo.json (sha256 434f2ceb...) placed at its root
+============================= test session starts =============================
+collecting ... collected 3 items
+
+tests/test_v112_offline.py::test_walmart_search_route_builds_store_pinned_payload PASSED [ 33%]
+tests/test_v112_offline.py::test_500_product_fixture_is_complete_and_not_published_by_demo PASSED [ 66%]
+tests/test_v112_offline.py::test_identity_and_offer_validation_blocks_publication PASSED [100%]
+
+============================== 3 passed in 0.80s ==============================

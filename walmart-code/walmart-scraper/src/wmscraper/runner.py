@@ -7,7 +7,7 @@ Phases (each resumable from the checkpoint):
   4. discovery     – category pages → subcategory listings (CSV exclusions applied)
   5. listings      – paginate every listing; per page: shape check, store check,
                      filter sponsored / marketplace / shipping-only / approx-weight, dedup
-  6. enrichment    – product pages: UPC, size, store-level offer re-check, deals
+  6. enrichment    – product pages: UPC, size, store-level offer re-check
   7. canary:end
   8. validate      – publish to latest/ only if every check passes
 """
@@ -27,9 +27,8 @@ from .checkpoint import Checkpoint
 from .config import Category, Location, Settings
 from .fetch import FetchError, build_fetcher
 from .lock import run_lock
-from .models import Record
-from .parse import deals
-from .parse.text import clean_text, extract_weight, format_price, is_approximate_weight, is_private_label
+from .models import Record, enforce_empty_fields
+from .parse.text import clean_text, extract_weight, is_approximate_weight, is_private_label, listing_price
 from .parse.walmart import (ChallengeError, ListingItem, ShapeError, category_id_of, children_of, department_children,
                             discover_links, next_data, parse_listing, parse_product, parse_store, store_context_excerpt)
 from .report import build_report
@@ -234,7 +233,7 @@ class Run:
     def finish(self, runtime: float) -> dict:
         if not getattr(self, "aborted", ""):
             self._carry_forward()
-        records = self.ck.records()
+        records = enforce_empty_fields(self.ck.records())  # fresh AND carried-forward records
         previous = self.storage.get_json(f"{self.loc.key}/latest/report.json")
         validation = validate_run(self.s, self.ck, records, self.categories, previous)
         if getattr(self, "aborted", ""):
@@ -293,14 +292,30 @@ class Run:
             raise RuntimeError(self.store["reason"])
 
     # ------------------------------------------------------------------ context checks (explicit)
+    def context_problems(self, location: dict) -> list[str]:
+        """The page's SELECTED location (explicit path) must be the configured store, the configured fulfillment
+        intent and the configured ZIP - each present, each matching, and no other location block disagreeing."""
+        probs = []
+        if location.get("storeId") != self.loc.store_id:
+            probs.append(f"storeId {location.get('storeId') or '-'} (expected {self.loc.store_id})")
+        if location.get("pickupStore") and location["pickupStore"] != self.loc.store_id:
+            probs.append(f"pickupStore {location['pickupStore']} (expected {self.loc.store_id})")
+        if self.loc.fulfillment == "pickup" and (location.get("intent") or "").upper() != "PICKUP":
+            probs.append(f"intent {location.get('intent') or '-'} (expected PICKUP)")
+        if self.loc.zipcode and location.get("postalCode") != self.loc.zipcode:
+            probs.append(f"postalCode {location.get('postalCode') or '-'} (expected {self.loc.zipcode})")
+        for other in location.get("conflicts") or []:
+            probs.append(f"conflicting selected location at {other.get('path')}: {other}")
+        return probs
+
     def _check_context(self, location: dict, where: str) -> bool:
-        """The page's SELECTED location must be the configured store (explicit path), not merely contain its id."""
-        if location.get("storeId") == self.loc.store_id:
+        probs = self.context_problems(location)
+        if not probs:
             self.ck.set("store_verified_pages", self.ck.get("store_verified_pages", 0) + 1)
             return True
         self.ck.set("store_mismatches", self.ck.get("store_mismatches", 0) + 1)
-        self.ck.event("store_mismatch", {"where": where, "selected_location": location})
-        log.error("store_context_mismatch", extra={"where": where, "selected_location": location})
+        self.ck.event("store_mismatch", {"where": where, "selected_location": location, "problems": probs})
+        log.error("store_context_mismatch", extra={"where": where, "selected_location": location, "problems": probs})
         return False
 
     def _product_context_ok(self, p) -> bool:
@@ -770,13 +785,20 @@ class Run:
         """Keep the store's own offers on one verified page, update reconciliation counters, decide stop.
         Returns True when the listing is finished (exhausted or capped)."""
         self._archive("listing", res, f"{category} / {sub} page {page}")
+        ids = [it.item_id for it in lp.items]
+        last = self.ck.get(f"last_page_ids:{category}:{url}") or {}
+        if page > 1 and ids and last.get("page") == page - 1 and last.get("ids") == ids:
+            # the route ignored the page parameter: a repeated page one is never counted as traversal
+            self.ck.event("repeated_page", {"category": category, "url": url, "page": page})
+            self.ck.fail_listing(category, url, f"page {page}: same products as page {page - 1} "
+                                                f"(pagination not honoured - unsupported coverage)")
+            return True
+        self.ck.set(f"last_page_ids:{category}:{url}", {"page": page, "ids": ids})
         row = self.ck.listing_row(category, url)
         expected = int(row.get("expected_store_total") or 0)
         streak = int(row.get("zero_streak") or 0)
         need_empty = int(self.crawl.get("store_exhausted_empty_pages", 1))
         accepted, skipped, avail = [], [], []
-        self._census([(it.item_id, t) for it in lp.items if it.is_store_item(self.loc.store_id)
-                      for t in it.promo_texts], "listing")
         now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         n_avail = n_oos = 0
         for it in lp.items:
@@ -810,20 +832,6 @@ class Run:
         self._sync_checkpoint()
         return stop or capped
 
-    def _census(self, pairs: list[tuple[str, str]], where: str) -> None:
-        """Offer census: every promotion / badge label Walmart displayed on store offers, with counts and examples."""
-        if not pairs:
-            return
-        census = self.ck.get("offer_census", {})
-        for item_id, text in pairs:
-            e = census.setdefault(text, {"count": 0, "examples": [], "seen_on": []})
-            e["count"] += 1
-            if len(e["examples"]) < 3 and item_id not in e["examples"]:
-                e["examples"].append(item_id)
-            if where not in e["seen_on"]:
-                e["seen_on"].append(where)
-        self.ck.set("offer_census", census)
-
     def _listing_params(self) -> dict:
         return {k: str(v).replace("{store_id}", self.loc.store_id) for k, v in (self.crawl.get("listing_params") or {}).items()}
 
@@ -833,22 +841,27 @@ class Run:
             return "marketplace_seller"
         if not it.is_store_item(self.loc.store_id):
             return "not_store_assortment_online_only"
+        problem = it.store_offer_problem(self.loc.store_id)
+        if problem:
+            return problem
         if it.approx_weight or is_approximate_weight(it.title):
             return "approximate_weight"
         return ""
 
     def _record(self, it: ListingItem, category: str, sub: str) -> dict:
-        """Prices, PPM and promotions come ONLY from this store offer on the store-pinned listing."""
-        regular, sale = (it.was_price, it.current_price) if it.was_price else (it.current_price, "")
-        d = deals.classify(it.promo_texts)
+        """Prices and PPM come ONLY from this store offer on the store-pinned listing. Each price field is validated
+        as one whole price token before normalisation. Walmart volume / digital offer fields stay "" (models)."""
+        current, was = listing_price(it.current_price), listing_price(it.was_price)
+        for name, raw, ok in (("current_price", it.current_price, current), ("was_price", it.was_price, was)):
+            if raw not in ("", None) and not ok:
+                self.ck.event("price_rejected", {"item_id": it.item_id, "field": name, "value": str(raw)})
+        regular, sale = (was, current) if was and current else (current, "")
         rec = Record(
             zipcode=self.store.get("zipcode", self.loc.zipcode), store_name=self.store.get("store_name", ""),
             store_location=self.store.get("store_location", ""), store_logo=self.s.get("store_logo_url", ""),
             store_brand="yes" if is_private_label(it.brand, it.title, self.s.private_label_brands) else "no",
             category=category, sub_category=sub, product_title=it.title, weight=extract_weight(it.title),
-            regular_price=format_price(regular), sale_price=format_price(sale),
-            volume_deals_description=d.volume_description, volume_deals_price=d.volume_price,
-            digital_deals_description=d.digital_description, digital_deals_price=d.digital_price,
+            regular_price=regular, sale_price=sale,
             image_url=it.image_url, url=it.url, upc=it.upc, ppm=it.ppm, crawl_date=self.crawl_date,
         )
         return rec.to_ordered_dict()

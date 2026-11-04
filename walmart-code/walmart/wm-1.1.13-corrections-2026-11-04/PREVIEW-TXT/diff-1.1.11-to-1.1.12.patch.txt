@@ -1,0 +1,154 @@
+# Normalized diff (UTF-8, LF line endings) between delivered packages
+# old: walmart-scraper-1.1.11-src.zip  sha256 a372f18090b36f233c744783470792cb4b592f8cc1c2ed5fa4d06615ef197c8a
+# new: walmart-scraper-1.1.12-src.zip  sha256 0182c094ef0ce53daf3b346f72a72a09dad5ada612682a0954b9b2a61121974c
+# files changed: 5
+#   modified  config/settings.yaml (+8 -0)
+#   modified  src/wmscraper/__init__.py (+1 -1)
+#   modified  src/wmscraper/fetch/base.py (+5 -0)
+#   modified  src/wmscraper/validate.py (+28 -0)
+#   added     tests/test_v112_offline.py (+49 -0)
+
+--- a/config/settings.yaml
++++ b/config/settings.yaml
+@@ -39,6 +39,14 @@
+     product_payload:
+       source: walmart_product
+       product_id: "{product_id}"
++      store_id: "{store_id}"
++      delivery_zip: "{zipcode}"
++      fulfillment_type: pickup
++    # Optional search listing route for offline/approved probes. Category crawling
++    # remains on store-pinned Walmart HTML until this route is explicitly selected.
++    search_payload:
++      source: walmart_search
++      query: "{query}"
+       store_id: "{store_id}"
+       delivery_zip: "{zipcode}"
+       fulfillment_type: pickup
+--- a/src/wmscraper/__init__.py
++++ b/src/wmscraper/__init__.py
+@@ -1,3 +1,3 @@
+ """Walmart location-specific product scraper for Microsoft Azure."""
+ 
+-__version__ = "1.1.11"
++__version__ = "1.1.12"
+--- a/src/wmscraper/fetch/base.py
++++ b/src/wmscraper/fetch/base.py
+@@ -14,6 +14,7 @@
+ import random
+ import time
+ from dataclasses import dataclass
++from urllib.parse import parse_qs, urlparse
+ 
+ from ..config import Location, Settings
+ from ..parse.walmart import detect_challenge
+@@ -81,6 +82,10 @@
+     Product pages: the documented `walmart_product` source with store localisation (store_id, delivery_zip,
+     fulfillment_type) when `fetch.oxylabs.product_payload` is configured; everything else: `fetch.oxylabs.payload`."""
+     m = _IP_RE.search(url)
++    if "/search" in urlparse(url).path and settings.get("fetch.oxylabs.search_payload") is not None:
++        tpl = settings.get("fetch.oxylabs.search_payload")
++        query = (parse_qs(urlparse(url).query).get("q") or [""])[0]
++        return fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
+     tpl = settings.get("fetch.oxylabs.product_payload") if m else None
+     if tpl:
+         return fill(tpl, url=url, product_id=m.group(1), store_id=location.store_id, zipcode=location.zipcode)
+--- a/src/wmscraper/validate.py
++++ b/src/wmscraper/validate.py
+@@ -13,9 +13,34 @@
+ from __future__ import annotations
+ 
+ from dataclasses import dataclass, field
++import re
+ 
+ from .models import FIELD_ORDER
+ from .parse.text import is_approximate_weight
++
++_GTIN_RE = re.compile(r"^\d{8,14}$")
++_PRICE_RE = re.compile(r"^\d+(?:\.\d{1,2})?$")
++_PPM_RE = re.compile(r"^\s*\$?\d+(?:\.\d+)?\s*¢?\s*/\s*\S+")
++
++
++def validate_record_contract(records: list[dict]) -> list[str]:
++    """Validate identity and store-offer field shapes without recalculating PPM."""
++    errors: list[str] = []
++    for index, record in enumerate(records):
++        prefix = f"record {index}"
++        upc = record.get("upc", "")
++        if upc and not _GTIN_RE.fullmatch(str(upc)):
++            errors.append(f"{prefix}: invalid UPC/GTIN")
++        for field in ("regular_price", "sale_price", "volume_deals_price", "digital_deals_price"):
++            value = record.get(field, "")
++            if value and not _PRICE_RE.fullmatch(str(value)):
++                errors.append(f"{prefix}: invalid {field}")
++        ppm = record.get("ppm", "")
++        if ppm and not _PPM_RE.match(str(ppm)):
++            errors.append(f"{prefix}: invalid PPM")
++        if record.get("sale_price") and not record.get("regular_price"):
++            errors.append(f"{prefix}: sale price has no regular-price offer")
++    return errors
+ 
+ 
+ @dataclass
+@@ -42,6 +67,9 @@
+ 
+ def validate_run(settings, ck, records: list[dict], categories, previous_report: dict | None) -> Validation:
+     v = Validation()
++
++    for error in validate_record_contract(records):
++        v.fail(error)
+ 
+     # 1. store context
+     store = ck.get("store_verification") or {}
+--- /dev/null
++++ b/tests/test_v112_offline.py
+@@ -0,0 +1,49 @@
++"""Offline acceptance checks for the 1.1.12 Walmart handoff."""
++from __future__ import annotations
++
++import json
++from pathlib import Path
++
++from wmscraper.fetch import classic_payload
++from wmscraper.validate import validate_record_contract
++
++
++def test_walmart_search_route_builds_store_pinned_payload(site):
++    settings = __import__("wmscraper.config", fromlist=["load_settings"]).load_settings(str(site))
++    settings.raw["fetch"]["oxylabs"]["search_payload"] = {
++        "source": "walmart_search",
++        "query": "{query}",
++        "store_id": "{store_id}",
++        "delivery_zip": "{zipcode}",
++        "fulfillment_type": "pickup",
++    }
++    location = settings.location("test-store")
++    payload = classic_payload(settings, location, "https://www.walmart.com/search?q=whole%20milk&page=2")
++    assert payload == {
++        "source": "walmart_search",
++        "query": "whole milk",
++        "store_id": "1234",
++        "delivery_zip": "72712",
++        "fulfillment_type": "pickup",
++    }
++
++
++def test_500_product_fixture_is_complete_and_not_published_by_demo():
++    path = Path(__file__).parents[1] / "walmart-500-demo.json"
++    records = json.loads(path.read_text(encoding="utf-8"))
++    assert len(records) == 500
++    assert all(record["gupc"] == "" and record["unit_price"] == "" for record in records)
++    assert all(not validate_record_contract([record]) for record in records)
++
++
++def test_identity_and_offer_validation_blocks_publication():
++    record = {
++        "upc": "not-a-upc",
++        "ppm": "computed from price",
++        "regular_price": "",
++        "sale_price": "4.98",
++    }
++    errors = validate_record_contract([record])
++    assert any("UPC" in error for error in errors)
++    assert any("PPM" in error for error in errors)
++    assert any("regular-price offer" in error for error in errors)

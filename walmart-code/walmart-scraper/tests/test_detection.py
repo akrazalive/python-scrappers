@@ -196,13 +196,14 @@ def test_variant_mismatch_is_never_attributed(site):
     assert rep["product_identity"]["variant_mismatches"] == 1
 
 
-def test_offer_census_reports_displayed_labels(site):
+def test_no_offer_collection_for_walmart(site):
+    """Walmart offers are out of scope: no offer census, no deal examples, all four offer fields empty."""
     s = load_settings(site)
-    rep = asyncio.run(Run(s, s.location("test-store")).execute())
-    labels = {r["label"]: r["classified_as"] for r in rep["offer_census"]["labels"]}
-    assert labels["2 for $9"] == "volume_deal"
-    assert labels["Clip Coupon: Save $1.00"] == "digital_deal"
-    assert labels["Earn $1 Walmart Cash"] == "reward_not_a_price_reduction"
+    run = Run(s, s.location("test-store"))
+    rep = asyncio.run(run.execute())
+    assert "offer_census" not in rep and run.ck.get("offer_census") is None
+    assert not {"volume_deals", "digital_deals"} & set(rep["examples"])
+    assert rep["field_completeness"]["volume_deals_description"] == rep["field_completeness"]["digital_deals_price"] == 0
 
 
 def test_oversize_listing_without_subcategories_is_price_partitioned(site):
@@ -333,7 +334,7 @@ def test_price_ppm_promotions_only_from_store_offer(site):
     recs = {r["product_title"]: r for r in build_storage(s).get_json("test-store/latest/records.json")}
     dor = recs["Doritos Nacho, 9.25 oz"]
     assert dor["ppm"] == "" and dor["regular_price"] == "4.98"      # listing store offer had no PPM -> stays empty
-    assert dor["volume_deals_description"] == "Buy 1, Get 1 Free"  # listing offer terms, not the product page's
+    assert dor["volume_deals_description"] == dor["volume_deals_price"] == ""  # Walmart offer fields always empty
     assert "Shipping Only Milk 12 pack" not in recs
     assert rep["excluded"]["not_store_assortment_online_only"] == 1
 

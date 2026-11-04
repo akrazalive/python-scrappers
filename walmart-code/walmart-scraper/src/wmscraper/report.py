@@ -34,22 +34,6 @@ def _availability(ck) -> dict:
             "examples": {s: [r for r in rows if r["status"] == s][:3] for s in by_status}}
 
 
-def _offer_census(census: dict) -> dict:
-    """Classify every displayed label with the same rules used for the output fields."""
-    from .parse import deals
-
-    rows = []
-    for text, e in sorted(census.items(), key=lambda kv: -kv[1]["count"]):
-        d = deals.classify([text])
-        kind = ("volume_deal" if d.volume_description else "digital_deal" if d.digital_description
-                else "reward_not_a_price_reduction" if d.ignored_rewards else "other_label")
-        rows.append({"label": text, "classified_as": kind, **e})
-    totals = {}
-    for r in rows:
-        totals[r["classified_as"]] = totals.get(r["classified_as"], 0) + r["count"]
-    return {"distinct_labels": len(rows), "occurrences_by_class": totals, "labels": rows}
-
-
 def _examples(records, predicate, n=5):
     return [r for r in records if predicate(r)][:n]
 
@@ -87,13 +71,10 @@ def build_report(run_id: str, location, store: dict, ck, records: list[dict], ru
         "category_completeness": _category_completeness(listings, records),
         "examples": {
             "ppm": _examples(records, lambda r: r["ppm"]),
-            "volume_deals": _examples(records, lambda r: r["volume_deals_description"]),
-            "digital_deals": _examples(records, lambda r: r["digital_deals_description"]),
             "sale_price": _examples(records, lambda r: r["sale_price"]),
-            "no_deals": _examples(records, lambda r: not (r["volume_deals_description"] or r["digital_deals_description"] or r["sale_price"])),
+            "no_sale_price": _examples(records, lambda r: not r["sale_price"]),
             "private_label": _examples(records, lambda r: r["store_brand"] == "yes"),
         },
-        "offer_census": _offer_census(ck.get("offer_census", {})),
         "availability": _availability(ck),
         "count_reconciliation": [{k: l.get(k) for k in ("category", "sub_category", "url", "expected_store_total",
                                                           "store_available", "store_oos", "stop_reason", "next_page",

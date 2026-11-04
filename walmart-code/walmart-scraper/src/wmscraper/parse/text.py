@@ -35,6 +35,28 @@ def format_price(value) -> str:
     return f"{num.quantize(Decimal('0.01'))}"
 
 
+# A listing price field must be ONE whole price token ("$1,299.50", "4.98", 4.98, "27 ¢") - never a number found
+# inside other wording ("Only 2 left", "Save $2", "2 for $5", "$3.48 - $5.00").
+_WHOLE_PRICE_RE = re.compile(r"^\s*\$?\s*(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d{1,2})?\s*$")
+
+
+def listing_price(value) -> str:
+    """Typed / whole-token validation of a listing price field BEFORE normalisation. '' when it is not a price."""
+    if value is None or isinstance(value, bool):
+        return ""
+    if isinstance(value, (int, float, Decimal)):
+        try:
+            num = Decimal(str(value))
+        except InvalidOperation:
+            return ""
+        return format_price(num) if num.is_finite() and num > 0 else ""
+    text = str(value)
+    if not (_WHOLE_PRICE_RE.match(text) or _CENTS_RE.match(text)):
+        return ""
+    out = format_price(text)
+    return out if out and Decimal(out) > 0 else ""
+
+
 # Approximate / variable-weight wording. Matches "approx", "approximately", "avg wt",
 # "average weight", "est. weight", "~1.5 lb", "weight varies", "sold by weight".
 _APPROX_RE = re.compile(
