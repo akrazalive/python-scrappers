@@ -1,0 +1,35 @@
+Mariano's v1.1.10: readable handoff (same version, not rebuilt)
+
+Thank you. This is the exact v1.1.10 you named, provided readable so no ZIP preview is needed. Nothing was changed,
+rebuilt or re-sent. Every file was copied byte-for-byte from marianos-scraper-1.1.10-src.zip (sha256 438133ff...):
+66 of 66 files, 0 differences. Walmart is in a separate message.
+
+Readable files:
+  READABLE-PRIORITY-FILES-1.1.10.txt  your priority files in one text file, in your order (qualification-price helper,
+                                      location/request builder, listing adapter, publication gates, bounded tests,
+                                      tests), each with path, sha256 and line numbers
+  00-INDEX.md                         where to look in each file (function -> line)
+  A-SOURCE-1.1.10/                    the full package unpacked, plus a sha256 for every file (for a read-only folder/repo)
+  B-DIFF/diff-1.1.9-to-1.1.10.patch   normalized diff (UTF-8, LF) built from the two delivered ZIPs; the earlier
+                                      copy was UTF-16, which is why it appeared as binary
+  C-TESTS/                            1.1.10 output as sent, plus a re-run from the unpacked package today: 92 passed
+  PREVIEW-TXT/                        .txt copies of the .md and .patch files, for preview in Freelancer
+
+Proposed one-request qualification (01-ONE-REQUEST-QUALIFICATION.md). This is a proposal, not an approved request:
+  - Time: Wednesday 2026-11-04, 10:00 CST (16:00 UTC), only if you approve it in writing by 09:00 CST. Without
+    approval nothing is sent.
+  - Command: MSCRAPER_FETCH_PROVIDER=oxylabs_realtime python -m mscraper --budget vernon-qual:1 verify-store
+    --location marianos-502-vernon-hills --max-requests 1   (run locally from v1.1.10; no redeployment)
+  - Query: milk. Body: {"source":"kroger_search","query":"milk","store_id":"53100502","fulfillment_type":"pickup"}
+    This is recorded as proposed, not as a verified supported account contract.
+  - Deadline: 210 s hard stop, no retry. Redacted receipt within 1 hour (the template is in the file).
+  - Pass only if the returned response shows store 53100502, the Mariano's banner, 1720 N Milwaukee, ZIP 60061,
+    PICKUP, and a finite positive price sourced from 53100502.
+  - Budget: either a separate one-request cap (Test 1 stays 0/19), or drawn from Test 1 (1/19). This is your choice.
+
+Known limitation in v1.1.10: if the response cannot be parsed as a Mariano's page, the error and ledger line are
+recorded but the raw body is not archived. I can add that offline before any request if you want it.
+
+Offline work, separate from approvals: answering your source-review findings, and the Mariano's complete offer terms,
+which remain required separately. The Test 1 balance is unchanged at 0/19. Test 1, Test 2, redeployment and full
+traversal remain your decision.

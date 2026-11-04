@@ -1,0 +1,2574 @@
+Mariano's scraper 1.1.10 (unchanged, not rebuilt) - priority files (readable)
+Package: marianos-scraper-1.1.10-src.zip  sha256 438133ff21950e002fc594199dd1ebfbb5eaec7485e5384173f695a2654c499d
+Every file below is copied byte-for-byte from that package; its SHA-256 is of the packaged bytes.
+Index:
+  [1 qualification-price helper + store verification]
+    b73fd4139574b470a355dbbd420feeda4a1750b7e7e56ac6c3d8ec38cd751941  src/mscraper/runner.py
+  [2 location / request builder]
+    3b6c2d735f93c78d2f76233cc4632f2db20b519523e88353fb0f88785781e948  src/mscraper/fetch.py
+    56f68ab61f914297d57d774050451632e9f3e1d29328e9291c253a4bde671c6f  src/mscraper/config.py
+    87d1bc2941643474d74232fb230956de16ce35da2fc951f969ab074f0ccfd4b1  config/locations.yaml
+    9248f21fbe3232d5dd8415494e47f408e2939b115d7ec6665ed05d6969984a1a  config/settings.yaml
+  [3 listing adapter]
+    004a27d81310c09f09fafa778e11c6b751ab4e13067f239c91badc15a493c1b8  src/mscraper/parse.py
+  [4 publication gates]
+    946fd2763f6636fc0abce215ac07c9dbd3d316ef8e2eb216469b94d61ee6247a  src/mscraper/validate.py
+  [5 bounded tests / one-request command]
+    f574cafc4a2706c9b0440bcf691a9b17a56093f3eac9817de9ccf32117b7cf56  src/mscraper/cli.py
+    025d2fea5bebe2e917deba376bc5fa4a101146f63bbeb7e2f9963900bc8e3e8e  src/mscraper/budget.py
+  [tests]
+    611b6ae8858836d85eafed46ef75ca60d1e0800026468f86398661445ad58204  tests/test_v1110_scope.py
+    bc83b4d1e637804cb96e4fe8b97ebe420c82f4b5b1a7bc5f1f301f8141e823e9  tests/test_v119_price.py
+    72f0588d4311ca36e0a3322b40d0afc7b9d6b04972f0214405adcdeb0fca3dc9  tests/test_v112_bounded_tests.py
+
+====================================================================================================
+[1 qualification-price helper + store verification] src/mscraper/runner.py
+sha256 b73fd4139574b470a355dbbd420feeda4a1750b7e7e56ac6c3d8ec38cd751941   lines 637
+====================================================================================================
+   1  """One run for one store location: verify store → discover → crawl → coupons → validate → publish.
+   2  
+   3  Every step is checkpointed; `run --resume` continues an interrupted run from the exact query where it stopped
+   4  (records already stored are never fetched or written twice). Every page used is written to the provenance ledger
+   5  with the SHA-256 of the exact response and a gzip excerpt of its price-bearing product data (see evidence.py).
+   6  """
+   7  from __future__ import annotations
+   8  
+   9  import asyncio
+  10  import gzip
+  11  import hashlib
+  12  import json
+  13  import logging
+  14  import math
+  15  import re
+  16  import time
+  17  import uuid
+  18  from datetime import datetime, timezone
+  19  from pathlib import Path
+  20  from urllib.parse import parse_qsl, quote, urlencode, urlparse
+  21  
+  22  from . import coverage, evidence, parse, retention
+  23  from .checkpoint import Checkpoint
+  24  from .config import Category, Location, Settings
+  25  from .fetch import FetchError, build_fetcher
+  26  from .report import build_report
+  27  from .validate import validate_run
+  28  
+  29  log = logging.getLogger("mscraper.run")
+  30  
+  31  
+  32  _DISPLAY_PRICE_RE = re.compile(r"^\s*\$\s*(\d+(?:\.\d{1,2})?)\s*(?:/[A-Za-z]+)?\s*$")
+  33  
+  34  
+  35  def _positive_number(value) -> bool:
+  36      return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value > 0
+  37  
+  38  
+  39  def _has_monetary_price(store_prices: dict, expected_modality: str = "IN_STORE") -> bool:
+  40      """Return whether a store-price block contains a payable value for the selected modality."""
+  41      for kind in ("regular", "promo"):
+  42          value = store_prices.get(kind)
+  43          if not isinstance(value, dict):
+  44              continue
+  45          mode = str(value.get("modality") or value.get("fulfillmentMode") or value.get("fulfillmentType") or "").upper()
+  46          if mode and mode != expected_modality.upper():
+  47              continue
+  48          for key in ("price", "amount", "nforPrice"):
+  49              if _positive_number(value.get(key)):
+  50                  return True
+  51          text = value.get("defaultDescription")
+  52          if isinstance(text, str):
+  53              match = _DISPLAY_PRICE_RE.fullmatch(text)
+  54              if match and float(match.group(1)) > 0:
+  55                  return True
+  56      return False
+  57  
+  58  
+  59  def _has_qualifying_store_price(store_prices: dict, source_location: str, configured_store: str,
+  60                                   expected_modality: str) -> bool:
+  61      return source_location == configured_store and _has_monetary_price(store_prices, expected_modality)
+  62  
+  63  
+  64  def _with_page(url: str, page: int) -> str:
+  65      if page <= 1:
+  66          return url
+  67      p = urlparse(url)
+  68      q = [(k, v) for k, v in parse_qsl(p.query, keep_blank_values=True) if k != "page"] + [("page", str(page))]
+  69      return p._replace(query=urlencode(q)).geturl()
+  70  
+  71  
+  72  def _now() -> str:
+  73      return datetime.now(timezone.utc).isoformat(timespec="seconds")
+  74  
+  75  
+  76  class Runner:
+  77      def __init__(self, settings: Settings, location: Location, storage, state_dir: Path, run_id: str | None = None,
+  78                   categories: list[str] | None = None, limit_per_category: int = 0, fetcher=None):
+  79          self.s, self.loc, self.storage = settings, location, storage
+  80          self.cats: list[Category] = settings.categories_for(location, categories)
+  81          self.scoped = bool(categories or location.categories)
+  82          self.limit = int(limit_per_category or location.limit_per_category or 0)
+  83          self.base = settings.get("base_url", "https://www.marianos.com").rstrip("/")
+  84          self.run_id = run_id or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:6]
+  85          self.dir = Path(state_dir) / location.key / "runs" / self.run_id
+  86          self.dir.mkdir(parents=True, exist_ok=True)
+  87          self.ck = Checkpoint(self.dir / "checkpoint.sqlite")
+  88          self.fetcher = fetcher or build_fetcher(settings, location)
+  89          self.fetcher.on_refusal = self._archive_refusal
+  90          self.census: dict[str, dict] = self.ck.get("offer_census", {})
+  91          self.page_size = int(settings.get("crawl.page_size", 24))
+  92          self.max_pages = int(settings.get("crawl.max_pages_per_query", 42))
+  93          self.empty_stop = int(settings.get("crawl.stop_after_empty_pages", 3))
+  94          self.skip_shelves = [re.compile(p, re.I) for p in settings.get("crawl.skip_shelf_patterns") or []]
+  95          self.raw_per_cat = int(settings.get("evidence.raw_pages_per_category", 2))
+  96          self._raw_count: dict[str, int] = {}
+  97  
+  98      def _archive_refusal(self, res) -> None:
+  99          evidence.save_refusal(self.dir, res)
+ 100  
+ 101      # ------------------------------------------------------------------ helpers
+ 102      def _ctx(self, category: str, sub: str) -> dict:
+ 103          st = self.ck.get("store_verification") or {}
+ 104          return {"store_id": self.loc.store_id, "zipcode": st.get("zipcode", ""), "store_name": st.get("store_name", ""),
+ 105                  "store_location": st.get("store_location", ""), "store_logo": st.get("store_logo", ""),
+ 106                  "brands": self.s.private_label_brands, "category": category, "sub_category": sub, "base_url": self.base,
+ 107                  "crawl_date": self.ck.get("crawl_date"),
+ 108                  "approx_price_wording": self.s.get("crawl.approximate_weight_price_wording", True)}
+ 109  
+ 110      def _record_page(self, kind: str, where: dict, url: str, html: str, state: dict | None,
+ 111                       sp: parse.SearchPage | None = None, store: parse.StoreInfo | None = None) -> str:
+ 112          cat = where.get("category", "")
+ 113          keep_raw = self._raw_count.get(cat or kind, 0) < self.raw_per_cat
+ 114          if keep_raw:
+ 115              self._raw_count[cat or kind] = self._raw_count.get(cat or kind, 0) + 1
+ 116          sha, size, rel = evidence.save_page(self.dir, html, state, keep_raw)
+ 117          store = store or (sp.store if sp else (parse.store_info(state) if state else parse.StoreInfo()))
+ 118          modal = ""
+ 119          for m in (((state or {}).get("calypso") or {}).get("domains") or {}).get("modalityPreferences", {}).get("modalities") or []:
+ 120              modal = m.get("modalityType") or modal
+ 121          priced, srcs = 0, set()
+ 122          if sp:
+ 123              for u in sp.upcs:
+ 124                  p = ((sp.products.get(u) or {}).get("data") or {}).get("price") or {}
+ 125                  s = p.get("storePrices") or {}
+ 126                  if s.get("regular"):
+ 127                      priced += 1
+ 128                  if s.get("sourceLocationId"):
+ 129                      srcs.add(str(s.get("sourceLocationId")))
+ 130          self.ck.ledger_add({"ts": _now(), "kind": kind, "category": cat, "sub_category": where.get("sub", ""),
+ 131                              "query": where.get("query", ""), "url": url, "response_sha256": sha, "response_bytes": size,
+ 132                              "evidence_file": rel, "store_location_id": store.location_id,
+ 133                              "request_location_id": sp.request_location if sp else "", "active_modality": modal,
+ 134                              "listed": len(sp.upcs) if sp else 0, "priced": priced,
+ 135                              "price_source_locations": ",".join(sorted(srcs)),
+ 136                              "reported_total": sp.total if sp else 0,
+ 137                              "store_ok": int(store.location_id == self.loc.store_id
+ 138                                              and (not srcs or srcs == {self.loc.store_id}))})
+ 139          return sha
+ 140  
+ 141      async def _search(self, url: str, where: dict, kind: str = "search") -> tuple[parse.SearchPage, str, str]:
+ 142          box = {}
+ 143  
+ 144          def check(html: str):
+ 145              st = parse.extract_state(html)
+ 146              box["state"], box["sp"] = st, parse.search_page(st)
+ 147  
+ 148          res = await self.fetcher.get(url, validate=check)
+ 149          sha = self._record_page(kind, where, url, res.html, box["state"], sp=box["sp"])
+ 150          return box["sp"], res.html, sha
+ 151  
+ 152      def _store_ok(self, store: parse.StoreInfo, where: str) -> bool:
+ 153          if store.location_id == self.loc.store_id:
+ 154              self.ck.incr("store_verified_pages")
+ 155              return True
+ 156          self.ck.incr("store_mismatches")
+ 157          self.ck.event("store_mismatch", {"where": where, "got": store.location_id, "name": store.name, "want": self.loc.store_id})
+ 158          log.error("store mismatch", extra={"where": where, "got": store.location_id, "want": self.loc.store_id})
+ 159          return False
+ 160  
+ 161      # ------------------------------------------------------------------ 1. store + canary
+ 162      async def verify_store(self) -> dict:
+ 163          q = self.loc.canary_query or "milk"
+ 164          box = {}
+ 165  
+ 166          def keep_state(html):
+ 167              box["state"] = parse.extract_state(html)
+ 168              box["sp"] = parse.search_page(box["state"])
+ 169  
+ 170          url = f"{self.base}/search?query={quote(q)}&searchType=default_search"
+ 171          res = await self.fetcher.get(url, validate=keep_state)
+ 172          sp, html = box["sp"], res.html
+ 173          sha = self._record_page("store_verification", {"query": q}, url, html, box["state"], sp=sp)
+ 174          st = sp.store
+ 175          modalities = (((box["state"].get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []
+ 176          want_modality = self.loc.expected_modality
+ 177          returned_modalities = [str(m.get("modalityType") or "").upper() for m in modalities]
+ 178          modality = next((m for m in returned_modalities if m == want_modality), returned_modalities[-1] if returned_modalities else "")
+ 179          price_sources: set[str] = set()
+ 180          priced_from_store = 0
+ 181          for u in sp.upcs:
+ 182              store_prices = (((sp.products.get(u) or {}).get("data") or {}).get("price") or {}).get("storePrices") or {}
+ 183              source = str(store_prices.get("sourceLocationId") or "")
+ 184              if source:
+ 185                  price_sources.add(source)
+ 186              if _has_qualifying_store_price(store_prices, source, self.loc.store_id, want_modality):
+ 187                  priced_from_store += 1
+ 188          checks = {
+ 189              "fulfillment_modality_matches": modality == want_modality,
+ 190              "location_id_matches": st.location_id == self.loc.store_id,
+ 191              "search_request_pinned_to_store": sp.request_location == self.loc.store_id,
+ 192              "zipcode_matches": (not self.loc.zipcode) or st.zipcode == self.loc.zipcode,
+ 193              "address_matches": (not self.loc.expected_address) or self.loc.expected_address.lower() in st.full_address.lower(),
+ 194              "banner_matches": "mariano" in st.banner.lower(),
+ 195              "prices_from_store": priced_from_store > 0,
+ 196              "price_source_locations_match": bool(price_sources) and price_sources == {self.loc.store_id},
+ 197          }
+ 198          result = {"verified": all(checks.values()), "checks": checks, "configured_store_id": self.loc.store_id,
+ 199                    "selected_store_id": st.location_id, "store_name": st.name, "store_location": st.full_address,
+ 200                    "zipcode": st.zipcode, "banner": st.banner, "fulfillment_modality": modality,
+ 201                    "store_logo": parse.store_logo(html, self.base) or self.s.get("store_logo_fallback", ""),
+ 202                    "verified_at": _now(), "evidence_query": q, "evidence_response_sha256": sha}
+ 203          self.ck.set("store_verification", result)
+ 204          log.info("store verification", extra=result)
+ 205          return result
+ 206  
+ 207      async def canary(self, phase: str) -> dict:
+ 208          q = self.loc.canary_query or "milk"
+ 209          found, priced = set(), 0
+ 210          try:
+ 211              sp, _, sha = await self._search(f"{self.base}/search?query={quote(q)}&searchType=default_search",
+ 212                                              {"query": q}, kind=f"canary_{phase}")
+ 213              self._store_ok(sp.store, f"canary-{phase}")
+ 214              for u in sp.upcs:
+ 215                  sprice = ((sp.products.get(u, {}).get("data") or {}).get("price") or {}).get("storePrices") or {}
+ 216                  if sprice.get("regular") and sprice.get("sourceLocationId") == self.loc.store_id:
+ 217                      priced += 1
+ 218                      found.add(u)
+ 219              missing = [u for u in self.loc.canary_upcs if u not in found]
+ 220              ok = priced >= self.page_size // 2 and not missing
+ 221              res = {"ok": ok, "priced_products": priced, "missing_canary_upcs": missing, "response_sha256": sha,
+ 222                     "detail": "" if ok else f"priced={priced}, missing={missing}"}
+ 223          except FetchError as exc:
+ 224              res = {"ok": False, "detail": f"fetch failed: {exc}"}
+ 225          c = self.ck.get("canary", {})
+ 226          c[phase] = res
+ 227          self.ck.set("canary", c)
+ 228          return res
+ 229  
+ 230      # ------------------------------------------------------------------ 2. discovery
+ 231      async def _site_menu(self) -> dict:
+ 232          """The site menu (every department with its sub-category links) is embedded in every Mariano's page;
+ 233          it is read once per run from a store-verified search page and kept in the checkpoint."""
+ 234          menu = self.ck.get("site_menu")
+ 235          if not menu:
+ 236              box = {}
+ 237  
+ 238              def check(html):
+ 239                  st = parse.extract_state(html)
+ 240                  m = {k: v for k, v in (st.get("dynamicdata") or {}).items() if "site-menu" in k}
+ 241                  if not m:
+ 242                      raise parse.PageError("site menu missing", "malformed")
+ 243                  box["m"], box["state"] = m, st
+ 244  
+ 245              url = f"{self.base}/search?query={quote(self.loc.canary_query or 'milk')}&searchType=default_search"
+ 246              res = await self.fetcher.get(url, validate=check)
+ 247              self._record_page("site_menu", {}, url, res.html, box["state"])
+ 248              self._store_ok(parse.store_info(box["state"]), "site menu page")
+ 249              menu = box["m"]
+ 250              self.ck.set("site_menu", menu)
+ 251          return {"dynamicdata": menu}
+ 252  
+ 253      async def discover(self, cat: Category) -> None:
+ 254          key = f"discovered:{cat.name}"
+ 255          if self.ck.get(key):
+ 256              return
+ 257          if cat.kind == "coupons":
+ 258              self.ck.set(key, {"kind": "coupons"})
+ 259              return
+ 260          if cat.kind == "list":
+ 261              sh = parse.shelf_from_url(cat.name, urlparse(cat.url).path)
+ 262              for q in sh.queries():
+ 263                  self.ck.add_listing(cat.name, cat.name, f"{self.base}/search?query={quote(q)}&searchType=default_search",
+ 264                                      q, cat.taxonomy_id, False)
+ 265              self.ck.set(key, {"kind": "list", "shelves": 1, "taxonomy": cat.taxonomy_id, "queries": sh.queries()})
+ 266              return
+ 267          menu_state = await self._site_menu()
+ 268          shelves = parse.department_shelves(menu_state, cat.slug)          # complete sub-category tree from the site menu
+ 269          box = {}
+ 270  
+ 271          def check(html):
+ 272              box["state"] = parse.extract_state(html)
+ 273  
+ 274          try:  # the department page adds its curated tiles; it is optional because the menu already lists every shelf
+ 275              res = await self.fetcher.get(cat.url, validate=check, retries=int(self.s.get("crawl.department_page_retries", 2)))
+ 276              self._record_page("department", {"category": cat.name}, cat.url, res.html, box["state"])
+ 277              self._store_ok(parse.store_info(box["state"]), f"department {cat.name}")
+ 278              known = {(x.taxonomy or x.query.lower()) for x in shelves}
+ 279              for x in parse.department_shelves(box["state"], cat.slug):
+ 280                  if (x.taxonomy or x.query.lower()) not in known:
+ 281                      shelves.append(x)
+ 282          except FetchError as exc:
+ 283              self.ck.event("department_page_unavailable", {"category": cat.name, "url": cat.url, "error": str(exc)[:200],
+ 284                                                           "used": "site menu sub-categories"})
+ 285          dept = parse.department_code(shelves)
+ 286          kept, skipped = 0, []
+ 287          for sh in shelves:
+ 288              if any(rx.search(sh.name) for rx in self.skip_shelves):
+ 289                  skipped.append(sh.name)
+ 290                  continue
+ 291              if sh.curated and not self.s.get("crawl.include_curated_shelves", True):
+ 292                  skipped.append(sh.name)
+ 293                  continue
+ 294              urls = []
+ 295              if sh.curated:  # the shelf's own curated search first, then its name
+ 296                  urls.append((self.base + sh.url if sh.url.startswith("/") else sh.url, sh.query))
+ 297                  tax = dept if self.s.get("crawl.curated_department_filter", True) else ""
+ 298              else:
+ 299                  tax = sh.taxonomy
+ 300              for q in sh.queries():
+ 301                  if sh.curated and q == sh.query:
+ 302                      continue        # the curated search itself is already queued with its own URL
+ 303                  urls.append((f"{self.base}/search?query={quote(q)}&searchType=default_search", q))
+ 304              for url, q in urls:
+ 305                  self.ck.add_listing(cat.name, sh.name, url, q, tax, sh.curated)
+ 306              if self.s.get("coupons.product_flag_via_search_filter", True) and not sh.curated:
+ 307                  self.ck.add_listing(cat.name, sh.name, f"{self.base}/search?query={quote(sh.query)}&searchType=default_search"
+ 308                                      f"&savings=Coupons", f"{sh.query} | savings=Coupons", tax, False, mode="coupon_filter")
+ 309              kept += 1
+ 310          if not kept:
+ 311              self.ck.event("discovery_failed", {"category": cat.name, "url": cat.url})
+ 312              raise FetchError(f"no sub-categories found on {cat.url}", "malformed")
+ 313          self.ck.set(key, {"kind": "department", "shelves": kept, "skipped_brand_shelves": skipped, "department_code": dept,
+ 314                            "subcategories": [s.name for s in shelves if s.name not in skipped]})
+ 315  
+ 316      # ------------------------------------------------------------------ 3. crawl one listing
+ 317      async def crawl_pending(self) -> None:
+ 318          """Continuous work queue: every pending request starts as soon as the fetcher has a free slot, and requests
+ 319          queued by expansion / brand slices start as soon as they appear. (Up to 1.1.1 the crawl ran in waves: a wave
+ 320          waited for its slowest request, retries and back-off included, before the next wave started, leaving most
+ 321          parallel slots idle - the main reason for ~8-9 requests per minute on 21 Oct.) The fetcher's semaphore still
+ 322          bounds parallel requests (`fetch.concurrency`). Each request is started at most once per session; one left
+ 323          pending is picked up by the next resume."""
+ 324          running: dict[tuple, asyncio.Task] = {}
+ 325          started: set[tuple] = set()
+ 326          n = 0
+ 327          while True:
+ 328              for l in self.ck.pending():
+ 329                  key = (l["category"], l["url"])
+ 330                  if key not in started:
+ 331                      started.add(key)
+ 332                      running[key] = asyncio.create_task(self.crawl_listing(l))
+ 333              if not running:
+ 334                  break
+ 335              done, _ = await asyncio.wait(running.values(), return_when=asyncio.FIRST_COMPLETED)
+ 336              for key in [k for k, t in running.items() if t in done]:
+ 337                  exc = running.pop(key).exception()
+ 338                  if exc:
+ 339                      for t in running.values():
+ 340                          t.cancel()
+ 341                      raise exc
+ 342              n += len(done)
+ 343              if n % 50 < len(done):
+ 344                  log.info("crawl", extra={"requests_done": n, "requests_running": len(running),
+ 345                                           "requests_total": len(self.ck.listings()), "fetch": dict(self.fetcher.stats)})
+ 346  
+ 347      async def crawl_listing(self, l: dict) -> None:
+ 348          """Read one search request of a shelf.
+ 349  
+ 350          Mariano's server-rendered search returns the first 24 results of a request whatever page is asked for.
+ 351          Two mechanisms extend coverage: (1) brand slices – a request that reports more products than it returned is
+ 352          partitioned with Mariano's own `brandName` filter, one request per brand (slices are disjoint, and their
+ 353          reported totals reconcile against the parent request in coverage.json); (2) query expansion – new products
+ 354          queue queries built from their sub-commodity names and brands. Neither is capped by default."""
+ 355          cat, url, sub = l["category"], l["url"], l["sub_category"]
+ 356          page, streak = int(l["next_page"]), int(l["empty_streak"])
+ 357          paginate = bool(self.s.get("crawl.paginate", False))
+ 358          mode = l.get("mode") or "query"
+ 359          while True:
+ 360              if self.limit and self.ck.kept_in_category(cat) >= self.limit:
+ 361                  self.ck.finish_listing(cat, url, "demo_limit_reached")
+ 362                  return
+ 363              where = {"category": cat, "sub": sub, "query": l["query"]}
+ 364              try:
+ 365                  sp, _, sha = await self._search(_with_page(url, page), where, kind=f"search_{mode}")
+ 366              except FetchError as exc:
+ 367                  self.ck.fail_listing(cat, url, f"page {page}: {exc}")
+ 368                  self.ck.event("listing_failed", {"category": cat, "sub": sub, "query": l["query"], "error": str(exc)})
+ 369                  return
+ 370              if not self._store_ok(sp.store, f"{cat} / {sub} [{l['query']}]") or (
+ 371                      sp.request_location and sp.request_location != self.loc.store_id):
+ 372                  self.ck.fail_listing(cat, url, f"page {page}: store context mismatch")
+ 373                  return
+ 374              if mode == "brand_slice" and sp.upcs:
+ 375                  want = l["query"].split("| brand=", 1)[-1].strip().lower()
+ 376                  got = [((sp.products.get(u) or {}).get("data") or {}).get("item", {}).get("brand", {}).get("name", "").lower()
+ 377                         for u in sp.upcs]
+ 378                  share = sum(1 for b in got if b == want) / len(got)
+ 379                  if share < float(self.s.get("crawl.brand_slice_min_share", 0.9)):
+ 380                      # Mariano's ignored the brand filter: never count this response as coverage of the slice
+ 381                      self.ck.fail_listing(cat, url, f"brand filter not honored ({share:.0%} of products are '{want}')")
+ 382                      self.ck.event("brand_filter_not_honored", {"query": l["query"], "share": share})
+ 383                      return
+ 384              accepted, skipped, matched, terms, obs, excl, listed = [], [], 0, [], [], [], []
+ 385              coupon_rows: list[tuple[str, str, str]] = []
+ 386              ctx = self._ctx(cat, sub)
+ 387              for upc in sp.upcs:
+ 388                  prod = sp.products.get(upc)
+ 389                  item = ((prod or {}).get("data") or {}).get("item") or {}
+ 390                  listed.append((upc, (item.get("brand") or {}).get("name", "")))
+ 391                  if not parse.matches(parse.product_codes(prod, sp.codes.get(upc)), l["taxonomy"]):
+ 392                      skipped.append((upc, "outside_subcategory"))
+ 393                      continue
+ 394                  matched += 1
+ 395                  if not prod or "data" not in prod:
+ 396                      skipped.append((upc, "no_product_data"))
+ 397                      continue
+ 398                  m = parse.map_product(prod, ctx)
+ 399                  if m.reason == "store_mismatch":
+ 400                      self.ck.incr("store_mismatches")
+ 401                      self.ck.event("store_mismatch", {"upc": upc, "source": m.source_location})
+ 402                  for text, tpl in m.offer_labels:
+ 403                      e = self.census.setdefault(text, {"count": 0, "template": tpl})
+ 404                      e["count"] += 1
+ 405                  if m.record:
+ 406                      accepted.append((m.identity, sub, m.record))
+ 407                      obs.append({"identity": m.identity, "upc": m.record["upc"], "source_product_id": m.source_product_id,
+ 408                                  "identity_source": m.identity_source, "availability": m.availability,
+ 409                                  "sell_by": m.sell_by, "modalities": json.dumps(m.modalities),
+ 410                                  "offers": json.dumps(m.offers, ensure_ascii=False), "response_sha256": sha,
+ 411                                  "observed_at": _now(), "query": l["query"]})
+ 412                  else:
+ 413                      skipped.append((m.identity or upc, m.reason))
+ 414                      if m.reason == "approximate_weight":
+ 415                          excl.append({"identity": m.identity, "category": cat, "sub_category": sub, "reason": m.reason,
+ 416                                       "trigger_field": m.trigger[0], "trigger_text": m.trigger[1], "response_sha256": sha})
+ 417                  if mode in ("query", "expansion"):
+ 418                      terms.extend(parse.expansion_terms(prod, l["taxonomy"], sub))
+ 419                  if mode == "coupon_filter" and m.identity:
+ 420                      coupon_rows.append((m.identity, l["query"], sha))
+ 421              streak = 0 if matched else streak + 1
+ 422              done, reason = True, "single_page_request"
+ 423              if paginate:
+ 424                  done, reason = False, ""
+ 425                  if len(sp.upcs) < self.page_size or (sp.total and page * self.page_size >= sp.total):
+ 426                      done, reason = True, "end_of_results"
+ 427                  elif streak >= self.empty_stop:
+ 428                      done, reason = True, f"no_matching_products_in_{self.empty_stop}_pages"
+ 429                  elif page >= self.max_pages:
+ 430                      done, reason = True, "query_page_window_reached"
+ 431              self.ck.listing_items_add(url, listed)
+ 432              self.ck.observe(obs)
+ 433              self.ck.exclude(excl)
+ 434              self.ck.flag_coupons(coupon_rows)
+ 435              new = self.ck.commit_page(cat, url, page, accepted, skipped, len(sp.upcs), matched, done, reason, streak, sp.total)
+ 436              sliced = self._slice(l, sp, listed) if mode == "query" else 0
+ 437              queued = self._expand(l, terms) if (new and mode in ("query", "expansion")) else 0
+ 438              log.info("request", extra={"category": cat, "sub": sub, "query": l["query"], "mode": mode,
+ 439                                         "listed": len(sp.upcs), "matched": matched, "new_records": new,
+ 440                                         "reported_total": sp.total, "brand_slices_queued": sliced,
+ 441                                         "queries_queued": queued, "response_sha256": sha})
+ 442              if done:
+ 443                  return
+ 444              page += 1
+ 445  
+ 446      def _slice(self, l: dict, sp: parse.SearchPage, listed: list[tuple[str, str]]) -> int:
+ 447          """Partition a SEED request (the shelf's own name / parts) that reports more than it returned into brand slices
+ 448          (Mariano's brandName filter). Expansion requests are discovery helpers and are not partitioned."""
+ 449          if not self.s.get("crawl.brand_slices", True) or sp.total <= len(sp.upcs):
+ 450              return 0
+ 451          brands = {b for _, b in listed if b}
+ 452          # brands seen anywhere in this shelf can also hide in this request's unseen remainder
+ 453          for (b,) in self.ck.db.execute(
+ 454                  "SELECT DISTINCT li.brand FROM listing_items li JOIN listings l ON l.url = li.url "
+ 455                  "WHERE l.category=? AND l.sub_category=? AND li.brand != ''", (l["category"], l["sub_category"])):
+ 456              brands.add(b)
+ 457          cap = int(self.s.get("crawl.max_brand_slices_per_request", 0))
+ 458          added = 0
+ 459          for b in sorted(brands):
+ 460              if cap and added >= cap:
+ 461                  break
+ 462              sep = "&" if "?" in l["url"] else "?"
+ 463              if self.ck.add_listing(l["category"], l["sub_category"], f"{l['url']}{sep}brandName={quote(b)}",
+ 464                                     f"{l['query']} | brand={b}", l["taxonomy"], bool(l["curated"]),
+ 465                                     mode="brand_slice", parent=l["url"]):
+ 466                  added += 1
+ 467          return added
+ 468  
+ 469      def _expand(self, l: dict, terms: list[str]) -> int:
+ 470          cap = int(self.s.get("crawl.max_queries_per_shelf", 0))
+ 471          shelf = [x for x in self.ck.listings() if x["category"] == l["category"] and x["sub_category"] == l["sub_category"]
+ 472                   and (x.get("mode") or "query") in ("query", "expansion")]
+ 473          used = {x["query"].lower() for x in shelf}
+ 474          added = 0
+ 475          for t in terms:
+ 476              if cap and len(shelf) + added >= cap:
+ 477                  break
+ 478              if t.lower() in used:
+ 479                  continue
+ 480              used.add(t.lower())
+ 481              self.ck.add_listing(l["category"], l["sub_category"],
+ 482                                  f"{self.base}/search?query={quote(t)}&searchType=default_search",
+ 483                                  t, l["taxonomy"], bool(l["curated"]), mode="expansion")
+ 484              added += 1
+ 485          return added
+ 486  
+ 487      # ------------------------------------------------------------------ 4. coupons
+ 488      async def collect_coupons(self, cat: Category) -> None:
+ 489          if self.ck.get("coupons_done"):
+ 490              return
+ 491          box = {}
+ 492  
+ 493          def check(html):
+ 494              box["coupons"] = parse.coupons(html)
+ 495              box["state"] = parse.extract_state(html)
+ 496  
+ 497          res = await self.fetcher.get(cat.url, render_js=bool(self.s.get("coupons.render_js", True)), validate=check)
+ 498          sha = self._record_page("coupons", {"category": cat.name}, cat.url, res.html, box["state"])
+ 499          self._store_ok(parse.store_info(box["state"]), "coupons page")
+ 500          cps = [{**c, "response_sha256": sha} for c in box["coupons"]]
+ 501          (self.dir / "coupons.json").write_text(json.dumps(cps, indent=2, ensure_ascii=False), encoding="utf-8")
+ 502          self.ck.set("coupons", {"count": len(cps), "url": cat.url, "bytes": len(res.html), "response_sha256": sha})
+ 503          self.ck.set("coupons_done", True)
+ 504  
+ 505      # ------------------------------------------------------------------ main
+ 506      async def run(self, publish: bool = True) -> dict:
+ 507          t0 = time.monotonic()
+ 508          started = self.ck.get("started_at")
+ 509          if not started:
+ 510              self.ck.set("started_at", _now())
+ 511              self.ck.set("crawl_date", datetime.now(timezone.utc).date().isoformat())
+ 512              self.ck.set("scope", {"categories": [c.name for c in self.cats], "limit_per_category": self.limit,
+ 513                                    "scoped_demo": self.scoped or bool(self.limit)})
+ 514              self.ck.set("provenance_start", {**evidence.fingerprints(self.s), "recorded_at": _now()})
+ 515          else:
+ 516              self.ck.incr("resumes")
+ 517              fp = {**evidence.fingerprints(self.s), "recorded_at": _now()}
+ 518              hist = self.ck.get("provenance_resumes", [])
+ 519              hist.append(fp)
+ 520              self.ck.set("provenance_resumes", hist)
+ 521              self.ck.event("resumed", {"retried_failed_listings": self.ck.retry_failed(),
+ 522                                        "items_already_kept": self.ck.db.execute("SELECT COUNT(*) FROM items").fetchone()[0],
+ 523                                        "pending_requests": len(self.ck.pending()), "code_sha256": fp["code_sha256"]})
+ 524          await self.fetcher.start()
+ 525          try:
+ 526              store = self.ck.get("store_verification") or {}
+ 527              if not store.get("verified"):
+ 528                  store = await self.verify_store()
+ 529                  if not store["verified"]:
+ 530                      raise RuntimeError(f"store verification failed: {store['checks']}")
+ 531              if not (self.ck.get("canary") or {}).get("start"):
+ 532                  await self.canary("start")
+ 533              for cat in self.cats:
+ 534                  try:
+ 535                      await self.discover(cat)
+ 536                      if self.ck.get(f"discovery_error:{cat.name}"):
+ 537                          self.ck.set(f"discovery_error:{cat.name}", None)   # earlier failure healed on resume
+ 538                  except FetchError as exc:
+ 539                      self.ck.set(f"discovery_error:{cat.name}", str(exc))
+ 540                      log.error("discovery failed", extra={"category": cat.name, "error": str(exc)})
+ 541              await self.crawl_pending()
+ 542              self.ck.set("offer_census", self.census)
+ 543              for cat in self.cats:
+ 544                  if cat.kind == "coupons" and self.s.get("coupons.enabled", True):
+ 545                      try:
+ 546                          await self.collect_coupons(cat)
+ 547                      except FetchError as exc:
+ 548                          self.ck.set("coupons_error", str(exc))
+ 549              await self.canary("end")
+ 550          finally:
+ 551              self.ck.set("offer_census", self.census)
+ 552              prev = self.ck.get("fetch_stats_before_resume", [])
+ 553              self.ck.set("fetch_stats", {**self.fetcher.stats, "provider": self.fetcher.name, "earlier_sessions": prev})
+ 554              prev.append({**self.fetcher.stats, "ended_at": _now()})
+ 555              self.ck.set("fetch_stats_before_resume", prev)
+ 556              await self.fetcher.close()
+ 557              self.ck.flush(force=True)
+ 558          runtime = time.monotonic() - t0 + float(self.ck.get("runtime_before_resume", 0))
+ 559          self.ck.set("runtime_before_resume", runtime)
+ 560          return self.finish(runtime, publish)
+ 561  
+ 562      # ------------------------------------------------------------------ finish: retention, evidence, validation, publish
+ 563      def _previous(self) -> tuple[dict, dict]:
+ 564          prev_recs = self.storage.get_json(f"{self.loc.key}/latest/records.json") or []
+ 565          prev_obs = self.storage.get_json(f"{self.loc.key}/latest/observations.json") or {}
+ 566          by_url = {o.get("url"): k for k, o in prev_obs.items() if o.get("url")}
+ 567          out = {}
+ 568          for r in prev_recs:
+ 569              ident = r.get("upc") or by_url.get(r.get("url"), "")
+ 570              if ident:
+ 571                  out[ident] = r
+ 572          return out, prev_obs
+ 573  
+ 574      def finish(self, runtime: float, publish: bool) -> dict:
+ 575          fresh = self.ck.identified_records()
+ 576          fresh_obs = {}
+ 577          for o in self.ck.table("observations"):
+ 578              o = dict(o)
+ 579              o["modalities"] = json.loads(o["modalities"] or "{}")
+ 580              o["offers"] = json.loads(o["offers"] or "[]")
+ 581              if o["identity"] in fresh:
+ 582                  o["url"] = fresh[o["identity"]].get("url", "")
+ 583              fresh_obs[o["identity"]] = o
+ 584          for row in self.ck.table("coupon_flags"):
+ 585              o = fresh_obs.get(row["identity"])
+ 586              if o is not None:   # Mariano's savings=Coupons filter lists this product (coupon terms not exposed)
+ 587                  o.setdefault("digital_coupon_available", {"source": "marianos.com search filter savings=Coupons",
+ 588                                                            "evidence_response_sha256": row["response_sha256"],
+ 589                                                            "query": row["query"]})
+ 590          demo = (self.ck.get("scope") or {}).get("scoped_demo")
+ 591          prev_recs, prev_obs = ({}, {}) if demo else self._previous()   # demo scope never carries / publishes
+ 592          recs_by_id, obs = retention.carry_forward(fresh, fresh_obs, prev_recs, prev_obs, self.run_id, self.ck.get("crawl_date"))
+ 593          records = list(recs_by_id.values())
+ 594          prev_report = self.storage.get_json(f"{self.loc.key}/latest/report.json")
+ 595          v = validate_run(self.s, self.ck, records, self.cats, prev_report, obs, recs_by_id)
+ 596          cov = coverage.reconcile(self.ck.listings(), self.ck.table("listing_items"), self.ck.table("ledger"))
+ 597          if cov["summary"]["unexplained_gap"]:
+ 598              v.fail(f"coverage: {cov['summary']['unexplained_gap']} product(s) in gaps without an explained reason")
+ 599          if cov["summary"]["queries"] and cov["summary"]["queries_complete"] < cov["summary"]["queries"]:
+ 600              v.warn(f"coverage: {cov['summary']['queries'] - cov['summary']['queries_complete']} of "
+ 601                     f"{cov['summary']['queries']} seed requests not proven complete (explained in coverage.json)")
+ 602          if demo:
+ 603              v.warn("demo scope (category subset / per-category limit): never published to latest/")
+ 604          provenance = {"start": self.ck.get("provenance_start"), "resumes": self.ck.get("provenance_resumes", []),
+ 605                        "finish": {**evidence.fingerprints(self.s), "recorded_at": _now()}}
+ 606          report = build_report(self.run_id, self.loc, self.ck, records, runtime, v.as_dict(), self.s, self.cats,
+ 607                                obs=obs, coverage=cov, provenance=provenance)
+ 608          files = {
+ 609              "records.json": json.dumps(records, ensure_ascii=False, indent=2),
+ 610              "report.json": json.dumps(report, ensure_ascii=False, indent=2),
+ 611              "observations.json": json.dumps(obs, ensure_ascii=False, indent=2),
+ 612              "coverage.json": json.dumps(cov, ensure_ascii=False, indent=2),
+ 613              "exclusions.json": json.dumps(self.ck.table("exclusions"), ensure_ascii=False, indent=2),
+ 614              "ledger.json": json.dumps(self.ck.table("ledger"), ensure_ascii=False, indent=2),
+ 615          }
+ 616          cp = self.dir / "coupons.json"
+ 617          if cp.exists():
+ 618              files["coupons.json"] = cp.read_text(encoding="utf-8")
+ 619          base = f"{self.loc.key}/runs/{self.run_id}"
+ 620          for name, body in files.items():
+ 621              (self.dir / name).write_text(body, encoding="utf-8")
+ 622              self.storage.put_bytes(f"{base}/{name}", body.encode("utf-8"))
+ 623          status = "validation_failed"
+ 624          self.ck.flush(force=True)       # durable checkpoint before anything is published
+ 625          if v.ok and not demo and publish:
+ 626              extras = {k: files[k] for k in ("observations.json", "coverage.json") if k in files}
+ 627              self.storage.publish(self.loc.key, self.run_id, records, report, extras=extras)
+ 628              status = "published"
+ 629          elif v.ok:
+ 630              status = "valid_not_published_demo" if demo else "valid_not_published"
+ 631          self.ck.set("final_status", status)
+ 632          self.ck.event("final_status", {"status": status, "records": len(records), "errors": v.errors[:20]})
+ 633          self.ck.flush(force=True)
+ 634          log.info("run finished", extra={"status": status, "records": len(records), "errors": v.errors[:10]})
+ 635          return {"run_id": self.run_id, "status": status, "records": len(records), "dir": str(self.dir),
+ 636                  "errors": v.errors, "warnings": v.warnings}
+ 637  
+
+====================================================================================================
+[2 location / request builder] src/mscraper/fetch.py
+sha256 3b6c2d735f93c78d2f76233cc4632f2db20b519523e88353fb0f88785781e948   lines 327
+====================================================================================================
+   1  """Fetching layer: provider adapter + pacing, retries with backoff, block and latency detection.
+   2  
+   3  Provider: Oxylabs Web Scraper API, Kroger endpoint. Every request carries the configured
+   4  `store_id`, so Mariano's serves that store's assortment and prices; the store is still
+   5  re-checked on every page by the runner (a provider that silently ignores the pin fails the run).
+   6  """
+   7  from __future__ import annotations
+   8  
+   9  import asyncio
+  10  import gzip
+  11  import logging
+  12  import os
+  13  import random
+  14  import time
+  15  from dataclasses import dataclass
+  16  from pathlib import Path
+  17  
+  18  log = logging.getLogger("mscraper.fetch")
+  19  
+  20  
+  21  @dataclass
+  22  class FetchResult:
+  23      url: str
+  24      status: int
+  25      html: str
+  26      elapsed: float
+  27      raw_response: str = ""
+  28      provider_status: int | None = None
+  29  
+  30  
+  31  class FetchError(Exception):
+  32      def __init__(self, message: str, kind: str = "error"):
+  33          super().__init__(message)
+  34          self.kind = kind  # http | blocked | timeout | budget | error | auth | compat | store | lock
+  35          self.result: FetchResult | None = None
+  36  
+  37      @property
+  38      def terminal(self) -> bool:
+  39          return self.kind in TERMINAL_KINDS
+  40  
+  41  
+  42  # Never retried, and a bounded test stops at the first one: retrying cannot fix a rejected credential, an unsupported
+  43  # request (provider 400/404/422), a wrong store/fulfillment context, a used-up budget or a lost exclusive lock.
+  44  TERMINAL_KINDS = {"auth", "compat", "refused", "store", "budget", "lock"}
+  45  
+  46  
+  47  def provider_error(status: int, text: str) -> "FetchError":
+  48      """Classify a provider HTTP error: 401/403 auth, 400/404/422 compatibility (terminal); 429/5xx retryable."""
+  49      if status in (401, 403):
+  50          return FetchError(f"provider authentication failed (HTTP {status})", "auth")
+  51      if status in (400, 404, 422):
+  52          return FetchError(f"provider rejected the request (HTTP {status}): {text[:200]}", "compat")
+  53      return FetchError(f"provider HTTP {status}: {text[:160]}", "http")
+  54  
+  55  
+  56  def require_live_lock(fetcher) -> None:
+  57      """Real provider adapters may only start inside lock.live_lock (one requester at a time)."""
+  58      from . import lock
+  59  
+  60      if not lock.live_held():
+  61          raise FetchError(f"{fetcher.name}: provider requests need the live lock (exclusive ownership)", "lock")
+  62  
+  63  
+  64  class Fetcher:
+  65      name = "base"
+  66  
+  67      def __init__(self, settings, location):
+  68          self.s, self.loc = settings, location
+  69          self.timeout = float(settings.get("fetch.timeout_seconds", 120))
+  70          self.retries = int(settings.get("fetch.max_retries", 4))
+  71          self.backoff = float(settings.get("fetch.backoff_base_seconds", 3))
+  72          self.min_delay = float(settings.get("fetch.min_delay_seconds", 0.4))
+  73          self.max_delay = float(settings.get("fetch.max_delay_seconds", 1.0))
+  74          self.slow = float(settings.get("fetch.slow_response_seconds", 60))
+  75          self.min_bytes = int(settings.get("fetch.min_page_bytes", 50000))
+  76          self.budget = int(settings.get("fetch.max_requests_per_run", 0))
+  77          self.total_budget = None   # budget.TotalBudget shared by all commands of one bounded test (persists on disk)
+  78          self.on_refusal = None
+  79          self.concurrency = int(os.getenv("MSCRAPER_CONCURRENCY") or settings.get("fetch.concurrency", 4))
+  80          self.sem = asyncio.Semaphore(self.concurrency)
+  81          self._last = 0.0
+  82          self._lock = asyncio.Lock()
+  83          self.stats = {"requests": 0, "ok": 0, "retries": 0, "blocked": 0, "http_errors": 0, "slow": 0,
+  84                        "provider_faults": 0, "seconds": 0.0}
+  85  
+  86      async def start(self):
+  87          return None
+  88  
+  89      async def close(self):
+  90          return None
+  91  
+  92      async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:  # pragma: no cover
+  93          raise NotImplementedError
+  94  
+  95      def validate_request(self, url: str, render_js: bool = False) -> None:
+  96          return None
+  97  
+  98      async def _pace(self):
+  99          async with self._lock:
+ 100              wait = self._last + random.uniform(self.min_delay, self.max_delay) - time.monotonic()
+ 101              if wait > 0:
+ 102                  await asyncio.sleep(wait)
+ 103              self._last = time.monotonic()
+ 104  
+ 105      async def get(self, url: str, render_js: bool = False, validate=None, retries: int | None = None) -> FetchResult:
+ 106          """Fetch with retries. `validate(html)` may raise to mark a response unusable (retried like a block)."""
+ 107          last: Exception | None = None
+ 108          max_retries = self.retries if retries is None else retries
+ 109          for attempt in range(max_retries + 1):
+ 110              self.validate_request(url, render_js)
+ 111              if self.budget and self.stats["requests"] >= self.budget:
+ 112                  raise FetchError(f"request budget of {self.budget} reached", "budget")
+ 113              async with self.sem:
+ 114                  await self._pace()
+ 115                  from . import lock
+ 116                  try:
+ 117                      lock.check_active()                 # a lost lease stops every further request
+ 118                  except lock.LockLost as exc:
+ 119                      raise FetchError(str(exc), "lock") from exc
+ 120                  if self.total_budget is not None:   # counted before sending; raises once the test's total is used
+ 121                      self.total_budget.take(url, self.loc.store_id)
+ 122                  self.stats["requests"] += 1
+ 123                  try:
+ 124                      res = await asyncio.wait_for(self._fetch_once(url, render_js), self.timeout + 90)
+ 125                      self.stats["seconds"] += res.elapsed
+ 126                      if res.elapsed > self.slow:
+ 127                          self.stats["slow"] += 1
+ 128                          log.warning("slow response", extra={"url": url, "seconds": round(res.elapsed, 1)})
+ 129                      if res.status >= 400:
+ 130                          if res.status in (401, 403):
+ 131                              exc = FetchError(f"target refused HTTP {res.status}", "refused")
+ 132                              exc.result = res
+ 133                              if self.on_refusal:
+ 134                                  self.on_refusal(res)
+ 135                              raise exc
+ 136                          raise FetchError(f"HTTP {res.status}", "http")
+ 137                      if len(res.html) < self.min_bytes:
+ 138                          raise FetchError(f"response too small ({len(res.html)} bytes) – blocked or empty", "blocked")
+ 139                      if validate:
+ 140                          validate(res.html)
+ 141                      self.stats["ok"] += 1
+ 142                      return res
+ 143                  except FetchError as exc:
+ 144                      last = exc
+ 145                      if exc.terminal:
+ 146                          raise
+ 147                      self.stats["blocked" if exc.kind == "blocked" else "http_errors"] += 1
+ 148                  except asyncio.TimeoutError:
+ 149                      last = FetchError("timeout", "timeout")
+ 150                  except Exception as exc:  # parse errors raised by validate(), provider faults
+ 151                      if isinstance(getattr(exc, "kind", None), str) and exc.kind in TERMINAL_KINDS:
+ 152                          raise
+ 153                      last = exc
+ 154                      self.stats["blocked"] += 1 if getattr(exc, "kind", "") in ("challenge", "malformed") else 0
+ 155              if attempt < max_retries:
+ 156                  self.stats["retries"] += 1
+ 157                  delay = self.backoff * (2 ** attempt) + random.uniform(0, 1.5)
+ 158                  log.info("retry", extra={"url": url, "attempt": attempt + 1, "error": str(last)[:200], "sleep": round(delay, 1)})
+ 159                  await asyncio.sleep(delay)
+ 160          raise FetchError(f"failed after {max_retries + 1} attempts: {last}", getattr(last, "kind", "error"))
+ 161  
+ 162  
+ 163  class OxylabsKrogerFetcher(Fetcher):
+ 164      name = "oxylabs_kroger"
+ 165      endpoint = "https://webapi.oxylabs.io/v1/scrape/kroger"
+ 166  
+ 167      async def start(self):
+ 168          import httpx
+ 169  
+ 170          require_live_lock(self)
+ 171          key = os.getenv("OXYLABS_WEBAPI_KEY")
+ 172          if not key:
+ 173              raise FetchError("OXYLABS_WEBAPI_KEY is not set (env var / Key Vault secret)", "error")
+ 174          self.client = httpx.AsyncClient(headers={"Authorization": f"Bearer {key}"}, timeout=self.timeout + 60)
+ 175  
+ 176      async def close(self):
+ 177          await self.client.aclose()
+ 178  
+ 179      async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:
+ 180          body = {"url": url, "location": "US", "output": ["html"], "store_id": self.loc.store_id}
+ 181          if render_js:
+ 182              body["run_js"] = True
+ 183          t0 = time.monotonic()
+ 184          r = await self.client.post(self.endpoint, json=body)
+ 185          elapsed = time.monotonic() - t0
+ 186          if r.status_code >= 500:
+ 187              self.stats["provider_faults"] += 1
+ 188              raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
+ 189          if r.status_code >= 400:
+ 190              raise provider_error(r.status_code, r.text)
+ 191          res = (r.json().get("results") or [{}])[0]
+ 192          meta = res.get("metadata") or {}
+ 193          status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
+ 194          return FetchResult(url, status, res.get("html") or "", elapsed, r.text, r.status_code)
+ 195  
+ 196  
+ 197  class FixtureFetcher(Fetcher):
+ 198      """Serves saved pages (tests and offline replays). Map: url substring -> file under fixtures dir."""
+ 199  
+ 200      name = "fixture"
+ 201  
+ 202      def __init__(self, settings, location, fixtures: dict[str, str] | None = None, root: str | None = None):
+ 203          super().__init__(settings, location)
+ 204          self.min_delay = self.max_delay = 0
+ 205          self.backoff = 0
+ 206          self.fixtures = fixtures or {}
+ 207          self.root = Path(root or settings.get("fetch.fixtures_dir", "tests/fixtures"))
+ 208          self.calls: list[str] = []
+ 209          self.fail_once: set[str] = set()
+ 210  
+ 211      async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:
+ 212          self.calls.append(url)
+ 213          for key in list(self.fail_once):
+ 214              if key in url:
+ 215                  self.fail_once.discard(key)
+ 216                  raise FetchError("injected failure", "http")
+ 217          for key, fname in sorted(self.fixtures.items(), key=lambda kv: -len(kv[0])):
+ 218              if key in url:
+ 219                  p = self.root / fname
+ 220                  raw = gzip.decompress(p.read_bytes()).decode("utf-8") if p.suffix == ".gz" else p.read_text(encoding="utf-8")
+ 221                  return FetchResult(url, 200, raw, 0.01)
+ 222          return FetchResult(url, 404, "", 0.01)
+ 223  
+ 224  
+ 225  def _fill(template, **values):
+ 226      """Recursively replace {placeholders} in a JSON-like provider payload template."""
+ 227      if isinstance(template, str):
+ 228          for k, v in values.items():
+ 229              template = template.replace("{" + k + "}", str(v))
+ 230          return template
+ 231      if isinstance(template, list):
+ 232          return [_fill(x, **values) for x in template]
+ 233      if isinstance(template, dict):
+ 234          return {k: _fill(v, **values) for k, v in template.items()}
+ 235      return template
+ 236  
+ 237  
+ 238  class OxylabsRealtimeFetcher(Fetcher):
+ 239      """Oxylabs Web Scraper API, classic realtime endpoint (username / password), for clients whose existing paid
+ 240      Oxylabs service is that product. The request body is configuration (`fetch.oxylabs_realtime.payload`) so it can be
+ 241      matched to the plan's Kroger source without code changes; it must be validated with `mscraper probe` first –
+ 242      every response is still checked for the configured store, so a payload that does not pin the store fails the run."""
+ 243  
+ 244      name = "oxylabs_realtime"
+ 245      endpoint = "https://realtime.oxylabs.io/v1/queries"
+ 246  
+ 247      async def start(self):
+ 248          import httpx
+ 249  
+ 250          require_live_lock(self)
+ 251          user, pwd = os.getenv("OXYLABS_USERNAME"), os.getenv("OXYLABS_PASSWORD")
+ 252          if not (user and pwd):
+ 253              raise FetchError("OXYLABS_USERNAME / OXYLABS_PASSWORD are not set (env vars / Key Vault secrets)", "error")
+ 254          self.client = httpx.AsyncClient(auth=(user, pwd), timeout=self.timeout + 60)
+ 255  
+ 256      async def close(self):
+ 257          await self.client.aclose()
+ 258  
+ 259      def validate_request(self, url: str, render_js: bool = False) -> None:
+ 260          realtime_payload(self.s, self.loc, url)
+ 261  
+ 262      async def _fetch_once(self, url: str, render_js: bool) -> FetchResult:
+ 263          body = realtime_payload(self.s, self.loc, url)
+ 264          if render_js:
+ 265              body["render"] = "html"
+ 266          t0 = time.monotonic()
+ 267          r = await self.client.post(self.endpoint, json=body)
+ 268          elapsed = time.monotonic() - t0
+ 269          if r.status_code >= 500:
+ 270              self.stats["provider_faults"] += 1
+ 271              raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
+ 272          if r.status_code >= 400:
+ 273              raise provider_error(r.status_code, r.text)
+ 274          res = (r.json().get("results") or [{}])[0]
+ 275          content = res.get("content") or ""
+ 276          status = int(res.get("status_code") or 200)
+ 277          return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text, r.status_code)
+ 278  
+ 279  
+ 280  def realtime_payload(settings, location, url: str) -> dict:
+ 281      """Classic Web Scraper API body (realtime.oxylabs.io/v1/queries).
+ 282      Search pages (…/search?query=…): `fetch.oxylabs_realtime.search_payload` when configured – the documented
+ 283      `kroger_search` source with store localisation ({query}, {store_id}). Everything else: `…oxylabs_realtime.payload`."""
+ 284      from urllib.parse import parse_qs, urlparse
+ 285  
+ 286      u = urlparse(url)
+ 287      params = parse_qs(u.query, keep_blank_values=True)
+ 288      query = (params.get("query") or [""])[0]
+ 289      is_search = u.path.rstrip("/").endswith("/search") and bool(query)
+ 290      if is_search:
+ 291          allowed = {"query", "searchType", "brandName", "page", "savings"}
+ 292          unknown = set(params) - allowed
+ 293          unsupported = set(unknown)
+ 294          if int((params.get("page") or ["1"])[0] or 1) > 1:
+ 295              unsupported.add("page")
+ 296          if "savings" in params:
+ 297              unsupported.add("savings")
+ 298          if unsupported:
+ 299              names = "/".join(sorted(unsupported))
+ 300              raise FetchError(f"unsupported on Classic kroger_search: {names}", "compat")
+ 301      tpl = settings.get("fetch.oxylabs_realtime.search_payload") if is_search else None
+ 302      if not tpl:
+ 303          tpl = settings.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
+ 304      modality = str(getattr(location, "expected_modality", "IN_STORE") or "IN_STORE").lower()
+ 305      body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode,
+ 306                   modality=modality, fulfillment_type=modality)
+ 307      # Keep the location pin and pickup mode authoritative even when a minimal
+ 308      # customer template omitted either field.
+ 309      if is_search:
+ 310          body.setdefault("store_id", location.store_id)
+ 311          body.setdefault("fulfillment_type", modality)
+ 312      brand = (params.get("brandName") or [""])[0]
+ 313      if is_search and brand:
+ 314          body["brand"] = brand
+ 315      return body
+ 316  
+ 317  
+ 318  def build_fetcher(settings, location, **kw) -> Fetcher:
+ 319      name = os.getenv("MSCRAPER_FETCH_PROVIDER") or settings.get("fetch.provider", "oxylabs_kroger")
+ 320      if name == "oxylabs_kroger":
+ 321          return OxylabsKrogerFetcher(settings, location)
+ 322      if name == "oxylabs_realtime":
+ 323          return OxylabsRealtimeFetcher(settings, location)
+ 324      if name == "fixture":
+ 325          return FixtureFetcher(settings, location, **kw)
+ 326      raise ValueError(f"unknown fetch provider: {name}")
+ 327  
+
+====================================================================================================
+[2 location / request builder] src/mscraper/config.py
+sha256 56f68ab61f914297d57d774050451632e9f3e1d29328e9291c253a4bde671c6f   lines 145
+====================================================================================================
+   1  """Loads settings, locations, categories and store brands from the config directory.
+   2  
+   3  Nothing retailer- or location-specific lives in source code: new stores and categories
+   4  are configuration changes only.
+   5  """
+   6  from __future__ import annotations
+   7  
+   8  import csv
+   9  import os
+  10  import re
+  11  from dataclasses import dataclass, field
+  12  from pathlib import Path
+  13  from urllib.parse import urlparse
+  14  
+  15  import yaml
+  16  
+  17  ROOT = Path(__file__).resolve().parents[2]
+  18  
+  19  
+  20  @dataclass(frozen=True)
+  21  class Category:
+  22      name: str
+  23      url: str
+  24      scope: str
+  25  
+  26      @property
+  27      def kind(self) -> str:
+  28          """department (/d/...), list (/pl/<slug>/<taxonomy>), coupons (/savings/cl/coupons/)"""
+  29          path = urlparse(self.url).path
+  30          if path.startswith("/d/"):
+  31              return "department"
+  32          if path.startswith("/pl/"):
+  33              return "list"
+  34          if "coupon" in path:
+  35              return "coupons"
+  36          return "other"
+  37  
+  38      @property
+  39      def taxonomy_id(self) -> str:
+  40          """Taxonomy id of a /pl/<slug>/<id> URL, e.g. '26003' for batteries."""
+  41          m = re.match(r"/pl/[^/]+/(\d+)", urlparse(self.url).path)
+  42          return m.group(1) if m else ""
+  43  
+  44      @property
+  45      def slug(self) -> str:
+  46          parts = [p for p in urlparse(self.url).path.split("/") if p]
+  47          return parts[1] if len(parts) > 1 else ""
+  48  
+  49  
+  50  @dataclass(frozen=True)
+  51  class Location:
+  52      key: str
+  53      store_id: str
+  54      zipcode: str = ""
+  55      expected_address: str = ""
+  56      canary_query: str = ""
+  57      canary_upcs: tuple[str, ...] = ()
+  58      enabled: bool = True
+  59      categories: tuple[str, ...] = ()
+  60      limit_per_category: int = 0
+  61      expected_modality: str = "IN_STORE"
+  62  
+  63  
+  64  @dataclass
+  65  class Settings:
+  66      raw: dict
+  67      categories: list[Category] = field(default_factory=list)
+  68      locations: list[Location] = field(default_factory=list)
+  69      private_label_brands: tuple[str, ...] = ()
+  70  
+  71      def get(self, dotted: str, default=None):
+  72          node = self.raw
+  73          for part in dotted.split("."):
+  74              if not isinstance(node, dict) or part not in node:
+  75                  return default
+  76              node = node[part]
+  77          return node
+  78  
+  79      def categories_for(self, loc: Location, only: list[str] | None = None) -> list[Category]:
+  80          wanted = [c.lower() for c in (only or loc.categories)]
+  81          if not wanted:
+  82              return list(self.categories)
+  83          cats = [c for c in self.categories if c.name.lower() in wanted]
+  84          missing = set(wanted) - {c.name.lower() for c in cats}
+  85          if missing:
+  86              raise KeyError(f"unknown categories {sorted(missing)}; configured: {[c.name for c in self.categories]}")
+  87          return cats
+  88  
+  89      def location(self, key: str) -> Location:
+  90          for loc in self.locations:
+  91              if loc.key == key:
+  92                  return loc
+  93          raise KeyError(f"Unknown location '{key}'. Configured: {[l.key for l in self.locations]}")
+  94  
+  95  
+  96  def _load_categories(path: Path, retailer: str) -> list[Category]:
+  97      cats = []
+  98      with path.open(encoding="utf-8-sig", newline="") as fh:
+  99          for row in csv.DictReader(fh):
+ 100              name = (row.get("Retailer") or "").strip().lower().replace("’", "'")
+ 101              if not name.startswith(retailer[:6]):  # "mariano's"
+ 102                  continue
+ 103              cats.append(Category(name=row["Category (Auto)"].strip(), url=row["URL"].strip(),
+ 104                                   scope=(row.get("Scope") or "").strip()))
+ 105      return cats
+ 106  
+ 107  
+ 108  def _load_locations(path: Path) -> list[Location]:
+ 109      data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+ 110      out = []
+ 111      for item in data.get("locations", []):
+ 112          canary = item.get("canary") or {}
+ 113          out.append(Location(
+ 114              key=str(item["key"]), store_id=str(item["store_id"]), zipcode=str(item.get("zipcode") or ""),
+ 115              expected_address=str(item.get("expected_address") or ""),
+ 116              canary_query=str(canary.get("query") or ""), canary_upcs=tuple(str(x) for x in canary.get("upcs") or ()),
+ 117              enabled=bool(item.get("enabled", True)), categories=tuple(str(x) for x in item.get("categories") or ()),
+ 118              limit_per_category=int(item.get("limit_per_category") or 0),
+ 119              expected_modality=str(item.get("expected_modality") or "IN_STORE").upper()))
+ 120      return out
+ 121  
+ 122  
+ 123  def _load_brands(path: Path) -> tuple[str, ...]:
+ 124      if not path.exists():
+ 125          return ()
+ 126      lines = (l.strip() for l in path.read_text(encoding="utf-8").splitlines())
+ 127      return tuple(sorted({l.lower().replace("’", "'") for l in lines if l and not l.startswith("#")}))
+ 128  
+ 129  
+ 130  def load_settings(config_path: str | os.PathLike | None = None) -> Settings:
+ 131      cfg_path = Path(config_path) if config_path else ROOT / "config" / "settings.yaml"
+ 132      raw = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+ 133      base = cfg_path.parent.parent if cfg_path.parent.name == "config" else ROOT
+ 134  
+ 135      def rel(key: str) -> Path:
+ 136          p = Path(raw[key])
+ 137          return p if p.is_absolute() else base / p
+ 138  
+ 139      s = Settings(raw=raw)
+ 140      s.categories = _load_categories(rel("categories_file"), raw.get("retailer", "marianos"))
+ 141      s.locations = _load_locations(rel("locations_file"))
+ 142      s.private_label_brands = _load_brands(rel("private_label_file"))
+ 143      s.raw["_base_dir"] = str(base)
+ 144      return s
+ 145  
+
+====================================================================================================
+[2 location / request builder] config/locations.yaml
+sha256 87d1bc2941643474d74232fb230956de16ce35da2fc951f969ab074f0ccfd4b1   lines 48
+====================================================================================================
+   1  # One entry per Mariano's store. Adding a store = adding an entry here (no code change).
+   2  #
+   3  # store_id      Kroger enterprise location id: division 531 + 5-digit store number (Mariano's Crystal Lake = 53100544).
+   4  #               Find it on marianos.com/stores (the store page URL ends with the id) or in any page's store details.
+   5  # zipcode       expected store ZIP; the run fails if the store page shows a different one
+   6  # expected_address  text that must appear in the selected store's address (second, independent check)
+   7  # canary        a search query and product UPCs that must come back with a store price at the start and end of each run
+   8  # categories    optional: limit this location to some CSV categories (empty = all)
+   9  # limit_per_category  optional: cap products per category (demo / smoke runs only; 0 = no cap)
+  10  
+  11  locations:
+  12    # Diagnostic only: intentionally disabled in v1.1.10. It remains configured so a
+  13    # response accidentally returned for Crystal Lake cannot be mistaken for acceptance.
+  14    - key: marianos-544-crystal-lake
+  15      store_id: "53100544"
+  16      zipcode: "60014"
+  17      expected_address: "105 Northwest Hwy"
+  18      canary:
+  19        query: milk
+  20        upcs: ["0001111050438", "0001111082556"]   # Simple Truth Organic 2% milk, Kroger lactose-free 2% milk
+  21      expected_modality: "IN_STORE"
+  22      enabled: false
+  23  
+  24    # Client-supplied store: Mariano's Vernon Hills, 1720 N Milwaukee Ave, Vernon Hills, IL 60061.
+  25    # store_id 53100502 is a CANDIDATE taken from the public store page URL (marianos.com/stores/grocery/il/vernon-hills/
+  26    # marianos-vernon-hills/531/00502). It is NOT verified until `verify-store --location marianos-502-vernon-hills`
+  27    # shows, from Mariano's own responses, location id 53100502 + ZIP 60061 + "1720 N Milwaukee" + store-sourced prices.
+  28    # Enabled acceptance location for v1.1.10. Results are labelled with response-derived store details.
+  29    - key: marianos-502-vernon-hills
+  30      store_id: "53100502"
+  31      zipcode: "60061"
+  32      expected_address: "1720 N Milwaukee"
+  33      canary:
+  34        query: milk
+  35        upcs: []          # set after verification (UPCs priced at this store)
+  36      expected_modality: "PICKUP"
+  37      enabled: true
+  38  
+  39    # Example of another store (disabled). Fill zipcode/expected_address from verify-store before enabling.
+  40    - key: marianos-539-bronzeville
+  41      store_id: "53100539"
+  42      zipcode: ""
+  43      expected_address: ""
+  44      canary:
+  45        query: milk
+  46        upcs: ["0001111050438"]
+  47      enabled: false
+  48  
+
+====================================================================================================
+[2 location / request builder] config/settings.yaml
+sha256 9248f21fbe3232d5dd8415494e47f408e2939b115d7ec6665ed05d6969984a1a   lines 86
+====================================================================================================
+   1  # Mariano's scraper – runtime settings.
+   2  # Secrets (provider key, storage connection string) are NEVER stored here.
+   3  # They come from environment variables / Azure Key Vault (see .env.example).
+   4  
+   5  retailer: marianos
+   6  base_url: https://www.marianos.com
+   7  categories_file: config/categories.csv
+   8  locations_file: config/locations.yaml
+   9  private_label_file: config/private_label_brands.txt
+  10  store_logo_fallback: https://www.marianos.com/cdn/images/multiColor-4Jf6i6B.svg   # used only if the page logo cannot be read
+  11  
+  12  fetch:
+  13    provider: oxylabs_kroger     # oxylabs_kroger (Web Scraper API, webapi.oxylabs.io, Bearer key – used for all runs so far)
+  14                                 # | oxylabs_realtime (classic realtime.oxylabs.io, username/password – validate with probe)
+  15                                 # | fixture (offline tests). Credentials only via env vars / Key Vault.
+  16    oxylabs_realtime:            # Classic Web Scraper API (realtime.oxylabs.io/v1/queries, API user + password)
+  17      # Pages without a dedicated Classic source (department, coupons): "url" alone. Oxylabs documents no store
+  18      # parameters for that route (developers.oxylabs.io > Web Scraper API > Kroger: "Any other Kroger page can be
+  19      # scraped by passing its url alone"), so every such page must still pass the scraper's own store check.
+  20      payload: {url: "{url}"}
+  21      # PROPOSED – not approved, not yet run (1.1.5). Search pages via the documented `kroger_search` source with store
+  22      # localisation (store_id = division + store number, e.g. 53100544; fulfillment_type in_store needs store_id).
+  23      # The documented source targets kroger.com; whether kroger.com serves the Mariano's store 53100544 with its own
+  24      # in-store prices is UNVERIFIED and is exactly what Test 1 checks (store, modality and price source are read from
+  25      # the returned page, never assumed). Delete this block to send search pages as "url" alone.
+  26      search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: "{fulfillment_type}"}
+  27    concurrency: 4               # parallel page requests (env MSCRAPER_CONCURRENCY overrides; set from the Test 2 measurement)
+  28    max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
+  29    timeout_seconds: 120
+  30    max_retries: 4               # per request, exponential backoff with jitter
+  31    backoff_base_seconds: 3
+  32    min_delay_seconds: 0.4       # controlled pacing between request starts
+  33    max_delay_seconds: 1.0
+  34    slow_response_seconds: 60    # logged as abnormal latency
+  35    min_page_bytes: 50000        # smaller responses are treated as blocked / malformed
+  36  
+  37  crawl:
+  38    page_size: 24                # Mariano's search grid page size
+  39    paginate: false              # Mariano's server-rendered search returns the first 24 results for every page
+  40                                 # number, so coverage comes from query expansion. Set true if Mariano's starts paging.
+  41    brand_slices: true           # a request reporting more products than it returned is partitioned with Mariano's own
+  42                                 # brandName filter (disjoint slices, reconciled in coverage.json)
+  43    max_brand_slices_per_request: 0   # 0 = no cap (production)
+  44    max_queries_per_shelf: 0     # query-expansion cap per sub-category; 0 = no cap (production)
+  45    max_pages_per_query: 42      # only used when paginate: true
+  46    stop_after_empty_pages: 3    # only used when paginate: true
+  47    include_curated_shelves: true          # department "curated" shelves (e.g. Steaks & Roasts) are crawled ...
+  48    curated_department_filter: true        # ... but only products of the same department are kept
+  49    skip_shelf_patterns:                    # merchandising/brand shelves that only repeat products of real subcategories
+  50      - "^Simple Truth$"
+  51      - "^Private Selection$"
+  52      - "^Kroger( Brand)?$"
+  53      - "^Our Brands$"
+  54      - "^Shop All\\b"
+  55    approximate_weight_price_wording: true  # exclude ONLY when Mariano's own size or price wording is approximate /
+  56                                 # estimated (e.g. "about $10.39 each"); sold-by-weight alone never excludes a product
+  57    max_products_per_run: 0      # 0 = no cap (production). Use --limit for demos.
+  58  
+  59  evidence:
+  60    raw_pages_per_category: 2    # full raw HTML kept for the first N pages per category (all pages keep a price-bearing
+  61                                 # gzip excerpt + SHA-256 in the ledger)
+  62  
+  63  coupons:
+  64    enabled: true                # the "Coupons" CSV row: collect every displayed digital coupon (wording, expiry, id)
+  65    render_js: true
+  66    product_flag_via_search_filter: true   # one request per shelf with Mariano's savings=Coupons filter: products it returns
+  67                                           # are flagged in observations.json (coupon terms are not exposed per product)
+  68  
+  69  validation:
+  70    min_products_per_category: 1        # 0 products = category failure, never "legitimately empty"
+  71    yield_drop_threshold: 0.6           # fail if a category drops below 60% of the last successful run
+  72    max_failed_listing_ratio: 0.0       # any failed listing blocks publication
+  73    min_field_completeness:
+  74      product_title: 1.0
+  75      regular_price: 1.0
+  76      url: 1.0
+  77      upc: 1.0
+  78      image_url: 0.98
+  79    canary_required: true
+  80  
+  81  output:
+  82    backend: local                # local | azure_blob
+  83    local_dir: output
+  84    blob_container: marianos-scraper
+  85  state_dir: state
+  86  
+
+====================================================================================================
+[3 listing adapter] src/mscraper/parse.py
+sha256 004a27d81310c09f09fafa778e11c6b751ab4e13067f239c91badc15a493c1b8   lines 422
+====================================================================================================
+   1  """Parsing of Mariano's pages.
+   2  
+   3  Mariano's (Kroger platform) server-renders every page with its full application state in
+   4  `window.__INITIAL_STATE__ = JSON.parse('...')`. Products, store prices, price-per-measure,
+   5  offers, UPCs and the selected store are read from that state – not from fragile CSS.
+   6  """
+   7  from __future__ import annotations
+   8  
+   9  import html as htmllib
+  10  import json
+  11  import re
+  12  from dataclasses import dataclass, field
+  13  from urllib.parse import parse_qs, unquote, urlparse
+  14  
+  15  from . import deals
+  16  from .text import clean_text, format_price, is_approximate, is_store_brand
+  17  
+  18  
+  19  class PageError(Exception):
+  20      """A response that is not a usable Mariano's page (challenge, block, malformed, server-side failure)."""
+  21  
+  22      def __init__(self, message: str, kind: str = "malformed"):
+  23          super().__init__(message)
+  24          self.kind = kind  # challenge | malformed | upstream
+  25  
+  26  
+  27  _SIMPLE = {"n": "\n", "t": "\t", "r": "\r", "b": "\b", "f": "\f", "0": "\0"}
+  28  _ESC_RE = re.compile(r"\\(?:u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|(.))", re.S)
+  29  _CHALLENGE_RE = re.compile(r"Access Denied|Reference #\d|/_Incapsula_|captcha|px-captcha|Pardon Our Interruption|"
+  30                             r"Request unsuccessful|errors\.edgesuite\.net", re.I)
+  31  
+  32  
+  33  def _js_unescape(m: re.Match) -> str:
+  34      if m.group(1):
+  35          return chr(int(m.group(1), 16))
+  36      if m.group(2):
+  37          return chr(int(m.group(2), 16))
+  38      return _SIMPLE.get(m.group(3), m.group(3))
+  39  
+  40  
+  41  def extract_state(html: str) -> dict:
+  42      if _CHALLENGE_RE.search(html[:20000]) and "__INITIAL_STATE__" not in html:
+  43          raise PageError("bot challenge / access denied page", "challenge")
+  44      i = html.find("__INITIAL_STATE__")
+  45      if i < 0:
+  46          raise PageError("no application state in page (blocked or malformed response)", "malformed")
+  47      start = html.find("JSON.parse('", i)
+  48      if start < 0:
+  49          raise PageError("application state not in expected format", "malformed")
+  50      start += len("JSON.parse('")
+  51      end = start
+  52      while True:
+  53          end = html.find("')", end)
+  54          if end < 0:
+  55              raise PageError("unterminated application state", "malformed")
+  56          if html[end - 1] != "\\":
+  57              break
+  58          end += 1
+  59      text = _ESC_RE.sub(_js_unescape, html[start:end])
+  60      try:
+  61          return json.loads(text, strict=False)
+  62      except json.JSONDecodeError as exc:
+  63          raise PageError(f"application state is not valid JSON: {exc}", "malformed") from exc
+  64  
+  65  
+  66  # ----------------------------------------------------------------------------- store
+  67  @dataclass
+  68  class StoreInfo:
+  69      location_id: str = ""
+  70      name: str = ""
+  71      address: str = ""
+  72      city: str = ""
+  73      state: str = ""
+  74      zipcode: str = ""
+  75      banner: str = ""
+  76  
+  77      @property
+  78      def full_address(self) -> str:
+  79          return ", ".join(x for x in (self.address, self.city, f"{self.state} {self.zipcode}".strip()) if x)
+  80  
+  81  
+  82  def store_info(state: dict) -> StoreInfo:
+  83      mp = ((state.get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}
+  84      active = ""
+  85      for m in mp.get("modalities") or []:
+  86          active = ((m.get("destination") or {}).get("locationId")) or active
+  87      for d in mp.get("storeDetails") or []:
+  88          if not active or d.get("locationId") == active:
+  89              a = (d.get("address") or {}).get("address") or {}
+  90              return StoreInfo(location_id=str(d.get("locationId") or ""), name=clean_text(d.get("vanityName") or a.get("name")),
+  91                               address=", ".join(a.get("addressLines") or []), city=a.get("cityTown", ""),
+  92                               state=a.get("stateProvince", ""), zipcode=a.get("postalCode", ""), banner=d.get("banner", ""))
+  93      return StoreInfo(location_id=active)
+  94  
+  95  
+  96  _LOGO_RE = re.compile(r'<img[^>]+src="([^"]+)"[^>]+alt="marianos logo"', re.I)
+  97  
+  98  
+  99  def store_logo(html: str, base_url: str) -> str:
+ 100      m = _LOGO_RE.search(html)
+ 101      if not m:
+ 102          return ""
+ 103      src = htmllib.unescape(m.group(1))
+ 104      return src if src.startswith("http") else base_url.rstrip("/") + src
+ 105  
+ 106  
+ 107  # ----------------------------------------------------------------------------- department navigation
+ 108  @dataclass
+ 109  class Shelf:
+ 110      name: str
+ 111      url: str          # original Mariano's link (kept for the report)
+ 112      query: str        # search query used to read the shelf
+ 113      taxonomy: str     # taxonomy prefix products must match ('' = department filter)
+ 114      curated: bool = False
+ 115  
+ 116      def queries(self) -> list[str]:
+ 117          """Search terms that together cover the shelf: its name, the parts of a compound name
+ 118          ("Milk & Milk Substitutes" -> "Milk", "Milk Substitutes") and the words of its URL slug."""
+ 119          out: list[str] = []
+ 120          parts = [self.query] + re.split(r"\s*(?:&|,|\band\b|/)\s*", self.name)
+ 121          m = re.match(r"/pl/([^/]+)/", urlparse(self.url).path)
+ 122          if m:
+ 123              parts.append(re.sub(r"[-_]+", " ", unquote(m.group(1))))
+ 124          for q in parts:
+ 125              q = clean_text(q)
+ 126              if len(q) > 2 and q.lower() not in {x.lower() for x in out}:
+ 127                  out.append(q)
+ 128          return out[:5]
+ 129  
+ 130  
+ 131  def department_shelves(state: dict, slug: str) -> list[Shelf]:
+ 132      """Sub-categories of the department /d/<slug>: the site menu tree (complete, with taxonomy ids)
+ 133      plus the department page's own tiles (adds curated shelves). Links to other departments are ignored."""
+ 134      out: list[Shelf] = []
+ 135      seen: set[str] = set()
+ 136  
+ 137      def add(name, url):
+ 138          name = clean_text(name)
+ 139          path = urlparse(url).path
+ 140          if not url or not name or path.startswith("/d/") or name.lower().startswith("shop all"):
+ 141              return
+ 142          sh = shelf_from_url(name, url)
+ 143          key = sh.taxonomy or sh.query.lower()
+ 144          if key in seen:
+ 145              return
+ 146          seen.add(key)
+ 147          out.append(sh)
+ 148  
+ 149      for name, url in menu_links(state, slug):
+ 150          add(name, url)
+ 151      pages = {k: v for k, v in (state.get("dynamicdata") or {}).items() if k.startswith(f"page/1-0-0/department/{slug}/")}
+ 152      for page in pages.values():
+ 153          for block in ((page.get("assetData") or {}).get("data") or {}).get("content") or []:
+ 154              for nav in (block.get("data") or {}).get("navItems") or []:
+ 155                  add(nav.get("altText") or nav.get("subText") or nav.get("omnitureTag"), nav.get("url") or "")
+ 156      return out
+ 157  
+ 158  
+ 159  def menu_links(state: dict, slug: str) -> list[tuple[str, str]]:
+ 160      """(title, url) of every product-list link under the site-menu node whose 'Shop All' points to /d/<slug>."""
+ 161      menus = [v for k, v in (state.get("dynamicdata") or {}).items() if "site-menu" in k]
+ 162      if not menus:
+ 163          return []
+ 164      root = ((menus[0].get("assetData") or {}).get("data") or {}).get("menu") or {}
+ 165  
+ 166      def links(n):
+ 167          for ch in n.get("children") or []:
+ 168              if ch.get("url"):
+ 169                  yield ch.get("title") or ch.get("name") or "", ch["url"]
+ 170              yield from links(ch)
+ 171  
+ 172      def owns(n):
+ 173          return any(urlparse(u).path.rstrip("/") == f"/d/{slug}" for _, u in links(n))
+ 174  
+ 175      best = None
+ 176      def walk(n):
+ 177          nonlocal best
+ 178          for ch in n.get("children") or []:
+ 179              if owns(ch):
+ 180                  if sum(1 for _, u in links(ch) if urlparse(u).path.startswith("/pl/")) >= 2:
+ 181                      best = ch      # deepest node that owns the department link and still lists its sub-categories
+ 182                  walk(ch)
+ 183      walk(root)
+ 184      if not best:
+ 185          return []
+ 186      return [(t, u) for t, u in links(best) if urlparse(u).path.startswith("/pl/")]
+ 187  
+ 188  
+ 189  def shelf_from_url(name: str, url: str) -> Shelf:
+ 190      p = urlparse(url)
+ 191      q = parse_qs(p.query)
+ 192      m = re.match(r"/pl/[^/]+/(\d+)", p.path)
+ 193      if m:  # product list: read through search, keep only products of this taxonomy
+ 194          return Shelf(name, url, (q.get("query") or [name])[0], m.group(1), curated=False)
+ 195      query = (q.get("query") or q.get("keyword") or [name])[0]
+ 196      return Shelf(name, url, query, "", curated=True)
+ 197  
+ 198  
+ 199  def department_code(shelves: list[Shelf]) -> str:
+ 200      """Two-digit department code most of the department's product lists share (e.g. '05' for Meat)."""
+ 201      from collections import Counter
+ 202  
+ 203      codes = Counter(s.taxonomy[:2] for s in shelves if s.taxonomy)
+ 204      return codes.most_common(1)[0][0] if codes else ""
+ 205  
+ 206  
+ 207  # ----------------------------------------------------------------------------- search results
+ 208  @dataclass
+ 209  class SearchPage:
+ 210      upcs: list[str]
+ 211      products: dict          # upc -> product domain object
+ 212      codes: dict             # upc -> list of sub-commodity codes
+ 213      total: int = 0
+ 214      available: int = 0
+ 215      request_location: str = ""
+ 216      store: StoreInfo = field(default_factory=StoreInfo)
+ 217  
+ 218  
+ 219  def search_page(state: dict) -> SearchPage:
+ 220      sa = (state.get("search") or {}).get("searchAll") or {}
+ 221      if sa.get("hasError"):
+ 222          raise PageError(f"search returned an error: {str(sa.get('error'))[:200]}", "upstream")
+ 223      resp = sa.get("response") or {}
+ 224      upcs = [u for u in resp.get("upcs") or []]
+ 225      codes = {p.get("upc"): p.get("subCommodityCode") or [] for p in resp.get("products") or []}
+ 226      prods = ((state.get("calypso") or {}).get("domains") or {}).get("products") or {}
+ 227      info = resp.get("productsInfo") or {}
+ 228      missing = [u for u in upcs if u not in prods or "data" not in prods[u]]
+ 229      if upcs and len(missing) == len(upcs):
+ 230          # the page listed products but Mariano's own product service did not answer (seen: "outbound timeout exceeded")
+ 231          raise PageError("product details missing for every listed UPC (upstream product service failed)", "upstream")
+ 232      return SearchPage(upcs=upcs, products=prods, codes=codes, total=int(info.get("totalCount") or 0),
+ 233                        available=int(info.get("availableCount") or 0),
+ 234                        request_location=str((sa.get("requestVars") or {}).get("locationId") or ""), store=store_info(state))
+ 235  
+ 236  
+ 237  def product_codes(prod: dict, listed: list[str] | None = None) -> list[str]:
+ 238      """Taxonomy codes of a product: from the search summary, else from the product's own taxonomy
+ 239      (department + commodity + sub-commodity, the same scheme as /pl/<slug>/<id> ids, e.g. 05 001 00004)."""
+ 240      codes = list(listed or [])
+ 241      item = ((prod or {}).get("data") or {}).get("item") or {}
+ 242      for t in item.get("taxonomies") or []:
+ 243          d, c, sc = ((t.get(k) or {}).get("code", "") for k in ("department", "commodity", "subCommodity"))
+ 244          if d:
+ 245              codes.append(f"{d}{c}{sc}")
+ 246      return codes
+ 247  
+ 248  
+ 249  def expansion_terms(prod: dict, prefix: str, shelf_name: str) -> list[str]:
+ 250      """New search terms from a product of the shelf: its sub-commodity / commodity names inside the shelf's
+ 251      taxonomy and '<brand> <shelf noun>' (e.g. 'Duracell Batteries')."""
+ 252      item = ((prod or {}).get("data") or {}).get("item") or {}
+ 253      out = []
+ 254      for t in item.get("taxonomies") or []:
+ 255          d, c, sc = ((t.get(k) or {}).get("code", "") for k in ("department", "commodity", "subCommodity"))
+ 256          if prefix and not f"{d}{c}{sc}".startswith(prefix):
+ 257              continue
+ 258          for k in ("subCommodity", "commodity"):
+ 259              name = clean_text((t.get(k) or {}).get("name"))
+ 260              if name and len(name) > 2:
+ 261                  out.append(name.title() if name.isupper() else name)
+ 262      brand = clean_text((item.get("brand") or {}).get("name"))
+ 263      noun = clean_text(re.split(r"\s*(?:&|,|/)\s*", shelf_name)[0])
+ 264      if brand and noun:
+ 265          out.append(brand if noun.lower() in brand.lower() else f"{brand} {noun}")
+ 266      return out
+ 267  
+ 268  
+ 269  def matches(codes: list[str], prefix: str) -> bool:
+ 270      return not prefix or any(str(c).startswith(prefix) for c in codes)
+ 271  
+ 272  
+ 273  # ----------------------------------------------------------------------------- product -> record
+ 274  @dataclass
+ 275  class Mapped:
+ 276      record: dict | None
+ 277      reason: str              # kept | approximate_weight | store_mismatch | no_identity
+ 278      source_location: str = ""
+ 279      offer_labels: list = field(default_factory=list)
+ 280      identity: str = ""       # dedup key: the UPC, or "product:<Mariano's product id>" when no UPC is given
+ 281      identity_source: str = ""   # item.upc | data.id
+ 282      source_product_id: str = ""
+ 283      availability: str = ""   # priced | no_store_price
+ 284      sell_by: str = ""
+ 285      offers: list = field(default_factory=list)   # structured offers with kind + terms
+ 286      trigger: tuple = ()      # (field, text) that caused an approximate-weight exclusion
+ 287      modalities: dict = field(default_factory=dict)
+ 288  
+ 289  
+ 290  def _usd(node: dict | None, key: str = "price") -> str:
+ 291      return format_price((node or {}).get(key))
+ 292  
+ 293  
+ 294  def _image(item: dict) -> str:
+ 295      imgs = item.get("images") or []
+ 296      for persp in ("front",):
+ 297          for size in ("medium", "large", "xlarge"):
+ 298              for im in imgs:
+ 299                  if im.get("perspective") == persp and im.get("size") == size and im.get("url"):
+ 300                      return im["url"]
+ 301      return imgs[0]["url"] if imgs and imgs[0].get("url") else ""
+ 302  
+ 303  
+ 304  def _ts(node: dict | None) -> str:
+ 305      """Source timestamp {'value': '2026-10-28T03:59:59.999Z'} -> '2026-10-28T03:59:59Z'; open-ended (year 9999) -> ''."""
+ 306      v = (node or {}).get("value") if isinstance(node, dict) else node
+ 307      if not v or str(v).startswith("9999"):
+ 308          return ""
+ 309      return re.sub(r"\.\d+Z$", "Z", str(v))
+ 310  
+ 311  
+ 312  def approximate_weight_trigger(item: dict, price: dict, ctx: dict) -> tuple:
+ 313      """(field, text) when Mariano's own wording says the weight is approximate / estimated, else ().
+ 314  
+ 315      Checked: the displayed size and the displayed regular / sale price wording (e.g. "about $10.39 each",
+ 316      which Mariano's shows when the package price is estimated from an average weight). Not checked: titles
+ 317      (a title such as "(About 3 Steaks per Pack)" describes a count) and sellBy alone (a product sold by
+ 318      weight with an exact displayed price is kept)."""
+ 319      sp = price.get("storePrices") or {}
+ 320      fields = [("customerFacingSize", item.get("customerFacingSize"))]
+ 321      if ctx.get("approx_price_wording", True):
+ 322          for k in ("regular", "promo"):
+ 323              fields.append((f"storePrices.{k}.defaultDescription", (sp.get(k) or {}).get("defaultDescription")))
+ 324      for name, text in fields:
+ 325          if text and is_approximate(str(text)):
+ 326              return (name, clean_text(text))
+ 327      return ()
+ 328  
+ 329  
+ 330  def map_product(prod: dict, ctx: dict) -> Mapped:
+ 331      data = prod.get("data") or {}
+ 332      item = data.get("item") or {}
+ 333      price = data.get("price") or {}
+ 334      sp = price.get("storePrices") or {}
+ 335      regular, promo = sp.get("regular") or {}, sp.get("promo") or {}
+ 336      src = str(sp.get("sourceLocationId") or "")
+ 337      if src and src != ctx["store_id"]:
+ 338          return Mapped(None, "store_mismatch", src)
+ 339  
+ 340      # identity: the UPC only ever comes from item.upc; Mariano's product id (data.id) is kept separately
+ 341      upc = clean_text(item.get("upc"))
+ 342      pid = clean_text(data.get("id"))
+ 343      if upc:
+ 344          identity, id_src = upc, "item.upc"
+ 345      elif pid:
+ 346          identity, id_src = f"product:{pid}", "data.id"
+ 347      else:
+ 348          return Mapped(None, "no_identity", src)
+ 349  
+ 350      modal = {}
+ 351      for loc in data.get("sourceLocations") or []:
+ 352          if str(loc.get("id")) == ctx["store_id"]:
+ 353              modal = {m.get("modalityType"): m.get("availability") for m in loc.get("modalityAvailabilities") or []}
+ 354      trig = approximate_weight_trigger(item, price, ctx)
+ 355      if trig:
+ 356          return Mapped(None, "approximate_weight", src, identity=identity, identity_source=id_src,
+ 357                        source_product_id=pid, sell_by=str(price.get("sellBy", "")), trigger=trig)
+ 358  
+ 359      size = clean_text(item.get("customerFacingSize"))
+ 360      availability = "priced" if regular else "no_store_price"   # unavailable products are kept, prices left empty
+ 361      regular_price = (_usd(regular, "unitPrice") or _usd(regular)) if regular else ""
+ 362      sale_price, offers = "", []
+ 363      ppm = regular.get("equivalizedUnitPriceString") or ""
+ 364      if int(regular.get("nfor") or 1) > 1:  # the shelf price itself is a multi-buy ("2 for $5.00")
+ 365          offers.append(deals.Offer(regular.get("defaultDescription", ""), "REGULAR_NFOR", _usd(regular, "nforPrice"),
+ 366                                    valid_to=_ts(regular.get("expirationDate")), source="price.storePrices.regular"))
+ 367      if promo:
+ 368          if int(promo.get("nfor") or 1) > 1:
+ 369              offers.append(deals.Offer(promo.get("defaultDescription", ""), "PROMO_NFOR", _usd(promo, "nforPrice"),
+ 370                                        valid_to=_ts(promo.get("expirationDate")), source="price.storePrices.promo"))
+ 371          else:
+ 372              p = _usd(promo, "unitPrice") or _usd(promo)
+ 373              if p and p != regular_price:
+ 374                  sale_price = p
+ 375                  ppm = promo.get("equivalizedUnitPriceString") or ppm  # the card shows the PPM of the price it shows
+ 376      for o in data.get("offers") or []:
+ 377          offers.append(deals.Offer(o.get("defaultDescription") or o.get("description") or "", o.get("displayTemplate") or "",
+ 378                                    valid_from=_ts(o.get("startDate")) or clean_text(o.get("start")),
+ 379                                    valid_to=_ts(o.get("endDate")) or clean_text(o.get("end")),
+ 380                                    modalities=tuple(o.get("modalities") or ()),
+ 381                                    limit=clean_text(o.get("limit") or o.get("maxQuantity") or ""), source="data.offers"))
+ 382      d = deals.classify(offers)
+ 383  
+ 384      brand = (item.get("brand") or {}).get("name", "")
+ 385      title = clean_text(item.get("description"))
+ 386      rec = {
+ 387          "zipcode": ctx["zipcode"], "store_name": ctx["store_name"], "store_location": ctx["store_location"],
+ 388          "store_logo": ctx["store_logo"],
+ 389          "store_brand": "yes" if is_store_brand(brand, title, ctx["brands"]) else "no",
+ 390          "category": ctx["category"], "sub_category": ctx["sub_category"],
+ 391          "product_title": title, "weight": size,
+ 392          "regular_price": regular_price, "sale_price": sale_price,
+ 393          "volume_deals_description": d.volume_description, "volume_deals_price": d.volume_price,
+ 394          "digital_deals_description": d.digital_description, "digital_deals_price": d.digital_price,
+ 395          "image_url": _image(item),
+ 396          "url": item.get("shareLink") or (f"{ctx['base_url']}/p/{item.get('seoDescription', '')}/{pid or upc}"
+ 397                                           if (pid or upc) else ""),
+ 398          "upc": upc, "gupc": "", "ppm": clean_text(ppm), "unit_price": "", "crawl_date": ctx["crawl_date"],
+ 399      }
+ 400      labels = [(o.text, o.template) for o in offers if o.text]
+ 401      return Mapped(rec, "kept", src, labels, identity=identity, identity_source=id_src, source_product_id=pid,
+ 402                    availability=availability, sell_by=str(price.get("sellBy", "")), offers=list(d.details),
+ 403                    modalities=modal)
+ 404  
+ 405  
+ 406  # ----------------------------------------------------------------------------- coupons page
+ 407  _COUPON_RE = re.compile(r'aria-label="Shop All Items for coupon: (.+?) coupon" data-testid="ShopAllItems-primary-(\d+)"', re.S)
+ 408  
+ 409  
+ 410  def coupons(html: str) -> list[dict]:
+ 411      """Digital coupons displayed on /savings/cl/coupons/ (wording, id, expiry) exactly as shown."""
+ 412      out, seen = [], set()
+ 413      for m in _COUPON_RE.finditer(html):
+ 414          text, cid = clean_text(htmllib.unescape(m.group(1))), m.group(2)
+ 415          if cid in seen:
+ 416              continue
+ 417          seen.add(cid)
+ 418          exp = re.search(rf'data-testid="CouponExpiryDate-{cid}"[^>]*>([^<]+)<', html)
+ 419          out.append({"coupon_id": cid, "description": text, "expires": clean_text(exp.group(1)) if exp else "",
+ 420                      "classified_as": deals.kind_of(text) if deals.kind_of(text) != "other" else "digital"})
+ 421      return out
+ 422  
+
+====================================================================================================
+[4 publication gates] src/mscraper/validate.py
+sha256 946fd2763f6636fc0abce215ac07c9dbd3d316ef8e2eb216469b94d61ee6247a   lines 153
+====================================================================================================
+   1  """Run validation – the gate between a finished run and publication.
+   2  
+   3  A run is publishable only if ALL of these hold:
+   4    1. store verified before collection, and every page / product came from the configured store
+   5    2. every CSV category was discovered and every listing finished (no failed / blocked listing)
+   6    3. no category returned zero products (a block is not an empty category); the Coupons
+   7       category must show at least one coupon
+   8    4. canary searches return store-priced products incl. the canary UPCs, at start and end
+   9    5. field completeness meets the configured minimums
+  10    6. schema: exact field order, strings only, gupc/unit_price empty, no approximate weights,
+  11       no duplicate UPCs
+  12    7. no category drops below the configured share of the last successful run
+  13  """
+  14  from __future__ import annotations
+  15  
+  16  from collections import Counter
+  17  from dataclasses import dataclass, field
+  18  
+  19  from .models import FIELD_ORDER
+  20  from .text import is_approximate
+  21  
+  22  
+  23  @dataclass
+  24  class Validation:
+  25      ok: bool = True
+  26      errors: list[str] = field(default_factory=list)
+  27      warnings: list[str] = field(default_factory=list)
+  28  
+  29      def fail(self, msg: str):
+  30          self.ok = False
+  31          self.errors.append(msg)
+  32  
+  33      def warn(self, msg: str):
+  34          self.warnings.append(msg)
+  35  
+  36      def as_dict(self):
+  37          return {"ok": self.ok, "errors": self.errors, "warnings": self.warnings}
+  38  
+  39  
+  40  def completeness(records: list[dict]) -> dict[str, float]:
+  41      n = len(records) or 1
+  42      return {f: round(sum(1 for r in records if r.get(f, "") != "") / n, 4) for f in FIELD_ORDER}
+  43  
+  44  
+  45  # fields whose completeness is measured only over fresh, priced, UPC-bearing observations: products kept
+  46  # without a current store price or without a UPC are valid rows with empty strings (retention rule)
+  47  PRICE_FIELDS = {"regular_price"}
+  48  UPC_FIELDS = {"upc"}
+  49  
+  50  
+  51  def scoped_completeness(recs_by_id: dict, obs: dict) -> dict[str, float]:
+  52      fresh = {k: r for k, r in recs_by_id.items() if (obs.get(k) or {}).get("status", "fresh") == "fresh"}
+  53      out = completeness(list(fresh.values()))
+  54      priced = [r for k, r in fresh.items() if (obs.get(k) or {}).get("availability", "priced") == "priced"]
+  55      with_upc = [r for k, r in fresh.items() if (obs.get(k) or {}).get("identity_source", "item.upc") == "item.upc"]
+  56      for f in PRICE_FIELDS:
+  57          out[f] = completeness(priced).get(f, 0) if priced else 1.0
+  58      for f in UPC_FIELDS:
+  59          out[f] = completeness(with_upc).get(f, 0) if with_upc else 1.0
+  60      return out
+  61  
+  62  
+  63  def validate_run(settings, ck, records: list[dict], categories, previous_report: dict | None,
+  64                   obs: dict | None = None, recs_by_id: dict | None = None) -> Validation:
+  65      v = Validation()
+  66      obs = obs or {}
+  67      recs_by_id = recs_by_id if recs_by_id is not None else {r["upc"]: r for r in records}
+  68  
+  69      # 1. store
+  70      store = ck.get("store_verification") or {}
+  71      if not store.get("verified"):
+  72          v.fail(f"store not verified before collection: {store.get('checks')}")
+  73      if ck.get("store_mismatches", 0):
+  74          v.fail(f"{ck.get('store_mismatches')} page(s)/product(s) came from a different store – run not publishable")
+  75  
+  76      # 2/3. coverage
+  77      listings = ck.listings()
+  78      by_cat = Counter(r["category"] for k, r in recs_by_id.items() if (obs.get(k) or {}).get("status", "fresh") == "fresh")
+  79      min_per_cat = int(settings.get("validation.min_products_per_category", 1))
+  80      for cat in categories:
+  81          if cat.kind == "coupons":
+  82              cps = ck.get("coupons") or {}
+  83              if settings.get("coupons.enabled", True) and not cps.get("count"):
+  84                  v.fail(f"Coupons: no digital coupons read from {cat.url} ({ck.get('coupons_error', 'empty page')})")
+  85              continue
+  86          if ck.get(f"discovery_error:{cat.name}"):
+  87              v.fail(f"category discovery failed: {cat.name}: {ck.get(f'discovery_error:{cat.name}')}")
+  88          elif not any(l["category"] == cat.name for l in listings):
+  89              v.fail(f"category never discovered/queued: {cat.name}")
+  90          elif by_cat.get(cat.name, 0) < min_per_cat:
+  91              v.fail(f"category returned {by_cat.get(cat.name, 0)} products (min {min_per_cat}): {cat.name}")
+  92      shelves: dict[tuple, dict] = {}
+  93      for l in listings:
+  94          if l["status"] != "done":
+  95              v.fail(f"listing not completed: {l['category']} / {l['sub_category']} [{l['query']}] ({l['status']}: {l['error']})")
+  96          sh = shelves.setdefault((l["category"], l["sub_category"]), {"seen": 0, "matched": 0, "demo": False})
+  97          sh["seen"] += l["seen"]
+  98          sh["matched"] += l["matched"]
+  99          sh["demo"] |= l["stop_reason"] == "demo_limit_reached"
+ 100      for (cat, sub), sh in shelves.items():
+ 101          if sh["demo"]:
+ 102              continue
+ 103          if sh["seen"] == 0:
+ 104              v.fail(f"zero products on shelf (all queries empty – possible silent block): {cat} / {sub}")
+ 105          elif sh["matched"] == 0:
+ 106              # a menu link whose taxonomy has no searchable products at this store (e.g. coffee filters are filed
+ 107              # under Kitchen): reported, not fatal - a whole category without products still fails above
+ 108              v.warn(f"menu shelf without products of its own taxonomy at this store: {cat} / {sub}")
+ 109  
+ 110      # 4. canaries
+ 111      if settings.get("validation.canary_required", True):
+ 112          canary = ck.get("canary", {})
+ 113          for phase in ("start", "end"):
+ 114              res = canary.get(phase)
+ 115              if res is None:
+ 116                  v.fail(f"canary check ({phase}) missing")
+ 117              elif not res.get("ok"):
+ 118                  v.fail(f"canary check ({phase}) failed: {res.get('detail')}")
+ 119  
+ 120      # 5. completeness (fresh observations; price over priced products, UPC over products that carry one)
+ 121      comp = scoped_completeness(recs_by_id, obs)
+ 122      for f, minimum in (settings.get("validation.min_field_completeness") or {}).items():
+ 123          if records and comp.get(f, 0) < float(minimum):
+ 124              v.fail(f"field completeness {f}={comp.get(f, 0):.2%} below {float(minimum):.0%}")
+ 125  
+ 126      # 6. schema + duplicates
+ 127      for r in records:
+ 128          if tuple(r.keys()) != FIELD_ORDER:
+ 129              v.fail("record field order does not match the required schema")
+ 130              break
+ 131          if any(not isinstance(x, str) for x in r.values()):
+ 132              v.fail("non-string value found (nulls are not allowed)")
+ 133              break
+ 134          if r["gupc"] or r["unit_price"]:
+ 135              v.fail("gupc/unit_price must be empty at scraper stage")
+ 136              break
+ 137          if is_approximate(r["weight"]):
+ 138              v.fail(f"approximate-weight record leaked: {r['url']}")
+ 139              break
+ 140      dups = [u for u, n in Counter(r["upc"] for r in records if r["upc"]).items() if n > 1]
+ 141      if dups:
+ 142          v.fail(f"{len(dups)} duplicate UPC(s) in output")
+ 143      if not records:
+ 144          v.fail("run produced no records")
+ 145  
+ 146      # 7. yield vs previous successful run
+ 147      if previous_report:
+ 148          threshold = float(settings.get("validation.yield_drop_threshold", 0.6))
+ 149          for name, prev_n in (previous_report.get("count_by_category") or {}).items():
+ 150              if prev_n and by_cat.get(name, 0) < prev_n * threshold:
+ 151                  v.fail(f"yield drop in {name}: {by_cat.get(name, 0)} vs {prev_n} in last good run")
+ 152      return v
+ 153  
+
+====================================================================================================
+[5 bounded tests / one-request command] src/mscraper/cli.py
+sha256 f574cafc4a2706c9b0440bcf691a9b17a56093f3eac9817de9ccf32117b7cf56   lines 307
+====================================================================================================
+   1  """Command line.
+   2  
+   3    python -m mscraper verify-store --location <key>
+   4    python -m mscraper run --location <key> [--categories "Dairy,Meat"] [--limit 100] [--resume] [--max-requests N]
+   5    python -m mscraper run-all                       # every enabled location (used by the Azure scheduled job)
+   6    python -m mscraper summary --location <key> [--run <run_id>]
+   7    python -m mscraper probe --location <key> [--query Batteries]   # live paging / brand-filter probe with evidence
+   8    python -m mscraper bounded-test test1|test2      # the agreed bounded live tests, total request cap enforced
+   9    python -m mscraper budget-status [--name test1]  # requests used / remaining per bounded test
+  10    python -m mscraper selfcheck                     # 0 provider requests: credentials present, blob + state write/read
+  11  
+  12    --budget NAME:TOTAL (or env MSCRAPER_BUDGET) puts any command under a TOTAL request cap that persists in the state
+  13    directory across commands, retries, resumes and job executions (see budget.py).
+  14  """
+  15  from __future__ import annotations
+  16  
+  17  import argparse
+  18  import asyncio
+  19  import json
+  20  import os
+  21  import sys
+  22  from pathlib import Path
+  23  
+  24  from . import evidence, logging_setup
+  25  from .budget import TotalBudget, parse_spec
+  26  from .config import load_settings
+  27  from .fetch import FetchError
+  28  from . import lock
+  29  from .lock import LockError, live_lock, run_lock
+  30  from .runner import Runner
+  31  from .storage import build_storage
+  32  
+  33  
+  34  def _state_dir(settings) -> Path:
+  35      d = Path(os.getenv("MSCRAPER_STATE_DIR") or settings.get("state_dir", "state"))
+  36      return d if d.is_absolute() else Path(settings.get("_base_dir")) / d
+  37  
+  38  
+  39  def _latest_unfinished(state_dir: Path, key: str) -> str | None:
+  40      from .checkpoint import read_meta
+  41  
+  42      runs = sorted({p.parent for pat in ("*/checkpoint.sqlite", "*/checkpoint.manifest.json")
+  43                     for p in (state_dir / key / "runs").glob(pat)}, reverse=True)
+  44      for run_dir in runs:
+  45          if read_meta(run_dir, "started_at") is None:
+  46              continue                                # never started (e.g. created and failed before any work)
+  47          if read_meta(run_dir, "final_status") is None:
+  48              return run_dir.name
+  49      return None
+  50  
+  51  
+  52  def _total_budget(args, settings, command: str):
+  53      spec = getattr(args, "budget", None) or os.getenv("MSCRAPER_BUDGET")
+  54      if not spec:
+  55          return None
+  56      name, total = parse_spec(spec)
+  57      return TotalBudget(_state_dir(settings) / "_budgets", name, total, command=command)
+  58  
+  59  
+  60  PROVIDER_ENV = {"oxylabs_kroger": ("OXYLABS_WEBAPI_KEY",), "oxylabs_realtime": ("OXYLABS_USERNAME", "OXYLABS_PASSWORD")}
+  61  
+  62  
+  63  def cmd_selfcheck(settings) -> dict:
+  64      """Deployment check without any provider request: Key Vault-backed credentials reached the process (names
+  65      only, never values), and the managed identity can write and read back a blob in the designated container; the
+  66      state share (persistent request budgets) is writable."""
+  67      import secrets
+  68      from datetime import datetime, timezone
+  69  
+  70      from .version import version_info
+  71  
+  72      provider = os.getenv("MSCRAPER_FETCH_PROVIDER") or settings.get("fetch.provider", "oxylabs_kroger")
+  73      out = {**version_info(), "provider": provider, "provider_requests": 0,
+  74             "credentials_present": {k: bool(os.getenv(k)) for k in PROVIDER_ENV.get(provider, ())}}
+  75      ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+  76      token = secrets.token_hex(16).encode()
+  77      try:
+  78          st = build_storage(settings)
+  79          key = f"_selfcheck/{ts}.txt"
+  80          st.put_bytes(key, token)
+  81          out["blob"] = {"backend": type(st).__name__, "key": key, "write": True, "read_back_matches": st.get_bytes(key) == token}
+  82      except Exception as exc:  # e.g. role assignment missing or not yet propagated
+  83          out["blob"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+  84      try:
+  85          f = _state_dir(settings) / "_selfcheck" / f"{ts}.txt"
+  86          f.parent.mkdir(parents=True, exist_ok=True)
+  87          f.write_bytes(token)
+  88          out["state_dir"] = {"path": str(f), "write": True, "read_back_matches": f.read_bytes() == token}
+  89      except Exception as exc:
+  90          out["state_dir"] = {"error": f"{type(exc).__name__}: {exc}"[:300]}
+  91      out["ok"] = (all(out["credentials_present"].values()) and out["blob"].get("read_back_matches") is True
+  92                   and out["state_dir"].get("read_back_matches") is True)
+  93      return out
+  94  
+  95  
+  96  # The bounded live tests proposed to the client. Each step has its own cap; the test's total cap is enforced on top
+  97  # of them by a persistent TotalBudget, so re-running a test can never exceed its total.
+  98  BOUNDED_TESTS = {
+  99      "test1": {"total": 19, "steps": [
+ 100          ["verify-store", "--location", "marianos-544-crystal-lake", "--max-requests", "2"],  # diagnostic only
+ 101          ["verify-store", "--location", "marianos-502-vernon-hills", "--max-requests", "2"],
+ 102          ["probe", "--location", "marianos-544-crystal-lake", "--query", "Batteries", "--max-requests", "15"]]},
+ 103      "test2": {"total": 300, "steps": [
+ 104          ["run", "--location", "marianos-502-vernon-hills", "--categories", "Batteries,Light Bulbs",
+ 105           "--max-requests", "300", "--no-publish", "--resume"]]},
+ 106  }
+ 107  
+ 108  
+ 109  def cmd_run(args, settings, loc_key: str) -> dict:
+ 110      loc = settings.location(loc_key)
+ 111      storage = build_storage(settings)
+ 112      state = _state_dir(settings)
+ 113      run_id = args.run or (_latest_unfinished(state, loc.key) if args.resume else None)
+ 114      if args.max_requests:
+ 115          settings.raw.setdefault("fetch", {})["max_requests_per_run"] = args.max_requests
+ 116      cats = [c.strip() for c in args.categories.split(",")] if getattr(args, "categories", None) else None
+ 117      with run_lock(storage, loc.key):
+ 118          runner = Runner(settings, loc, storage, state, run_id=run_id, categories=cats, limit_per_category=args.limit or 0)
+ 119          runner.fetcher.total_budget = _total_budget(args, settings, f"run {loc.key}")
+ 120          logging_setup.setup(args.log_level, str(runner.dir / "run.log"))
+ 121          return asyncio.run(runner.run(publish=not args.no_publish))
+ 122  
+ 123  
+ 124  LIVE_COMMANDS = {"verify-store", "probe", "run", "run-all", "bounded-test"}
+ 125  
+ 126  
+ 127  def main(argv=None) -> int:
+ 128      ap = argparse.ArgumentParser(prog="mscraper")
+ 129      ap.add_argument("--config", default=None)
+ 130      ap.add_argument("--log-level", default="INFO")
+ 131      ap.add_argument("--budget", default=None, help="NAME:TOTAL persistent total request cap (env MSCRAPER_BUDGET)")
+ 132      sub = ap.add_subparsers(dest="cmd", required=True)
+ 133      v = sub.add_parser("verify-store")
+ 134      v.add_argument("--location", required=True)
+ 135      v.add_argument("--max-requests", type=int, default=2, help="hard cap on provider requests (retries included)")
+ 136      r = sub.add_parser("run")
+ 137      r.add_argument("--location", required=True)
+ 138      r.add_argument("--categories", default="")
+ 139      r.add_argument("--limit", type=int, default=0, help="max records per category (demo / smoke runs)")
+ 140      r.add_argument("--resume", action="store_true", help="continue the latest unfinished run")
+ 141      r.add_argument("--run", default=None, help="continue a specific run id")
+ 142      r.add_argument("--max-requests", type=int, default=0)
+ 143      r.add_argument("--no-publish", action="store_true")
+ 144      a = sub.add_parser("run-all")
+ 145      a.add_argument("--resume", action="store_true", default=True)
+ 146      pr = sub.add_parser("probe", help="~6-12 live requests: page 2 / JS paging / brand-filter behaviour, with evidence")
+ 147      pr.add_argument("--location", required=True)
+ 148      pr.add_argument("--query", default="Batteries")
+ 149      pr.add_argument("--max-requests", type=int, default=15, help="hard cap on provider requests for this probe")
+ 150      bt = sub.add_parser("bounded-test", help="run an agreed bounded live test under its enforced total request cap")
+ 151      bt.add_argument("test", choices=sorted(BOUNDED_TESTS))
+ 152      sub.add_parser("selfcheck", help="0 provider requests: credentials present, blob + state write/read")
+ 153      bs = sub.add_parser("budget-status")
+ 154      bs.add_argument("--name", default=None)
+ 155      s = sub.add_parser("summary")
+ 156      s.add_argument("--location", required=True)
+ 157      s.add_argument("--run", default=None)
+ 158      args = ap.parse_args(argv)
+ 159      try:  # local runs: read .env; in Azure the values come from Key Vault-backed env vars
+ 160          from dotenv import load_dotenv
+ 161  
+ 162          load_dotenv()
+ 163      except ImportError:
+ 164          pass
+ 165      settings = load_settings(args.config)
+ 166      logging_setup.setup(args.log_level)
+ 167  
+ 168      # Exclusive ownership: every command that can send provider requests runs inside the live lock (one Blob lease
+ 169      # for all tests and locations), so two executions can never overlap or draw on the same budget concurrently.
+ 170      if args.cmd in LIVE_COMMANDS and not lock.live_held():
+ 171          try:
+ 172              with live_lock(build_storage(settings)):
+ 173                  return main(argv)
+ 174          except LockError as exc:
+ 175              print(f"refused: {exc}", file=sys.stderr)
+ 176              return 3
+ 177  
+ 178      if args.cmd == "verify-store":
+ 179          loc = settings.location(args.location)
+ 180          runner = Runner(settings, loc, build_storage(settings), _state_dir(settings) / "_verify")
+ 181          runner.fetcher.budget = args.max_requests
+ 182          runner.fetcher.retries = max(0, args.max_requests - 1)
+ 183          runner.fetcher.total_budget = _total_budget(args, settings, f"verify-store {loc.key}")
+ 184  
+ 185          async def go():
+ 186              await runner.fetcher.start()
+ 187              try:
+ 188                  return await runner.verify_store()
+ 189              finally:
+ 190                  await runner.fetcher.close()
+ 191  
+ 192          try:
+ 193              res = asyncio.run(go())
+ 194          finally:
+ 195              runner.ck.close()
+ 196          print(json.dumps(res, indent=2))
+ 197          return 0 if res["verified"] else 2
+ 198  
+ 199      if args.cmd == "probe":
+ 200          from datetime import datetime, timezone
+ 201  
+ 202          from .fetch import build_fetcher
+ 203          from .probe import run_probe
+ 204  
+ 205          loc = settings.location(args.location)
+ 206          out = _state_dir(settings) / loc.key / "probes" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+ 207          f = build_fetcher(settings, loc)
+ 208          f.on_refusal = lambda res: evidence.save_refusal(out, res)
+ 209          f.budget = args.max_requests          # retries count too: the probe can never exceed this many requests
+ 210          f.retries = 1
+ 211          f.total_budget = _total_budget(args, settings, f"probe {loc.key}")
+ 212  
+ 213          async def go():
+ 214              await f.start()
+ 215              try:
+ 216                  return await run_probe(f, settings, loc, out, args.query, args.max_requests)
+ 217              finally:
+ 218                  await f.close()
+ 219  
+ 220          try:
+ 221              rep = asyncio.run(go())
+ 222          except FetchError as exc:
+ 223              print(json.dumps({"dir": str(out), "error": str(exc), "kind": exc.kind}, indent=2), file=sys.stderr)
+ 224              return 2
+ 225          print(json.dumps({"dir": str(out), "findings": rep["findings"], "requests": rep["fetch_stats"]}, indent=2))
+ 226          return 0
+ 227  
+ 228      if args.cmd == "run":
+ 229          try:
+ 230              res = cmd_run(args, settings, args.location)
+ 231          except LockError as exc:
+ 232              print(f"skipped: {exc}", file=sys.stderr)
+ 233              return 3
+ 234          print(json.dumps(res, indent=2))
+ 235          return 0 if res["status"] in ("published", "valid_not_published_demo", "valid_not_published") else 1
+ 236  
+ 237      if args.cmd == "run-all":
+ 238          rc = 0
+ 239          for loc in settings.locations:
+ 240              if not loc.enabled:
+ 241                  continue
+ 242              ns = argparse.Namespace(run=None, resume=True, max_requests=0, categories="", limit=0, no_publish=False,
+ 243                                      log_level=args.log_level)
+ 244              try:
+ 245                  res = cmd_run(ns, settings, loc.key)
+ 246                  print(json.dumps(res))
+ 247                  rc |= 0 if res["status"] == "published" else 1
+ 248              except LockError as exc:
+ 249                  print(f"{loc.key}: skipped: {exc}", file=sys.stderr)
+ 250          return rc
+ 251  
+ 252      if args.cmd == "bounded-test":
+ 253          plan = BOUNDED_TESTS[args.test]
+ 254          spec = f"{args.test}:{plan['total']}"
+ 255          rc = 0
+ 256          from .budget import BudgetError
+ 257          from .checkpoint import CheckpointError
+ 258  
+ 259          for i, step in enumerate(plan["steps"], 1):
+ 260              b = _total_budget(argparse.Namespace(budget=spec), settings, "")
+ 261              if b.remaining <= 0:
+ 262                  print(f"{args.test}: total of {b.total} requests used up – step not started: {' '.join(step)}")
+ 263                  rc = 4
+ 264                  break
+ 265              label = " [DIAGNOSTIC ONLY; disabled for acceptance]" if "marianos-544-crystal-lake" in step else ""
+ 266              print(f"{args.test}: step {i}: {' '.join(step)}{label}  (total used {b.used}/{b.total})", flush=True)
+ 267              try:
+ 268                  step_rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
+ 269                                 "--budget", spec] + step)
+ 270              except FetchError as exc:   # auth / compatibility / store / budget / lock: never send more
+ 271                  print(f"{args.test}: step {i} stopped ({exc.kind}): {exc} – later steps NOT started")
+ 272                  rc = 4
+ 273                  break
+ 274              except (LockError, BudgetError, CheckpointError) as exc:
+ 275                  print(f"{args.test}: step {i} stopped ({type(exc).__name__}): {exc} – later steps NOT started")
+ 276                  rc = 5
+ 277                  break
+ 278              if step_rc:                 # e.g. store verification failed (exit 2): stop immediately
+ 279                  print(f"{args.test}: step {i} failed (exit {step_rc}) – later steps NOT started")
+ 280                  rc = step_rc
+ 281                  break
+ 282          b = _total_budget(argparse.Namespace(budget=spec), settings, "")
+ 283          print(json.dumps({"test": args.test, "exit_code": rc, "budget": b.summary()}, indent=2))
+ 284          return rc
+ 285  
+ 286      if args.cmd == "selfcheck":
+ 287          res = cmd_selfcheck(settings)
+ 288          print(json.dumps(res, indent=2))
+ 289          return 0 if res["ok"] else 1
+ 290  
+ 291      if args.cmd == "budget-status":
+ 292          d = _state_dir(settings) / "_budgets"
+ 293          rows = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(d.glob("*.json"))] if d.exists() else []
+ 294          rows = [r for r in rows if not args.name or r["name"] == args.name]
+ 295          print(json.dumps([{**r, "remaining": int(r["total"]) - int(r["used"])} for r in rows], indent=2))
+ 296          return 0
+ 297  
+ 298      if args.cmd == "summary":
+ 299          state = _state_dir(settings) / args.location / "runs"
+ 300          run = args.run or sorted(p.name for p in state.iterdir() if p.is_dir())[-1]
+ 301          rep = json.loads((state / run / "report.json").read_text(encoding="utf-8"))
+ 302          keys = ("run_id", "runtime_seconds", "total_unique_records", "duplicate_records_in_output", "count_by_category",
+ 303                  "excluded", "store_checks_during_run", "validation")
+ 304          print(json.dumps({k: rep.get(k) for k in keys}, indent=2))
+ 305          return 0
+ 306      return 1
+ 307  
+
+====================================================================================================
+[5 bounded tests / one-request command] src/mscraper/budget.py
+sha256 025d2fea5bebe2e917deba376bc5fa4a101146f63bbeb7e2f9963900bc8e3e8e   lines 135
+====================================================================================================
+   1  """Total request budget shared by every command of one bounded test (Test 1 = 19, Test 2 = 300, ...).
+   2  
+   3  The per-process caps (`--max-requests`) restart with each process; this budget does not. It is a pair of files in the
+   4  state directory (Azure: the mounted Azure Files share), so it holds across commands, retries, resumes, container
+   5  restarts and repeated job executions:
+   6  
+   7      state/_budgets/<name>.json     {"name", "total", "used", "created_at", "updated_at"}
+   8      state/_budgets/<name>.jsonl    one line per provider request: ts, n, command, store, url
+   9  
+  10  Exclusive ownership (1.1.5): a budget may only be opened and used while this process holds the live lock
+  11  (lock.live_lock – a Blob lease in Azure), so two executions can never draw on it at the same time. Every take()
+  12  re-checks the lock, re-reads the state from disk (no cached counter) and only then reserves the next request.
+  13  
+  14  Order of writes per request: (1) the ledger line is appended and flushed, (2) the state file is replaced atomically,
+  15  (3) the request is sent. A crash between (1) and (2) leaves one ledger line more than `used`; on the next open that
+  16  request is counted as used (fail safe). Anything else is inconsistent and fails closed (BudgetError): a missing or
+  17  invalid state file next to an existing ledger, fewer ledger lines than `used`, more than one extra line, a total that
+  18  differs from the requested one, or used > total. A cap can only be raised by a new, separately named budget.
+  19  """
+  20  from __future__ import annotations
+  21  
+  22  import json
+  23  import os
+  24  import re
+  25  from datetime import datetime, timezone
+  26  from pathlib import Path
+  27  
+  28  from .fetch import FetchError
+  29  from . import lock
+  30  
+  31  _NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
+  32  
+  33  
+  34  class BudgetError(RuntimeError):
+  35      """The persistent budget is missing, inconsistent or not exclusively owned: no request may be sent."""
+  36  
+  37  
+  38  def _now() -> str:
+  39      return datetime.now(timezone.utc).isoformat(timespec="seconds")
+  40  
+  41  
+  42  class TotalBudget:
+  43      def __init__(self, directory: Path, name: str, total: int, command: str = "", require_lock: bool = True):
+  44          if not _NAME_RE.match(name):
+  45              raise ValueError(f"budget name must be lowercase letters/digits/-/_: {name!r}")
+  46          if total <= 0:
+  47              raise ValueError("budget total must be > 0")
+  48          self.require_lock = require_lock
+  49          self._owned()
+  50          self.dir, self.name, self.command, self.want_total = Path(directory), name, command, total
+  51          self.dir.mkdir(parents=True, exist_ok=True)
+  52          self.path, self.log = self.dir / f"{name}.json", self.dir / f"{name}.jsonl"
+  53          if not self.path.exists():
+  54              if self.log.exists() and self._lines():
+  55                  raise BudgetError(f"budget {name!r}: ledger exists but state file is missing – refusing to reset")
+  56              self.state = {"name": name, "total": total, "used": 0, "created_at": _now(), "updated_at": _now()}
+  57              self._save()
+  58          self.state = self._load()
+  59  
+  60      def _owned(self) -> None:
+  61          if self.require_lock and not lock.live_held():
+  62              raise BudgetError("a persistent request budget may only be used while holding the live lock")
+  63          lock.check_active()
+  64  
+  65      def _lines(self) -> int:
+  66          if not self.log.exists():
+  67              return 0
+  68          return sum(1 for ln in self.log.read_text(encoding="utf-8").splitlines() if ln.strip())
+  69  
+  70      def _load(self) -> dict:
+  71          """Read and validate the state from disk; repair only the single crash window described above."""
+  72          try:
+  73              st = json.loads(self.path.read_text(encoding="utf-8"))
+  74              total, used = int(st["total"]), int(st["used"])
+  75          except Exception as exc:
+  76              raise BudgetError(f"budget {self.name!r}: state file unreadable/invalid ({exc})") from exc
+  77          if st.get("name") != self.name:
+  78              raise BudgetError(f"budget {self.name!r}: state file names {st.get('name')!r}")
+  79          if total != self.want_total:
+  80              raise ValueError(f"budget {self.name!r} already exists with total {total} (asked {self.want_total}); "
+  81                               f"a cap is never raised – use a new budget name")
+  82          if not 0 <= used <= total:
+  83              raise BudgetError(f"budget {self.name!r}: used {used} outside 0..{total}")
+  84          lines = self._lines()
+  85          if lines == used + 1 and lines <= total:      # ledger written, state not yet: count it as used
+  86              st["used"], st["updated_at"], st["repaired_at"] = lines, _now(), _now()
+  87              self.state = st
+  88              self._save()
+  89          elif lines != used:
+  90              raise BudgetError(f"budget {self.name!r}: ledger has {lines} lines but state says used={used}")
+  91          return st
+  92  
+  93      @property
+  94      def total(self) -> int:
+  95          return int(self.state["total"])
+  96  
+  97      @property
+  98      def used(self) -> int:
+  99          return int(self.state["used"])
+ 100  
+ 101      @property
+ 102      def remaining(self) -> int:
+ 103          return self.total - self.used
+ 104  
+ 105      def _save(self):
+ 106          tmp = self.path.with_suffix(".tmp")
+ 107          tmp.write_text(json.dumps(self.state, indent=2), encoding="utf-8")
+ 108          os.replace(tmp, self.path)
+ 109  
+ 110      def take(self, url: str, store_id: str = "") -> int:
+ 111          """Reserve one provider request before it is sent; refuse when the total is used up or ownership is gone."""
+ 112          self._owned()
+ 113          self.state = self._load()                      # never trust an in-memory counter
+ 114          if self.used >= self.total:
+ 115              raise FetchError(f"total budget {self.name!r} of {self.total} requests used up", "budget")
+ 116          n = self.used + 1
+ 117          with self.log.open("a", encoding="utf-8") as f:   # (1) ledger first
+ 118              f.write(json.dumps({"ts": _now(), "n": n, "command": self.command, "store": store_id, "url": url}) + "\n")
+ 119              f.flush()
+ 120              os.fsync(f.fileno())
+ 121          self.state = {**self.state, "used": n, "updated_at": _now()}
+ 122          self._save()                                       # (2) then the counter
+ 123          return n
+ 124  
+ 125      def summary(self) -> dict:
+ 126          return {**self.state, "remaining": self.remaining, "ledger": str(self.log)}
+ 127  
+ 128  
+ 129  def parse_spec(spec: str) -> tuple[str, int]:
+ 130      """'test1:19' -> ('test1', 19)"""
+ 131      name, _, total = (spec or "").partition(":")
+ 132      if not name or not total.isdigit():
+ 133          raise ValueError(f"budget must look like NAME:TOTAL (e.g. test1:19), got {spec!r}")
+ 134      return name.strip(), int(total)
+ 135  
+
+====================================================================================================
+[tests] tests/test_v1110_scope.py
+sha256 611b6ae8858836d85eafed46ef75ca60d1e0800026468f86398661445ad58204   lines 39
+====================================================================================================
+   1  """v1.1.10 acceptance scope: Vernon Hills pickup, Crystal Lake diagnostic only."""
+   2  from pathlib import Path
+   3  
+   4  from mscraper.config import load_settings
+   5  from mscraper.fetch import realtime_payload
+   6  
+   7  
+   8  ROOT = Path(__file__).resolve().parents[1]
+   9  
+  10  
+  11  def test_enabled_acceptance_location_and_disabled_diagnostic_are_explicit():
+  12      settings = load_settings(ROOT / "config" / "settings.yaml")
+  13      vernon = settings.location("marianos-502-vernon-hills")
+  14      crystal = settings.location("marianos-544-crystal-lake")
+  15      assert (vernon.enabled, vernon.store_id, vernon.zipcode, vernon.expected_address,
+  16              vernon.expected_modality) == (True, "53100502", "60061", "1720 N Milwaukee", "PICKUP")
+  17      assert (crystal.enabled, crystal.store_id, crystal.expected_modality) == (False, "53100544", "IN_STORE")
+  18  
+  19  
+  20  def test_realtime_payload_is_pinned_to_location_store_and_pickup():
+  21      settings = load_settings(ROOT / "config" / "settings.yaml")
+  22      location = settings.location("marianos-502-vernon-hills")
+  23      payload = realtime_payload(settings, location, "https://www.marianos.com/search?query=milk")
+  24      assert payload["store_id"] == "53100502"
+  25      assert payload["fulfillment_type"] == "pickup"
+  26      assert payload["query"] == "milk"
+  27  
+  28  
+  29  def test_bounded_scope_keeps_test1_cap_stop_rule_and_uses_vernon_for_test2():
+  30      from mscraper import cli
+  31  
+  32      test1 = cli.BOUNDED_TESTS["test1"]
+  33      test2 = cli.BOUNDED_TESTS["test2"]
+  34      assert test1["total"] == 19
+  35      assert sum(int(s[s.index("--max-requests") + 1]) for s in test1["steps"]) == 19
+  36      assert test1["steps"][0][test1["steps"][0].index("--location") + 1] == "marianos-544-crystal-lake"
+  37      assert test2["steps"][0][test2["steps"][0].index("--location") + 1] == "marianos-502-vernon-hills"
+  38      assert "--no-publish" in test2["steps"][0]
+  39  
+
+====================================================================================================
+[tests] tests/test_v119_price.py
+sha256 bc83b4d1e637804cb96e4fe8b97ebe420c82f4b5b1a7bc5f1f301f8141e823e9   lines 70
+====================================================================================================
+   1  import asyncio
+   2  from types import SimpleNamespace
+   3  
+   4  import pytest
+   5  
+   6  from mscraper.runner import _has_monetary_price, _has_qualifying_store_price
+   7  
+   8  
+   9  @pytest.mark.parametrize("value", ["2 pack", "Only 2 left", "Save $2", "0", "-1.99", "inf", "2026-11-01"])
+  10  def test_unrelated_or_nonpositive_display_text_is_rejected(value):
+  11      assert not _has_monetary_price({"regular": {"defaultDescription": value}})
+  12  
+  13  
+  14  @pytest.mark.parametrize("value", ["$3.49", "$3.49/lb"])
+  15  def test_payable_display_prices_are_accepted(value):
+  16      assert _has_monetary_price({"regular": {"defaultDescription": value}})
+  17  
+  18  
+  19  @pytest.mark.parametrize("value", [0, -1.99, float("inf"), float("nan")])
+  20  def test_nonfinite_or_nonpositive_numeric_prices_are_rejected(value):
+  21      assert not _has_monetary_price({"regular": {"price": value}})
+  22  
+  23  
+  24  def test_numeric_regular_and_promo_prices_are_accepted():
+  25      assert _has_monetary_price({"regular": {"price": 3.49}})
+  26      assert _has_monetary_price({"promo": {"amount": 2.99}})
+  27  
+  28  
+  29  def test_wrong_fulfillment_mode_is_rejected():
+  30      assert not _has_monetary_price({"regular": {"price": 3.49, "fulfillmentMode": "DELIVERY"}})
+  31  
+  32  
+  33  def test_wrong_store_is_rejected_by_qualification_context():
+  34      assert not _has_qualifying_store_price({"regular": {"price": 3.49}}, "53100539", "53100544", "IN_STORE")
+  35  
+  36  
+  37  def test_verify_store_fixture_with_only_stock_count_is_not_verified(tmp_path, monkeypatch):
+  38      from conftest import ROOT
+  39      from mscraper.config import Location, load_settings
+  40      from mscraper.fetch import FetchResult
+  41      from mscraper.parse import SearchPage, StoreInfo
+  42      from mscraper.storage import LocalStorage
+  43      import mscraper.runner as runner_module
+  44  
+  45      settings = load_settings(ROOT / "config" / "settings.yaml")
+  46      location = Location("test", "53100544", zipcode="60014", expected_address="105 Northwest Hwy")
+  47      store = StoreInfo(location_id="53100544", zipcode="60014", banner="Mariano's",
+  48                        address="105 Northwest Hwy", city="Crystal Lake", state="IL")
+  49      product = {"data": {"price": {"storePrices": {"sourceLocationId": "53100544",
+  50                                                       "regular": {"defaultDescription": "Only 2 left"}}}}}
+  51      search = SearchPage(["A"], {"A": product}, {}, request_location="53100544", store=store)
+  52      state = {"calypso": {"domains": {"modalityPreferences": {
+  53          "modalities": [{"modalityType": "IN_STORE"}]}}}}
+  54  
+  55      class Page:
+  56          async def get(self, url, validate=None):
+  57              if validate:
+  58                  validate("<html>" + ("x" * 1000) + "</html>")
+  59              return FetchResult(url, 200, "<html>" + ("x" * 1000) + "</html>", 0.01)
+  60  
+  61      monkeypatch.setattr(runner_module.parse, "extract_state", lambda _: state)
+  62      monkeypatch.setattr(runner_module.parse, "search_page", lambda _: search)
+  63      runner = __import__("mscraper.runner", fromlist=["Runner"]).Runner(
+  64          settings, location, LocalStorage(tmp_path / "output"), tmp_path / "state", fetcher=Page())
+  65      try:
+  66          result = asyncio.run(runner.verify_store())
+  67      finally:
+  68          runner.ck.close()
+  69      assert result["verified"] is False
+  70  
+
+====================================================================================================
+[tests] tests/test_v112_bounded_tests.py
+sha256 72f0588d4311ca36e0a3322b40d0afc7b9d6b04972f0214405adcdeb0fca3dc9   lines 123
+====================================================================================================
+   1  """v1.1.2: enforced TOTAL request caps for the bounded live tests (offline – fixture provider, no network)."""
+   2  import asyncio
+   3  import json
+   4  
+   5  import pytest
+   6  from conftest import FIX, PAGES, ROOT
+   7  
+   8  from mscraper import cli
+   9  from mscraper.budget import TotalBudget, parse_spec
+  10  from mscraper.fetch import FetchError, FixtureFetcher
+  11  
+  12  
+  13  def test_total_budget_persists_refuses_and_cannot_be_raised(tmp_path, live):
+  14      b = TotalBudget(tmp_path, "test1", 3, command="x")
+  15      for _ in range(2):
+  16          b.take("u1")
+  17      again = TotalBudget(tmp_path, "test1", 3)            # a new process / resume reads the same file
+  18      assert again.used == 2
+  19      again.take("u2")
+  20      with pytest.raises(FetchError) as e:
+  21          again.take("u3")
+  22      assert e.value.kind == "budget"
+  23      with pytest.raises(ValueError):
+  24          TotalBudget(tmp_path, "test1", 30)               # a cap is never raised under the same name
+  25      lines = (tmp_path / "test1.jsonl").read_text(encoding="utf-8").splitlines()
+  26      assert [json.loads(x)["n"] for x in lines] == [1, 2, 3]
+  27      assert parse_spec("test2:300") == ("test2", 300)
+  28  
+  29  
+  30  def test_retries_and_resumed_processes_count_against_the_same_total(settings, location, tmp_path, live):
+  31      def fetcher():
+  32          f = FixtureFetcher(settings, location, fixtures=dict(PAGES), root=str(FIX))
+  33          f.total_budget = TotalBudget(tmp_path, "test2", 5)
+  34          return f
+  35  
+  36      f1 = fetcher()
+  37      f1.fail_once = {"query=milk"}                         # 1 failure + 1 retry = 2 counted requests
+  38      asyncio.run(f1.get("https://www.marianos.com/search?query=milk"))
+  39      asyncio.run(f1.get("https://www.marianos.com/search?query=beef"))
+  40      assert f1.total_budget.used == 3
+  41      f2 = fetcher()                                        # "resume": new process, same budget file
+  42      asyncio.run(f2.get("https://www.marianos.com/search?query=beef"))
+  43      asyncio.run(f2.get("https://www.marianos.com/search?query=beef"))
+  44      with pytest.raises(FetchError) as e:
+  45          asyncio.run(f2.get("https://www.marianos.com/search?query=beef"))
+  46      assert e.value.kind == "budget" and f2.total_budget.used == 5
+  47  
+  48  
+  49  def test_bounded_test1_never_exceeds_19_requests_even_when_repeated(tmp_path, monkeypatch, capsys):
+  50      # every request fails (fixture provider without pages -> HTTP 404), so every step retries up to its own cap –
+  51      # the worst case for request count
+  52      monkeypatch.setenv("MSCRAPER_FETCH_PROVIDER", "fixture")
+  53      monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
+  54      monkeypatch.setattr("mscraper.fetch.Fetcher._pace", lambda self: asyncio.sleep(0))
+  55      monkeypatch.setattr("mscraper.fetch.random.uniform", lambda a, b: 0)
+  56      cfg = str(ROOT / "config" / "settings.yaml")
+  57      import mscraper.fetch as fetch_mod
+  58      orig = fetch_mod.Fetcher.__init__
+  59  
+  60      def fast_init(self, settings, location):
+  61          orig(self, settings, location)
+  62          self.backoff = 0
+  63      monkeypatch.setattr(fetch_mod.Fetcher, "__init__", fast_init)
+  64  
+  65      cli.main(["--config", cfg, "bounded-test", "test1"])
+  66      st = json.loads((tmp_path / "state" / "_budgets" / "test1.json").read_text(encoding="utf-8"))
+  67      assert st["total"] == 19 and 0 < st["used"] <= 19
+  68      first = st["used"]
+  69      rc = cli.main(["--config", cfg, "bounded-test", "test1"])     # repeating the test cannot add requests past 19
+  70      st = json.loads((tmp_path / "state" / "_budgets" / "test1.json").read_text(encoding="utf-8"))
+  71      assert st["used"] <= 19 and st["used"] >= first and rc != 0
+  72      ledger = (tmp_path / "state" / "_budgets" / "test1.jsonl").read_text(encoding="utf-8").splitlines()
+  73      assert len(ledger) == st["used"]
+  74      assert {json.loads(x)["store"] for x in ledger} <= {"53100544", "53100502"}
+  75  
+  76  
+  77  def test_bounded_test_plans_match_the_proposal():
+  78      assert cli.BOUNDED_TESTS["test1"]["total"] == 19
+  79      caps = [int(s[s.index("--max-requests") + 1]) for s in cli.BOUNDED_TESTS["test1"]["steps"]]
+  80      assert sum(caps) == 19
+  81      t2 = cli.BOUNDED_TESTS["test2"]
+  82      assert t2["total"] == 300 and "--no-publish" in t2["steps"][0]
+  83      assert "marianos-502-vernon-hills" in t2["steps"][0]
+  84  
+  85  
+  86  def test_crawl_queue_starts_new_requests_without_waiting_for_slow_ones(settings, location, storage, fetcher, tmp_path):
+  87      """No wave barrier: a request queued by a fast listing starts while a slow listing is still running."""
+  88      from mscraper.runner import Runner
+  89  
+  90      r = Runner(settings, location, storage, tmp_path / "state", fetcher=fetcher)
+  91      for name in ("slow", "fast"):
+  92          r.ck.add_listing("Meat", name, f"https://x/{name}", name, "", False)
+  93      order = []
+  94  
+  95      async def fake(l):
+  96          order.append(("start", l["url"]))
+  97          if l["url"].endswith("slow"):
+  98              await asyncio.sleep(0.3)
+  99          elif l["url"].endswith("fast"):
+ 100              r.ck.add_listing("Meat", "queued", "https://x/queued", "queued", "", False)
+ 101          order.append(("end", l["url"]))
+ 102          r.ck.finish_listing(l["category"], l["url"], "done")
+ 103  
+ 104      r.crawl_listing = fake
+ 105      asyncio.run(r.crawl_pending())
+ 106      assert order.index(("start", "https://x/queued")) < order.index(("end", "https://x/slow"))
+ 107      assert not r.ck.pending()
+ 108  
+ 109  
+ 110  def test_crawl_queue_starts_each_request_once_per_session(settings, location, storage, fetcher, tmp_path):
+ 111      from mscraper.runner import Runner
+ 112  
+ 113      r = Runner(settings, location, storage, tmp_path / "state", fetcher=fetcher)
+ 114      r.ck.add_listing("Meat", "stuck", "https://x/stuck", "stuck", "", False)
+ 115      calls = []
+ 116  
+ 117      async def leaves_pending(l):
+ 118          calls.append(l["url"])
+ 119  
+ 120      r.crawl_listing = leaves_pending
+ 121      asyncio.run(r.crawl_pending())          # returns; the listing stays pending for the next resume
+ 122      assert calls == ["https://x/stuck"] and len(r.ck.pending()) == 1
+ 123  

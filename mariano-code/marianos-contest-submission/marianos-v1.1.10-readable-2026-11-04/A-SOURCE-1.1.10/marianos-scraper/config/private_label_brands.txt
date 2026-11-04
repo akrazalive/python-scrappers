@@ -1,0 +1,30 @@
+# Store brands sold at Mariano's (Kroger family + Roundy's). store_brand = "yes" when the product's
+# brand matches one of these; otherwise "no". One brand per line, case-insensitive.
+Roundy's
+Roundy's Select
+Kroger
+Simple Truth
+Simple Truth Organic
+Private Selection
+Home Chef
+Heritage Farm
+Psst
+Smart Way
+Comforts
+Luvsome
+Abound
+Bakery Fresh Goodness
+Big K
+Check This Out
+Dip
+Everyday Living
+HemisFares
+Murray's
+Murray's Cheese
+Office Works
+Pet Pride
+Kroger Mercado
+Vitacci
+Bright Idea
+Free & Clear
+Mariano's

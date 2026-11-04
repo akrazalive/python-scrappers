@@ -1,0 +1,261 @@
+# Normalized diff (UTF-8, LF line endings) between delivered packages
+# old: marianos-scraper-1.1.9-src.zip  sha256 dce4d5313cc011fff8ff6a1841522e2439f4f1156d12417ff4a423d80ac0bb2a
+# new: marianos-scraper-1.1.10-src.zip  sha256 438133ff21950e002fc594199dd1ebfbb5eaec7485e5384173f695a2654c499d
+# files changed: 13
+#   modified  CHANGELOG.md (+9 -0)
+#   modified  README.md (+1 -1)
+#   modified  config/locations.yaml (+7 -3)
+#   modified  config/settings.yaml (+1 -1)
+#   modified  deploy/azure/main.bicep (+1 -1)
+#   modified  deploy/azure/run_test.sh (+1 -1)
+#   modified  src/mscraper/cli.py (+4 -3)
+#   modified  src/mscraper/config.py (+3 -1)
+#   modified  src/mscraper/fetch.py (+8 -1)
+#   modified  src/mscraper/runner.py (+4 -4)
+#   modified  src/mscraper/version.py (+1 -1)
+#   added     tests/test_v1110_scope.py (+38 -0)
+#   modified  tests/test_v112_bounded_tests.py (+1 -0)
+
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -9,6 +9,15 @@
+ scoped to the configured store and selected fulfilment modality. Unrelated digits such as savings, quantities,
+ stock counts and dates are no longer sufficient. Production collection still retains unavailable and no-price
+ products unchanged.
++
++## 1.1.10 (2026-11-03 CST) - Vernon Hills pickup acceptance
++
++Vernon Hills (store `53100502`, ZIP `60061`, 1720 N Milwaukee Ave) is the
++enabled acceptance location and requires `PICKUP` responses with positive
++store-sourced prices. Crystal Lake (`53100544`) remains a clearly labelled,
++disabled diagnostic location. Location configuration now carries the expected
++fulfillment modality; realtime payloads derive `store_id` and pickup mode from
++that location rather than global settings.
+ 
+ ## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
+ 
+--- a/README.md
++++ b/README.md
+@@ -31,7 +31,7 @@
+ python -m mscraper run --location marianos-544-crystal-lake --resume                                # continue an interrupted run
+ python -m mscraper summary --location marianos-544-crystal-lake
+ python -m mscraper probe --location marianos-544-crystal-lake --query Batteries                 # live paging / brand-filter check
+-python -m mscraper bounded-test test1        # live Test 1: both stores + probe, TOTAL <= 19 requests (enforced)
++python -m mscraper bounded-test test1        # live Test 1: diagnostic Crystal Lake + Vernon Hills probe, TOTAL <= 19
+ python -m mscraper bounded-test test2        # live Test 2: Batteries + Light Bulbs, no publish, TOTAL <= 300 (enforced)
+ python -m mscraper budget-status             # requests used / remaining per bounded test
+ ./deploy/azure/run_test.sh <sub> <rg> test1  # the same test as one MANUAL Azure job execution, evidence downloaded
+--- a/config/locations.yaml
++++ b/config/locations.yaml
+@@ -9,6 +9,8 @@
+ # limit_per_category  optional: cap products per category (demo / smoke runs only; 0 = no cap)
+ 
+ locations:
++  # Diagnostic only: intentionally disabled in v1.1.10. It remains configured so a
++  # response accidentally returned for Crystal Lake cannot be mistaken for acceptance.
+   - key: marianos-544-crystal-lake
+     store_id: "53100544"
+     zipcode: "60014"
+@@ -16,13 +18,14 @@
+     canary:
+       query: milk
+       upcs: ["0001111050438", "0001111082556"]   # Simple Truth Organic 2% milk, Kroger lactose-free 2% milk
+-    enabled: true
++    expected_modality: "IN_STORE"
++    enabled: false
+ 
+   # Client-supplied store: Mariano's Vernon Hills, 1720 N Milwaukee Ave, Vernon Hills, IL 60061.
+   # store_id 53100502 is a CANDIDATE taken from the public store page URL (marianos.com/stores/grocery/il/vernon-hills/
+   # marianos-vernon-hills/531/00502). It is NOT verified until `verify-store --location marianos-502-vernon-hills`
+   # shows, from Mariano's own responses, location id 53100502 + ZIP 60061 + "1720 N Milwaukee" + store-sourced prices.
+-  # Kept disabled until then; its results are always labelled with the store details read from its own responses.
++  # Enabled acceptance location for v1.1.10. Results are labelled with response-derived store details.
+   - key: marianos-502-vernon-hills
+     store_id: "53100502"
+     zipcode: "60061"
+@@ -30,7 +33,8 @@
+     canary:
+       query: milk
+       upcs: []          # set after verification (UPCs priced at this store)
+-    enabled: false
++    expected_modality: "PICKUP"
++    enabled: true
+ 
+   # Example of another store (disabled). Fill zipcode/expected_address from verify-store before enabling.
+   - key: marianos-539-bronzeville
+--- a/config/settings.yaml
++++ b/config/settings.yaml
+@@ -23,7 +23,7 @@
+     # The documented source targets kroger.com; whether kroger.com serves the Mariano's store 53100544 with its own
+     # in-store prices is UNVERIFIED and is exactly what Test 1 checks (store, modality and price source are read from
+     # the returned page, never assumed). Delete this block to send search pages as "url" alone.
+-    search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: in_store}
++    search_payload: {source: kroger_search, query: "{query}", store_id: "{store_id}", fulfillment_type: "{fulfillment_type}"}
+   concurrency: 4               # parallel page requests (env MSCRAPER_CONCURRENCY overrides; set from the Test 2 measurement)
+   max_requests_per_run: 0      # safety cap on paid requests; 0 = unlimited. Override with --max-requests
+   timeout_seconds: 120
+--- a/deploy/azure/main.bicep
++++ b/deploy/azure/main.bicep
+@@ -24,7 +24,7 @@
+ param image string = 'docker.io/library/python:3.12-slim'
+ 
+ @description('Blob (in the marianos-scraper container) holding the delivered source package the job runs.')
+-param releaseBlob string = 'releases/marianos-scraper-1.1.9-src.zip'
++param releaseBlob string = 'releases/marianos-scraper-1.1.10-src.zip'
+ 
+ @description('Create the job identity role assignments (needs Owner / User Access Administrator / RBAC Administrator).')
+ param assignRoles bool = false
+--- a/deploy/azure/run_test.sh
++++ b/deploy/azure/run_test.sh
+@@ -4,7 +4,7 @@
+ #
+ #   run_test.sh <sub> <rg> selfcheck         # 0 provider requests: Key Vault credentials present, blob + state write/read
+ #   run_test.sh <sub> <rg> test1             # <= 19 provider requests in total (both stores + probe)
+-#   run_test.sh <sub> <rg> test2             # <= 300 in total (Batteries + Light Bulbs, Crystal Lake, no publish)
++#   run_test.sh <sub> <rg> test2             # <= 300 in total (Batteries + Light Bulbs, Vernon Hills, no publish)
+ #   run_test.sh <sub> <rg> full <cap>        # Test 3: all CSV rows, Crystal Lake, total <= <cap> (client-approved);
+ #                                            # the same command resumes the unfinished run from its checkpoint
+ #   run_test.sh <sub> <rg> stop              # forced interruption of the running execution (kill/resume test)
+--- a/src/mscraper/cli.py
++++ b/src/mscraper/cli.py
+@@ -97,11 +97,11 @@
+ # of them by a persistent TotalBudget, so re-running a test can never exceed its total.
+ BOUNDED_TESTS = {
+     "test1": {"total": 19, "steps": [
+-        ["verify-store", "--location", "marianos-544-crystal-lake", "--max-requests", "2"],
++        ["verify-store", "--location", "marianos-544-crystal-lake", "--max-requests", "2"],  # diagnostic only
+         ["verify-store", "--location", "marianos-502-vernon-hills", "--max-requests", "2"],
+         ["probe", "--location", "marianos-544-crystal-lake", "--query", "Batteries", "--max-requests", "15"]]},
+     "test2": {"total": 300, "steps": [
+-        ["run", "--location", "marianos-544-crystal-lake", "--categories", "Batteries,Light Bulbs",
++        ["run", "--location", "marianos-502-vernon-hills", "--categories", "Batteries,Light Bulbs",
+          "--max-requests", "300", "--no-publish", "--resume"]]},
+ }
+ 
+@@ -262,7 +262,8 @@
+                 print(f"{args.test}: total of {b.total} requests used up – step not started: {' '.join(step)}")
+                 rc = 4
+                 break
+-            print(f"{args.test}: step {i}: {' '.join(step)}  (total used {b.used}/{b.total})", flush=True)
++            label = " [DIAGNOSTIC ONLY; disabled for acceptance]" if "marianos-544-crystal-lake" in step else ""
++            print(f"{args.test}: step {i}: {' '.join(step)}{label}  (total used {b.used}/{b.total})", flush=True)
+             try:
+                 step_rc = main((["--config", args.config] if args.config else []) + ["--log-level", args.log_level,
+                                "--budget", spec] + step)
+--- a/src/mscraper/config.py
++++ b/src/mscraper/config.py
+@@ -58,6 +58,7 @@
+     enabled: bool = True
+     categories: tuple[str, ...] = ()
+     limit_per_category: int = 0
++    expected_modality: str = "IN_STORE"
+ 
+ 
+ @dataclass
+@@ -114,7 +115,8 @@
+             expected_address=str(item.get("expected_address") or ""),
+             canary_query=str(canary.get("query") or ""), canary_upcs=tuple(str(x) for x in canary.get("upcs") or ()),
+             enabled=bool(item.get("enabled", True)), categories=tuple(str(x) for x in item.get("categories") or ()),
+-            limit_per_category=int(item.get("limit_per_category") or 0)))
++            limit_per_category=int(item.get("limit_per_category") or 0),
++            expected_modality=str(item.get("expected_modality") or "IN_STORE").upper()))
+     return out
+ 
+ 
+--- a/src/mscraper/fetch.py
++++ b/src/mscraper/fetch.py
+@@ -301,7 +301,14 @@
+     tpl = settings.get("fetch.oxylabs_realtime.search_payload") if is_search else None
+     if not tpl:
+         tpl = settings.get("fetch.oxylabs_realtime.payload") or {"source": "kroger", "url": "{url}", "store_id": "{store_id}"}
+-    body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode)
++    modality = str(getattr(location, "expected_modality", "IN_STORE") or "IN_STORE").lower()
++    body = _fill(tpl, url=url, query=query, store_id=location.store_id, zipcode=location.zipcode,
++                 modality=modality, fulfillment_type=modality)
++    # Keep the location pin and pickup mode authoritative even when a minimal
++    # customer template omitted either field.
++    if is_search:
++        body.setdefault("store_id", location.store_id)
++        body.setdefault("fulfillment_type", modality)
+     brand = (params.get("brandName") or [""])[0]
+     if is_search and brand:
+         body["brand"] = brand
+--- a/src/mscraper/runner.py
++++ b/src/mscraper/runner.py
+@@ -172,10 +172,10 @@
+         sp, html = box["sp"], res.html
+         sha = self._record_page("store_verification", {"query": q}, url, html, box["state"], sp=sp)
+         st = sp.store
+-        modality = ""
+-        for m in (((box["state"].get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []:
+-            modality = m.get("modalityType") or modality
+-        want_modality = self.s.get("store.expected_modality", "IN_STORE")
++        modalities = (((box["state"].get("calypso") or {}).get("domains") or {}).get("modalityPreferences") or {}).get("modalities") or []
++        want_modality = self.loc.expected_modality
++        returned_modalities = [str(m.get("modalityType") or "").upper() for m in modalities]
++        modality = next((m for m in returned_modalities if m == want_modality), returned_modalities[-1] if returned_modalities else "")
+         price_sources: set[str] = set()
+         priced_from_store = 0
+         for u in sp.upcs:
+--- a/src/mscraper/version.py
++++ b/src/mscraper/version.py
+@@ -6,7 +6,7 @@
+ import sys
+ from pathlib import Path
+ 
+-__version__ = "1.1.9"
++__version__ = "1.1.10"
+ _SRC = Path(__file__).resolve().parent
+ _ROOT = _SRC.parents[1]
+ # release_sha256 covers everything that decides what a deployment does (client review 27 Oct: code_sha256 alone
+--- /dev/null
++++ b/tests/test_v1110_scope.py
+@@ -0,0 +1,38 @@
++"""v1.1.10 acceptance scope: Vernon Hills pickup, Crystal Lake diagnostic only."""
++from pathlib import Path
++
++from mscraper.config import load_settings
++from mscraper.fetch import realtime_payload
++
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def test_enabled_acceptance_location_and_disabled_diagnostic_are_explicit():
++    settings = load_settings(ROOT / "config" / "settings.yaml")
++    vernon = settings.location("marianos-502-vernon-hills")
++    crystal = settings.location("marianos-544-crystal-lake")
++    assert (vernon.enabled, vernon.store_id, vernon.zipcode, vernon.expected_address,
++            vernon.expected_modality) == (True, "53100502", "60061", "1720 N Milwaukee", "PICKUP")
++    assert (crystal.enabled, crystal.store_id, crystal.expected_modality) == (False, "53100544", "IN_STORE")
++
++
++def test_realtime_payload_is_pinned_to_location_store_and_pickup():
++    settings = load_settings(ROOT / "config" / "settings.yaml")
++    location = settings.location("marianos-502-vernon-hills")
++    payload = realtime_payload(settings, location, "https://www.marianos.com/search?query=milk")
++    assert payload["store_id"] == "53100502"
++    assert payload["fulfillment_type"] == "pickup"
++    assert payload["query"] == "milk"
++
++
++def test_bounded_scope_keeps_test1_cap_stop_rule_and_uses_vernon_for_test2():
++    from mscraper import cli
++
++    test1 = cli.BOUNDED_TESTS["test1"]
++    test2 = cli.BOUNDED_TESTS["test2"]
++    assert test1["total"] == 19
++    assert sum(int(s[s.index("--max-requests") + 1]) for s in test1["steps"]) == 19
++    assert test1["steps"][0][test1["steps"][0].index("--location") + 1] == "marianos-544-crystal-lake"
++    assert test2["steps"][0][test2["steps"][0].index("--location") + 1] == "marianos-502-vernon-hills"
++    assert "--no-publish" in test2["steps"][0]
+--- a/tests/test_v112_bounded_tests.py
++++ b/tests/test_v112_bounded_tests.py
+@@ -80,6 +80,7 @@
+     assert sum(caps) == 19
+     t2 = cli.BOUNDED_TESTS["test2"]
+     assert t2["total"] == 300 and "--no-publish" in t2["steps"][0]
++    assert "marianos-502-vernon-hills" in t2["steps"][0]
+ 
+ 
+ def test_crawl_queue_starts_new_requests_without_waiting_for_slow_ones(settings, location, storage, fetcher, tmp_path):
