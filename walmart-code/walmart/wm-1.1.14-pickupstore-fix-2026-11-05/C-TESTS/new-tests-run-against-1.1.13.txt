@@ -1,0 +1,110 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: C:\Users\iZa Computers\AppData\Local\Temp\claude\d--PROJECTS-python-scrappers\69aa6648-d1b0-42b6-ad40-7d376e4d599d\scratchpad\wm113\walmart-scraper
+plugins: anyio-4.15.1, platformdirs-4.13.5
+collecting ... collected 9 items
+
+tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_is_a_conflict[primary0-secondary0] FAILED [ 11%]
+tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_is_a_conflict[primary1-secondary1] FAILED [ 22%]
+tests/test_v114_corrections.py::test_contradicting_third_block_pickup_store_is_a_conflict FAILED [ 33%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks0] PASSED [ 44%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks1] PASSED [ 55%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks2] PASSED [ 66%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks3] PASSED [ 77%]
+tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_fails_the_run FAILED [ 88%]
+tests/test_v114_corrections.py::test_unavailable_identity_kept_with_agreeing_pickup_store_blocks PASSED [100%]
+
+================================== FAILURES ===================================
+_ test_contradicting_secondary_pickup_store_is_a_conflict[primary0-secondary0] _
+
+site = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-318/test_contradicting_secondary_p0/config/settings.yaml')
+primary = {'storeId': '1234', 'intent': 'PICKUP', 'postalCode': '72712', 'pickupStore': '1234'}
+secondary = {'storeId': '1234', 'intent': 'PICKUP', 'postalCode': '72712', 'pickupStore': '9999'}
+
+    @pytest.mark.parametrize("primary,secondary", [
+        ({**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": "9999"}),   # the reviewer's case (100 vs 9999)
+        (BASE, {**BASE, "pickupStore": "9999"}),                                # first block names no pickupStore
+    ])
+    def test_contradicting_secondary_pickup_store_is_a_conflict(site, primary, secondary):
+        got = _location(primary, secondary)
+>       assert [f["pickupStore"] for f in got["conflicts"]] == ["9999"]
+E       AssertionError: assert [] == ['9999']
+E         
+E         Right contains one more item: '9999'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     '9999',
+E         - ]
+
+tests\test_v114_corrections.py:44: AssertionError
+_ test_contradicting_secondary_pickup_store_is_a_conflict[primary1-secondary1] _
+
+site = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-318/test_contradicting_secondary_p1/config/settings.yaml')
+primary = {'storeId': '1234', 'intent': 'PICKUP', 'postalCode': '72712'}
+secondary = {'storeId': '1234', 'intent': 'PICKUP', 'postalCode': '72712', 'pickupStore': '9999'}
+
+    @pytest.mark.parametrize("primary,secondary", [
+        ({**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": "9999"}),   # the reviewer's case (100 vs 9999)
+        (BASE, {**BASE, "pickupStore": "9999"}),                                # first block names no pickupStore
+    ])
+    def test_contradicting_secondary_pickup_store_is_a_conflict(site, primary, secondary):
+        got = _location(primary, secondary)
+>       assert [f["pickupStore"] for f in got["conflicts"]] == ["9999"]
+E       AssertionError: assert [] == ['9999']
+E         
+E         Right contains one more item: '9999'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     '9999',
+E         - ]
+
+tests\test_v114_corrections.py:44: AssertionError
+__________ test_contradicting_third_block_pickup_store_is_a_conflict __________
+
+site = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-318/test_contradicting_third_block0/config/settings.yaml')
+
+    def test_contradicting_third_block_pickup_store_is_a_conflict(site):
+        got = _location({**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": "9999"})
+>       assert [f["path"] for f in got["conflicts"]] == ["initialData.searchResult.pageMetadata.location"]
+E       AssertionError: assert [] == ['initialData...ata.location']
+E         
+E         Right contains one more item: 'initialData.searchResult.pageMetadata.location'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     'initialData.searchResult.pageMetadata.location',
+E         - ]
+
+tests\test_v114_corrections.py:51: AssertionError
+___________ test_contradicting_secondary_pickup_store_fails_the_run ___________
+
+site = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-318/test_contradicting_secondary_p2/config/settings.yaml')
+
+    def test_contradicting_secondary_pickup_store_fails_the_run(site):
+        """Full offline collection: the listing with the contradicting block fails validation and nothing is published."""
+        fx, m = _fixtures(site)
+        p = fx / m[MILK]
+        html = p.read_text(encoding="utf-8")
+        assert LOC in html
+        primary = LOC.replace('"postalCode": "72712"}', f'"postalCode": "72712", "pickupStore": "{c.STORE}"}}')
+        secondary = ('"contentLayout": {"pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP", '
+                     '"postalCode": "72712", "pickupStore": "9999"}}}')
+        p.write_text(html.replace(LOC, f"{secondary}, {primary}"), encoding="utf-8")
+        s, rep, st, _ = _run(site)
+>       assert not rep["validation"]["ok"] and rep["published"] is None and st.get_json("test-store/latest/records.json") is None
+E       assert (not True)
+
+tests\test_v114_corrections.py:78: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  wmscraper.run:runner.py:403 root_id_unresolved
+=========================== short test summary info ===========================
+FAILED tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_is_a_conflict[primary0-secondary0]
+FAILED tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_is_a_conflict[primary1-secondary1]
+FAILED tests/test_v114_corrections.py::test_contradicting_third_block_pickup_store_is_a_conflict
+FAILED tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_fails_the_run
+========================= 4 failed, 5 passed in 2.54s =========================

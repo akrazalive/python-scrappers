@@ -1,0 +1,27 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: C:\Users\iZa Computers\AppData\Local\Temp\claude\d--PROJECTS-python-scrappers\69aa6648-d1b0-42b6-ad40-7d376e4d599d\scratchpad\wm114\walmart-scraper
+plugins: anyio-4.15.1, platformdirs-4.13.5
+collecting ... collected 61 items / 42 deselected / 19 selected
+
+tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_is_a_conflict[primary0-secondary0] PASSED [  5%]
+tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_is_a_conflict[primary1-secondary1] PASSED [ 10%]
+tests/test_v114_corrections.py::test_contradicting_third_block_pickup_store_is_a_conflict PASSED [ 15%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks0] PASSED [ 21%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks1] PASSED [ 26%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks2] PASSED [ 31%]
+tests/test_v114_corrections.py::test_agreeing_pickup_store_blocks_pass[blocks3] PASSED [ 36%]
+tests/test_v114_corrections.py::test_contradicting_secondary_pickup_store_fails_the_run PASSED [ 42%]
+tests/test_v114_corrections.py::test_unavailable_identity_kept_with_agreeing_pickup_store_blocks PASSED [ 47%]
+tests/test_v113_corrections.py::test_search_unsupported_or_invalid_parameters_are_refused[&facet=fulfillment_method%3APickup] PASSED [ 52%]
+tests/test_v113_corrections.py::test_listing_context_requires_store_pickup_and_zip["pageMetadata": {"location": {"storeId": "1234", "postalCode": "72712"}}-intent -] PASSED [ 57%]
+tests/test_v113_corrections.py::test_listing_context_requires_store_pickup_and_zip["pageMetadata": {"location": {"storeId": "1234", "intent": "SHIPPING", "postalCode": "72712"}}-intent SHIPPING] PASSED [ 63%]
+tests/test_v113_corrections.py::test_listing_context_requires_store_pickup_and_zip["pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP"}}-postalCode -] PASSED [ 68%]
+tests/test_v113_corrections.py::test_listing_context_requires_store_pickup_and_zip["pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP", "postalCode": "10001"}}-postalCode 10001] PASSED [ 73%]
+tests/test_v113_corrections.py::test_listing_context_requires_store_pickup_and_zip["pageMetadata": {"location": {"intent": "PICKUP", "postalCode": "72712"}}-storeId -] PASSED [ 78%]
+tests/test_v113_corrections.py::test_listing_context_requires_store_pickup_and_zip["contentLayout": {"pageMetadata": {"location": {"storeId": "9999", "intent": "PICKUP", "postalCode": "72712"}}}, "pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP", "postalCode": "72712"}}-conflicting selected location] PASSED [ 84%]
+tests/test_v113_corrections.py::test_real_listing_location_shape_passes PASSED [ 89%]
+tests/test_v113_corrections.py::test_listing_items_need_store_bound_offer_chain PASSED [ 94%]
+tests/test_v113_corrections.py::test_unavailable_store_item_identity_preserved_in_run PASSED [100%]
+
+====================== 19 passed, 42 deselected in 6.30s ======================

@@ -1,0 +1,328 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: C:\Users\iZa Computers\AppData\Local\Temp\claude\d--PROJECTS-python-scrappers\69aa6648-d1b0-42b6-ad40-7d376e4d599d\scratchpad\ms1110\marianos-scraper
+plugins: anyio-4.15.1, platformdirs-4.13.5
+collecting ... collected 15 items
+
+tests/test_v1111_failed_response.py::test_cli_verify_store_malformed_http200_body_is_preserved_with_receipt FAILED [  6%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[not-json] FAILED [ 13%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[empty] FAILED [ 20%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[truncated-json] FAILED [ 26%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[json-list] FAILED [ 33%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[results-wrong-type] FAILED [ 40%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[non-numeric-status] FAILED [ 46%]
+tests/test_v1111_failed_response.py::test_kroger_adapter_malformed_body_is_archived_without_the_bearer_key FAILED [ 53%]
+tests/test_v1111_failed_response.py::test_valid_envelope_with_unparseable_page_is_archived FAILED [ 60%]
+tests/test_v1111_failed_response.py::test_stored_copy_is_bounded_and_the_original_hash_is_of_the_full_body FAILED [ 66%]
+tests/test_v1111_failed_response.py::test_credentials_and_sensitive_headers_never_reach_the_archive FAILED [ 73%]
+tests/test_v1111_failed_response.py::test_each_retried_attempt_gets_its_own_receipt_and_ledger_line FAILED [ 80%]
+tests/test_v1111_failed_response.py::test_provider_error_bodies_are_archived[400-compat] FAILED [ 86%]
+tests/test_v1111_failed_response.py::test_provider_error_bodies_are_archived[503-http] FAILED [ 93%]
+tests/test_v1111_failed_response.py::test_usable_response_writes_no_failure_receipt PASSED [100%]
+
+================================== FAILURES ===================================
+___ test_cli_verify_store_malformed_http200_body_is_preserved_with_receipt ____
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_cli_verify_store_malforme0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB803AC40>
+
+    def test_cli_verify_store_malformed_http200_body_is_preserved_with_receipt(tmp_path, monkeypatch):
+        monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
+        monkeypatch.setenv("MSCRAPER_FETCH_PROVIDER", "oxylabs_realtime")
+        sent = _mock(monkeypatch, [(200, NOT_JSON)])
+        with pytest.raises(FetchError) as exc:
+            cli.main(["--config", CFG, "--budget", "qual:1", "verify-store", "--location", VERNON, "--max-requests", "1"])
+>       assert exc.value.kind == "malformed" and len(sent) == 1           # one attempt, exactly as before
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ('error' == 'malformed'
+E         
+E         - malformed
+E         + error)
+
+tests\test_v1111_failed_response.py:94: AssertionError
+____ test_unsupported_provider_shapes_are_archived_not_discarded[not-json] ____
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_unsupported_provider_shap0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB803A8B0>
+body = '<html><body>Upstream gateway error. Authorization: Basic dXNlcjpwYXNzd29yZA== token=tok-77aa retry later</body></html>'
+fmt = 'text'
+
+    @pytest.mark.parametrize("body,fmt", [
+        (NOT_JSON, "text"),                                              # not JSON at all
+        ("", "text"),                                                    # empty HTTP-200 body
+        ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
+        ("[1, 2, 3]", "json"),                                           # JSON, but a list
+        ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
+        ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
+    ], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
+    def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
+        _mock(monkeypatch, [(200, body)])
+        runner = _runner(tmp_path)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:126: AssertionError
+_____ test_unsupported_provider_shapes_are_archived_not_discarded[empty] ______
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_unsupported_provider_shap1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB8120EF0>
+body = '', fmt = 'text'
+
+    @pytest.mark.parametrize("body,fmt", [
+        (NOT_JSON, "text"),                                              # not JSON at all
+        ("", "text"),                                                    # empty HTTP-200 body
+        ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
+        ("[1, 2, 3]", "json"),                                           # JSON, but a list
+        ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
+        ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
+    ], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
+    def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
+        _mock(monkeypatch, [(200, body)])
+        runner = _runner(tmp_path)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:126: AssertionError
+_ test_unsupported_provider_shapes_are_archived_not_discarded[truncated-json] _
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_unsupported_provider_shap2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB811CC00>
+body = '{"results": [{"content": "<html>', fmt = 'text'
+
+    @pytest.mark.parametrize("body,fmt", [
+        (NOT_JSON, "text"),                                              # not JSON at all
+        ("", "text"),                                                    # empty HTTP-200 body
+        ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
+        ("[1, 2, 3]", "json"),                                           # JSON, but a list
+        ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
+        ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
+    ], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
+    def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
+        _mock(monkeypatch, [(200, body)])
+        runner = _runner(tmp_path)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:126: AssertionError
+___ test_unsupported_provider_shapes_are_archived_not_discarded[json-list] ____
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_unsupported_provider_shap3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB811D590>
+body = '[1, 2, 3]', fmt = 'json'
+
+    @pytest.mark.parametrize("body,fmt", [
+        (NOT_JSON, "text"),                                              # not JSON at all
+        ("", "text"),                                                    # empty HTTP-200 body
+        ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
+        ("[1, 2, 3]", "json"),                                           # JSON, but a list
+        ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
+        ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
+    ], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
+    def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
+        _mock(monkeypatch, [(200, body)])
+        runner = _runner(tmp_path)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:126: AssertionError
+_ test_unsupported_provider_shapes_are_archived_not_discarded[results-wrong-type] _
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_unsupported_provider_shap4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB8073450>
+body = '{"results": "not-a-list"}', fmt = 'json'
+
+    @pytest.mark.parametrize("body,fmt", [
+        (NOT_JSON, "text"),                                              # not JSON at all
+        ("", "text"),                                                    # empty HTTP-200 body
+        ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
+        ("[1, 2, 3]", "json"),                                           # JSON, but a list
+        ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
+        ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
+    ], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
+    def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
+        _mock(monkeypatch, [(200, body)])
+        runner = _runner(tmp_path)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:126: AssertionError
+_ test_unsupported_provider_shapes_are_archived_not_discarded[non-numeric-status] _
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_unsupported_provider_shap5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB8073050>
+body = '{"results": [{"content": "<html></html>", "status_code": "n/a"}]}'
+fmt = 'json'
+
+    @pytest.mark.parametrize("body,fmt", [
+        (NOT_JSON, "text"),                                              # not JSON at all
+        ("", "text"),                                                    # empty HTTP-200 body
+        ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
+        ("[1, 2, 3]", "json"),                                           # JSON, but a list
+        ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
+        ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
+    ], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
+    def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
+        _mock(monkeypatch, [(200, body)])
+        runner = _runner(tmp_path)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:126: AssertionError
+____ test_kroger_adapter_malformed_body_is_archived_without_the_bearer_key ____
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_kroger_adapter_malformed_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB80166C0>
+
+    def test_kroger_adapter_malformed_body_is_archived_without_the_bearer_key(tmp_path, monkeypatch):
+        _mock(monkeypatch, [(200, NOT_JSON + " " + SECRETS["OXYLABS_WEBAPI_KEY"])])
+        runner = _runner(tmp_path, provider=OxylabsKrogerFetcher)
+>       assert _verify(runner).kind == "malformed"
+E       AssertionError: assert 'error' == 'malformed'
+E         
+E         - malformed
+E         + error
+
+tests\test_v1111_failed_response.py:138: AssertionError
+____________ test_valid_envelope_with_unparseable_page_is_archived ____________
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_valid_envelope_with_unpar0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB7B5B6B0>
+
+    def test_valid_envelope_with_unparseable_page_is_archived(tmp_path, monkeypatch):
+        """The envelope parses but the Mariano's page inside has no application state (PageError in validate)."""
+        envelope = json.dumps({"job_id": "job-42", "results": [{"content": "<html>" + "x" * 2000 + "</html>", "status_code": 200}]})
+        _mock(monkeypatch, [(200, envelope)])
+        runner = _runner(tmp_path)
+        assert _verify(runner).kind == "malformed"
+>       [rec] = _receipts(runner.dir)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_v1111_failed_response.py:150: ValueError
+____ test_stored_copy_is_bounded_and_the_original_hash_is_of_the_full_body ____
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_stored_copy_is_bounded_an0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB81812B0>
+
+    def test_stored_copy_is_bounded_and_the_original_hash_is_of_the_full_body(tmp_path, monkeypatch):
+        big = "<html>" + "y" * 50_000 + "</html>"
+        _mock(monkeypatch, [(200, big)])
+        runner = _runner(tmp_path, max_bytes=4096)
+        _verify(runner)
+>       [rec] = _receipts(runner.dir)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_v1111_failed_response.py:161: ValueError
+_______ test_credentials_and_sensitive_headers_never_reach_the_archive ________
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_credentials_and_sensitive0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB81B8210>
+
+    def test_credentials_and_sensitive_headers_never_reach_the_archive(tmp_path, monkeypatch):
+        envelope = json.dumps({"job": {"id": "job-9", "Authorization": "Basic dXNlcjpwYXNzd29yZA=="},
+                               "results": [{"content": "page token=tok-77aa " + SECRETS["OXYLABS_PASSWORD"],
+                                            "headers": {"Set-Cookie": "sess=abc123", "X-Api-Key": "k-1"},
+                                            "url": f"https://{SECRETS['OXYLABS_USERNAME']}:{SECRETS['OXYLABS_PASSWORD']}@x.io/",
+                                            "status_code": "bad"}]})
+        _mock(monkeypatch, [(200, envelope)])
+        runner = _runner(tmp_path)
+        _verify(runner)
+>       [rec] = _receipts(runner.dir)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_v1111_failed_response.py:175: ValueError
+_______ test_each_retried_attempt_gets_its_own_receipt_and_ledger_line ________
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_each_retried_attempt_gets0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB7C25640>
+
+    def test_each_retried_attempt_gets_its_own_receipt_and_ledger_line(tmp_path, monkeypatch):
+        _mock(monkeypatch, [(200, NOT_JSON), (200, "[]")])
+        runner = _runner(tmp_path)
+        _verify(runner, retries=1)
+        recs = _receipts(runner.dir)
+>       assert [(r["attempt"], r["request_seq"]) for r in recs] == [(1, 1), (2, 2)]
+E       AssertionError: assert [] == [(1, 1), (2, 2)]
+E         
+E         Right contains 2 more items, first extra item: (1, 1)
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     (...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests\test_v1111_failed_response.py:189: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"ts": "2026-11-05T03:38:12+00:00", "level": "INFO", "logger": "mscraper.fetch", "event": "retry", "url": "https://www.marianos.com/search?query=milk&searchType=default_search", "attempt": 1, "error": "Expecting value: line 1 column 1 (char 0)", "sleep": 0}
+------------------------------ Captured log call ------------------------------
+INFO     mscraper.fetch:fetch.py:158 retry
+_____________ test_provider_error_bodies_are_archived[400-compat] _____________
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_provider_error_bodies_are0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB808F050>
+status = 400, kind = 'compat'
+
+    @pytest.mark.parametrize("status,kind", [(400, "compat"), (503, "http")])
+    def test_provider_error_bodies_are_archived(tmp_path, monkeypatch, status, kind):
+        _mock(monkeypatch, [(status, '{"message": "source not available for this account"}')])
+        runner = _runner(tmp_path)
+        assert _verify(runner).kind == kind
+>       [rec] = _receipts(runner.dir)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_v1111_failed_response.py:198: ValueError
+______________ test_provider_error_bodies_are_archived[503-http] ______________
+
+tmp_path = WindowsPath('C:/Users/iZa Computers/AppData/Local/Temp/pytest-of-iZa Computers/pytest-322/test_provider_error_bodies_are1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001AFB808F1D0>
+status = 503, kind = 'http'
+
+    @pytest.mark.parametrize("status,kind", [(400, "compat"), (503, "http")])
+    def test_provider_error_bodies_are_archived(tmp_path, monkeypatch, status, kind):
+        _mock(monkeypatch, [(status, '{"message": "source not available for this account"}')])
+        runner = _runner(tmp_path)
+        assert _verify(runner).kind == kind
+>       [rec] = _receipts(runner.dir)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests\test_v1111_failed_response.py:198: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_v1111_failed_response.py::test_cli_verify_store_malformed_http200_body_is_preserved_with_receipt
+FAILED tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[not-json]
+FAILED tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[empty]
+FAILED tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[truncated-json]
+FAILED tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[json-list]
+FAILED tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[results-wrong-type]
+FAILED tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[non-numeric-status]
+FAILED tests/test_v1111_failed_response.py::test_kroger_adapter_malformed_body_is_archived_without_the_bearer_key
+FAILED tests/test_v1111_failed_response.py::test_valid_envelope_with_unparseable_page_is_archived
+FAILED tests/test_v1111_failed_response.py::test_stored_copy_is_bounded_and_the_original_hash_is_of_the_full_body
+FAILED tests/test_v1111_failed_response.py::test_credentials_and_sensitive_headers_never_reach_the_archive
+FAILED tests/test_v1111_failed_response.py::test_each_retried_attempt_gets_its_own_receipt_and_ledger_line
+FAILED tests/test_v1111_failed_response.py::test_provider_error_bodies_are_archived[400-compat]
+FAILED tests/test_v1111_failed_response.py::test_provider_error_bodies_are_archived[503-http]
+======================== 14 failed, 1 passed in 2.20s =========================

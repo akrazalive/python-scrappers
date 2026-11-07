@@ -1,0 +1,756 @@
+Changed files 1.1.13 -> 1.1.14 (copied byte-for-byte from the 1.1.14 ZIP; line numbers start at 1)
+
+====================================================================================================
+FILE   docs/CHANGES.md
+SHA256 905d56c3c2660a17146ac74deeefbaf5f175390f97c737f7accf34e93926fd9f
+STATUS modified
+====================================================================================================
+    1  # Changes
+    2  
+    3  ## 1.1.14 (2026-11-05) - pickupStore checked on every selected-location block
+    4  
+    5  Client review of 1.1.13. Offline only: no Oxylabs request, no Azure deployment, no budget change (probe stays 3 of 10).
+    6  `parse/walmart.page_location` compared secondary location blocks on `storeId`, intent and `postalCode` only, so a
+    7  secondary block naming another `pickupStore` (primary 100, secondary 9999) produced no conflict and
+    8  `Run.context_problems` returned no error. Every block's `pickupStore` is now compared with the page's pickup store
+    9  (the first block's `pickupStore`, or its selected `storeId` when it names none); a disagreeing block is a conflict and
+   10  fails the listing's store context. Eligible unavailable store items are still kept with their identity.
+   11  Tests: `tests/test_v114_corrections.py` (9 cases). Full suite 145 passed.
+   12  
+   13  ## 1.1.13 (2026-11-04) - corrections from the client's static review of 1.1.12
+   14  
+   15  Offline only: no Oxylabs request, no Azure deployment, no budget change (probe budget stays 3 of 10).
+   16  Tests: `tests/test_v113_corrections.py` (52 cases) + `test_detection.py::test_no_offer_collection_for_walmart`;
+   17  the 6 deal-classification tests are removed with `parse/deals.py`. Full suite 136 passed.
+   18  1. **Search route keeps page and filters** (`fetch/base.search_payload`). `/search` URLs map `page` -> `start_page`
+   19     and `min_price` / `max_price` -> the same payload keys, whole numbers only (`fetch.oxylabs.search_params`), as in
+   20     Oxylabs' Walmart search parameter table (checked 2026-11-04; it lists no `pages` and no `delivery_zip`).
+   21     Any other parameter (facet, sort, cat_id, a different `stores`, an invalid or fractional value) is refused as terminal `compat`,
+   22     never dropped. A listing page with exactly the previous page's products fails the listing ("pagination not
+   23     honoured") so a repeated page one is never counted as traversal. Category browsing stays on `/browse` and does
+   24     not use this helper. The route itself is still PROPOSED and not run.
+   25  2. **Walmart offer fields always empty; no offer collection.** `runner._record` no longer calls `deals.classify`;
+   26     `parse/deals.py`, the promotion-text parsing, the offer census and the deal examples in `report.json` are removed. `Record` and
+   27     `models.enforce_empty_fields` (applied in `Run.finish` to fresh and carried-forward records) blank all four
+   28     volume/digital fields. `validate_record_contract` fails a run if any of them is non-empty.
+   29  3. **Whole-token listing prices** (`parse/text.listing_price`). Listing `current_price` / `was_price` are validated
+   30     before normalisation, so "Only 2 left", "Save $2", "2 for $5", ranges, zero, NaN and negatives give `""`
+   31     (identity kept, price never invented; `price_rejected` event). The validator also requires prices > 0.
+   32  4. **Listing context and offer chain.** `_check_context` now requires the selected `storeId` (and `pickupStore` when
+   33     present), intent PICKUP and the configured ZIP, each present, and no other location block on the page that
+   34     disagrees. Items need a store-bound offer: not in Walmart's shipping stack, no other store in the fulfillment
+   35     summary, and a summary entry for this store, unless the store item is unavailable (identity kept).
+   36  5. **Fixture packaged.** `walmart-500-demo.json` is now in the source ZIP. It is an existing offline fixture, not a
+   37     genuine 500-product demonstration.
+   38  
+   39  ## 1.1.9 (2026-10-29) – lease safety and target refusal evidence
+   40  
+   41  1. The lease is checked again after pacing immediately before budget reservation and the provider send; a lost lease
+   42     raises terminal `lock` and makes zero provider calls.
+   43  2. Target HTTP 401/403 responses inside provider results are terminal `refused` errors and are archived with raw body,
+   44     SHA-256, and returned store context. Provider 401/403 remain `auth`; 503 remains retryable.
+   45  3. The Classic probe remains limited to `walmart_product` canaries. The listing route is unresolved; `walmart_search`
+   46     is a separate later evaluation and is not claimed to work.
+   47  
+   48  ## 1.1.8 (2026-10-28) – client review of 28 Oct (budget safety, canary rules, fulfillment, evidence, --categories)
+   49  
+   50  Offline only; no live or Azure request. Tests: `tests/test_v118_safety.py` (22 new, 71 in total).
+   51  1. **Budget: exclusive and atomic** (`budget.py`, `lock.py`, `storage.py`). A budget is used only while the process
+   52     holds the live lock (one Blob lease for every request path: `run`, `run-all`, `verify-store`). An overlapping
+   53     execution exits 3 before any request. Every reservation re-reads the state with its ETag and writes it
+   54     conditionally (If-Match / create-if-absent), so a second holder can never also reserve. The ledger line is
+   55     written before the counter. A deleted state next to an existing ledger, an invalid state, used > total, or a
+   56     ledger shorter than `used` all fail closed. They never reset to 0. The existing `probe` budget (3 of 10) keeps
+   57     its identity and 7 remaining. Ledger chunks of 200 lines keep each write bounded.
+   58  2. **Canary stops at the first failure** (`runner.canary`). The first failing item raises a store error, and later
+   59     canary items are not requested. `verify-store` returns non-zero unless the store and every canary pass (the
+   60     unconditional success return is removed). Provider 401/403 (auth) and 400/404/422 (compatibility) are terminal
+   61     and never retried. 429/5xx/timeouts/challenges stay retryable. Real adapters refuse to start without the live
+   62     lock.
+   63  3. **Fulfillment and price verified, not only a store id** (`runner.canary_problems`). All of these come from the
+   64     returned product: `location.pickupLocation.storeId` = store, `location.storeIds` contains it,
+   65     `location.intent` = PICKUP, a PICKUP option for the store in `fulfillmentSummary`, `fulfillmentType` = STORE
+   66     (store-sourced offer), a current price > 0, and a matching postal code.
+   67  4. **Every canary response archived before validation**, including failures (`_archive(..., always=True)`): raw
+   68     gzip, SHA-256 and the returned store/fulfillment context in `raw/index.json`.
+   69  5. **`--categories` fixed** (`cli.cmd_run`): regression tests run the exact README command (`--categories "Food,Pets" --limit 600`) against the delivered config, and the demo form on the test site.
+   70  6. **Lease loss** stops requests, checkpoint commits/uploads and every publication step (`lock.check_active`).
+   71  7. **Proposed Classic product payload** (`config/settings.yaml` `fetch.oxylabs.product_payload`, NOT yet approved
+   72     or run): documented source `walmart_product` with `product_id`, `store_id`, `delivery_zip`,
+   73     `fulfillment_type: pickup`. All other pages keep the `universal` payload. Delete the block to revert.
+   74  
+   75  ## 1.1.7 (2026-10-27) – persistent request ledger and zero-request selfcheck
+   76  
+   77  1. **Persistent total request budget** (`src/wmscraper/budget.py`, hooked into `fetch/base.py`): `--budget NAME:TOTAL`
+   78     (or `WMSCRAPER_BUDGET`). Every provider attempt, retries included, is counted and saved in the run storage
+   79     (Azure: `_budgets/<name>.json` in the walmart-scraper container) BEFORE it is sent, with one ledger line per
+   80     request (`_budgets/<name>.jsonl`: time, n, command, store, URL). The total holds across retries, restarts and
+   81     repeated executions, and cannot be raised under the same name.
+   82  2. `run_test.sh probe` runs `--budget probe:10 verify-store … --max-requests 10`; `run_test.sh run <name> <cap>`
+   83     puts any approved run under a persistent total; `run_test.sh budget <name>` shows used / remaining.
+   84  3. **`selfcheck`**: credentials present (names only) + test-blob write/read-back with the managed identity, 0 provider
+   85     requests. `budget-status --name <name>`.
+   86  4. Log Analytics daily cap (0.03 GB) in the template, so redeploying cannot reset it.
+   87  5. Tests: 2 new offline tests (probe repeated three times never exceeds its total; retries count, a restarted process
+   88     is refused, a cap cannot be raised); 49 in total. Collection, parsing, validation and publication are unchanged.
+   89  
+   90  ## 1.1.6 (2026-10-26) – Azure: infrastructure first, manual only, scoped roles
+   91  
+   92  Deployment and CLI only. Collection, parsing, validation and publication logic are unchanged from 1.1.5
+   93  (`src/wmscraper/runner.py`, `parse/`, `validate.py`, `fetch/` identical); no live requests were made.
+   94  
+   95  1. **Two-phase deployment into the existing resource group** (`deploy/azure/main.bicep`, `deploy.sh`):
+   96     phase `infra` creates Log Analytics, Storage, an empty Key Vault, the managed identity and the Container Apps
+   97     environment – no job, no schedule, no Oxylabs credential. Phase `job` adds the job after the client has stored
+   98     the credential and applied the roles.
+   99  2. **No role assignments by the developer**: `assignRoles=false` by default (resource-group Contributor cannot
+  100     assign roles). Phase `infra` writes `HANDOVER-azure-ids.txt` (vault name, id and URI, secret name(s), identity
+  101     principal/object id, client id, resource id, storage container id) and `admin-role-commands.sh` with the two
+  102     scoped assignments: Storage Blob Data Contributor on the `walmart-scraper` **container**, Key Vault Secrets User
+  103     on the vault.
+  104  3. **No container registry, no AcrPull**: the ACR resource and its role are removed; the job runs the versioned
+  105     source ZIP on the public Python image (as before).
+  106  4. **Manual only**: trigger Manual unless `SCHEDULE=on`; default command `status`; `replicaRetryLimit` 0 so an
+  107     execution can never exceed its request cap through automatic restarts.
+  108  5. **No credentials through the deployment**: the `@secure()` credential parameters were removed; only the client
+  109     writes secrets into the vault. The provider (`oxylabs_webapi` API key or `oxylabs` API user) is chosen at
+  110     deployment (`PROVIDER=`, sets `WMSCRAPER_FETCH_PROVIDER`).
+  111  6. **CLI**: `status` (version, source hash, provider, credential present yes/no by name only, storage reachable;
+  112     0 provider requests); `verify-store --max-requests N` (cap includes retries).
+  113  7. **`deploy/azure/run_test.sh`** (check / probe ≤ 10 / run with a cap / stop / status / collect) replaces
+  114     `collect_evidence.sh`; refuses to start unless the job is Manual; storage read with the account key, so the
+  115     developer needs no data-plane role. `deploy/azure/preflight.sh` added (read-only access check).
+  116  8. Tests: `tests/test_azure_manual.py` (4 offline tests; 47 in total).
+
+====================================================================================================
+FILE   src/wmscraper/__init__.py
+SHA256 47243db617f256a01797c83603534ced18d4d937ae1974f5643db6698127930d
+STATUS modified
+====================================================================================================
+    1  """Walmart location-specific product scraper for Microsoft Azure."""
+    2  
+    3  __version__ = "1.1.14"
+
+====================================================================================================
+FILE   src/wmscraper/parse/walmart.py
+SHA256 0bbed7b13505c25970356d7dbbb54776fc40c0b7cf81057fc63b53b4ba4a19e0
+STATUS modified
+====================================================================================================
+    1  """Parsing of Walmart pages via the embedded __NEXT_DATA__ JSON.
+    2  
+    3  Walmart renders listing, product and store pages with Next.js and embeds the full page
+    4  state as JSON. Reading that JSON is far more reliable than CSS selectors. Every parser
+    5  validates the response shape and raises ShapeError instead of silently returning nothing,
+    6  so a changed or blocked page can never be mistaken for an empty category.
+    7  """
+    8  from __future__ import annotations
+    9  
+   10  import json
+   11  import re
+   12  from collections import deque
+   13  from dataclasses import dataclass, field
+   14  from typing import Any, Iterator
+   15  from urllib.parse import urljoin
+   16  
+   17  from .text import clean_text, format_price
+   18  
+   19  BASE = "https://www.walmart.com"
+   20  WALMART_SELLER_IDS = {"F55CDC31AB754BB68FE0B39041159D63"}
+   21  WALMART_SELLER_NAMES = {"walmart.com", "walmart", "walmart inc", "walmart inc."}
+   22  
+   23  _NEXT_RE = re.compile(r'<script[^>]+id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S)
+   24  def product_url(url: str) -> str:
+   25      """Clean product URL: Walmart appends listing filters / tracking (?filters=...&classType=...) to canonical links."""
+   26      return (url or "").split("#")[0].split("?")[0] if "/ip/" in (url or "") else (url or "")
+   27  
+   28  
+   29  _CHALLENGE_MARKERS = ("Robot or human", "px-captcha", "/blocked?url=", "Access Denied", "verify you are a human")
+   30  _STORE_KEYS = {"storeId", "assortmentStoreId", "preferredStoreId", "pickupStoreId", "intentStoreId", "accessPointStoreId"}
+   31  
+   32  
+   33  class ShapeError(Exception):
+   34      """The response did not have the expected structure (layout change, partial page, etc.)."""
+   35  
+   36  
+   37  class ChallengeError(Exception):
+   38      """The response is a bot challenge / block page."""
+   39  
+   40  
+   41  # ----------------------------------------------------------------------------- helpers
+   42  def detect_challenge(html: str, final_url: str = "") -> bool:
+   43      head = html[:20000]
+   44      return "/blocked" in final_url or any(m in head for m in _CHALLENGE_MARKERS)
+   45  
+   46  
+   47  def next_data(html: str, final_url: str = "") -> dict:
+   48      if detect_challenge(html, final_url):
+   49          raise ChallengeError(f"bot challenge served for {final_url or 'page'}")
+   50      m = _NEXT_RE.search(html)
+   51      if not m:
+   52          raise ShapeError("__NEXT_DATA__ not found")
+   53      try:
+   54          return json.loads(m.group(1))
+   55      except json.JSONDecodeError as exc:
+   56          raise ShapeError(f"__NEXT_DATA__ is not valid JSON: {exc}") from exc
+   57  
+   58  
+   59  def walk(node: Any) -> Iterator[Any]:
+   60      """Breadth-first walk that preserves document order."""
+   61      queue = deque([node])
+   62      while queue:
+   63          cur = queue.popleft()
+   64          yield cur
+   65          if isinstance(cur, dict):
+   66              queue.extend(cur.values())
+   67          elif isinstance(cur, list):
+   68              queue.extend(cur)
+   69  
+   70  
+   71  def dig(node: Any, *path, default=None):
+   72      for p in path:
+   73          if isinstance(node, dict) and p in node:
+   74              node = node[p]
+   75          elif isinstance(node, list) and isinstance(p, int) and -len(node) <= p < len(node):
+   76              node = node[p]
+   77          else:
+   78              return default
+   79      return node
+   80  
+   81  
+   82  def _price_string(v) -> str:
+   83      if isinstance(v, dict):
+   84          return v.get("priceString") or v.get("priceDisplay") or (str(v["price"]) if v.get("price") is not None else "")
+   85      return v or ""
+   86  
+   87  
+   88  def store_ids_in(data: Any) -> set[str]:
+   89      """All store identifiers present in the page's location/fulfillment context."""
+   90      found: set[str] = set()
+   91      for node in walk(data):
+   92          if isinstance(node, dict):
+   93              for k in _STORE_KEYS:
+   94                  v = node.get(k)
+   95                  if isinstance(v, (str, int)) and str(v).isdigit():
+   96                      found.add(str(v))
+   97              ids = node.get("storeIds")
+   98              if isinstance(ids, list):
+   99                  found.update(str(x) for x in ids if str(x).isdigit())
+  100      return found
+  101  
+  102  
+  103  _CONTEXT_KEYS = _STORE_KEYS | {"storeIds", "intent", "fulfillmentIntent", "postalCode", "zipCode", "fulfillment",
+  104                                 "fulfillmentType", "accessPointId", "storeName", "displayName"}
+  105  
+  106  
+  107  def store_context_excerpt(data: Any, limit: int = 40) -> list[dict]:
+  108      """JSON paths + values of every store / pickup / postal-code field in a page (evidence of context)."""
+  109      out: list[dict] = []
+  110      queue = deque([("$", data)])
+  111      while queue and len(out) < limit:
+  112          path, node = queue.popleft()
+  113          if isinstance(node, dict):
+  114              for k, v in node.items():
+  115                  p = f"{path}.{k}"
+  116                  if k in _CONTEXT_KEYS and isinstance(v, (str, int, list)) and v not in ("", [], None):
+  117                      out.append({"path": p, "value": v if not isinstance(v, list) else v[:10]})
+  118                  if isinstance(v, (dict, list)):
+  119                      queue.append((p, v))
+  120          elif isinstance(node, list):
+  121              for i, v in enumerate(node[:200]):
+  122                  if isinstance(v, (dict, list)):
+  123                      queue.append((f"{path}[{i}]", v))
+  124      return out
+  125  
+  126  
+  127  def page_location(data: Any) -> dict:
+  128      """The page's SELECTED location (explicit path, not 'a store id anywhere in the response')."""
+  129      initial = dig(data, "props", "pageProps", "initialData") or {}
+  130      found = []
+  131      for path in (("pageMetadata", "location"), ("contentLayout", "pageMetadata", "location"),
+  132                   ("searchResult", "pageMetadata", "location"), ("data", "contentLayout", "pageMetadata", "location")):
+  133          loc = dig(initial, *path)
+  134          if isinstance(loc, dict) and loc.get("storeId"):
+  135              found.append({"storeId": str(loc.get("storeId")), "intent": clean_text(loc.get("intent")),
+  136                            "postalCode": clean_text(loc.get("postalCode")),
+  137                            "pickupStore": str(loc.get("pickupStore") or ""), "path": "initialData." + ".".join(path)})
+  138      if not found:
+  139          return {}
+  140      out = dict(found[0])
+  141      # every selected-location block on the page must agree (store, intent, ZIP, pickup store); otherwise the context
+  142      # is conflicting. A pickupStore on any block must be the page's pickup store, or its selected storeId when the
+  143      # first block names none, so a secondary block cannot point Pickup at another store unnoticed.
+  144      keys = ("storeId", "intent", "postalCode")
+  145      pickup = out["pickupStore"] or out["storeId"]
+  146      out["conflicts"] = [f for f in found[1:] if any(f[k] and out[k] and f[k] != out[k] for k in keys)
+  147                          or (f["pickupStore"] and f["pickupStore"] != pickup)]
+  148      return out
+  149  
+  150  
+  151  # ----------------------------------------------------------------------------- listing
+  152  @dataclass
+  153  class ListingItem:
+  154      item_id: str
+  155      title: str
+  156      url: str
+  157      image_url: str
+  158      brand: str
+  159      current_price: str
+  160      was_price: str
+  161      ppm: str
+  162      seller_name: str
+  163      seller_id: str
+  164      sponsored: bool
+  165      fulfillment_texts: list[str]
+  166      upc: str = ""
+  167      raw: dict = field(default_factory=dict, repr=False)
+  168      pickup_store_ids: set = field(default_factory=set)   # stores offering PICKUP / IN_STORE for this item
+  169      secondary_stack: bool = False                         # Walmart's "not at this store, ships instead" group
+  170      approx_weight: bool = False                           # sold by average / variable weight
+  171      fulfillment_type: str = ""                            # STORE | FC | MARKETPLACE
+  172      availability_value: str = ""                          # Walmart availabilityStatusV2.value, e.g. OUT_OF_STOCK
+  173      store_ids_any: set = field(default_factory=set)       # every store id in the item's fulfillment summary
+  174  
+  175      def availability(self, store_id: str) -> str:
+  176          """Availability at the configured store, for the availability log (never used to drop a product)."""
+  177          if self.is_store_item(store_id):
+  178              if self.availability_value and self.availability_value != "IN_STOCK":
+  179                  return "out_of_stock"
+  180              return "available" if store_id in self.pickup_store_ids else "unavailable_for_pickup"
+  181          return "shipping_only_not_sold_at_store"
+  182  
+  183      def is_store_item(self, store_id: str) -> bool:
+  184          """The selected store's own offer (store assortment, store price), checked explicitly on THIS item:
+  185          Walmart fulfillmentType STORE and, when the item carries a fulfillment summary, an entry for this store.
+  186          A temporarily out-of-stock store item has no summary but stays a store offer."""
+  187          if self.fulfillment_type.upper() != "STORE" or self.is_marketplace:
+  188              return False
+  189          if self.store_ids_any:
+  190              return store_id in self.store_ids_any
+  191          return True
+  192  
+  193      def store_offer_problem(self, store_id: str) -> str:
+  194          """'' when this store item's price is bound to the selected store's own offer: not in Walmart's shipping
+  195          stack, no other store in its fulfillment summary, and either a summary entry for this store or an
+  196          unavailable store item (Walmart drops the summary when out of stock - identity kept, never dropped)."""
+  197          if self.secondary_stack:
+  198              return "shipping_context_not_store_offer"
+  199          if self.store_ids_any - {store_id}:
+  200              return "conflicting_store_offer"
+  201          if not self.store_ids_any and self.availability_value in ("", "IN_STOCK"):
+  202              return "store_offer_unbound"
+  203          return ""
+  204  
+  205      @property
+  206      def is_marketplace(self) -> bool:
+  207          if self.seller_id and self.seller_id.upper() in WALMART_SELLER_IDS:
+  208              return False
+  209          if self.seller_name and self.seller_name.lower() in WALMART_SELLER_NAMES:
+  210              return False
+  211          return bool(self.seller_id or self.seller_name)
+  212  
+  213      @property
+  214      def has_local_fulfillment(self) -> bool:
+  215          if self.secondary_stack:
+  216              return False
+  217          if self.pickup_store_ids:
+  218              return True
+  219          text = " ".join(self.fulfillment_texts).lower()
+  220          return any(k in text for k in ("pickup", "in-store", "in store", "aisle"))
+  221  
+  222      def local_at(self, store_id: str) -> bool:
+  223          """Item offered for pickup / in-store at the given store (per-item store verification)."""
+  224          if self.pickup_store_ids:
+  225              return store_id in self.pickup_store_ids and not self.secondary_stack
+  226          return self.has_local_fulfillment
+  227  
+  228  
+  229  @dataclass
+  230  class ListingPage:
+  231      items: list[ListingItem]
+  232      max_page: int
+  233      total_count: int
+  234      store_ids: set[str]
+  235      subcategory_links: list[tuple[str, str]]  # (name, absolute url)
+  236      children: list[tuple[str, str]] = field(default_factory=list)  # Departments facet: (name, category id)
+  237      location: dict = field(default_factory=dict)                    # the page's selected store context
+  238  
+  239  
+  240  def _texts(node: Any) -> list[str]:
+  241      out = []
+  242      for n in walk(node):
+  243          if isinstance(n, dict):
+  244              for key in ("text", "slaText", "label", "message", "displayText", "description"):
+  245                  v = n.get(key)
+  246                  if isinstance(v, str) and v.strip():
+  247                      out.append(clean_text(v))
+  248              content = n.get("content")
+  249              if isinstance(content, list):  # Walmart badge members: [{type: TEXT, value: ...}]
+  250                  t = " ".join(c.get("value") or "" for c in content if isinstance(c, dict) and c.get("type") == "TEXT")
+  251                  if t.strip():
+  252                      out.append(clean_text(t))
+  253      return out
+  254  
+  255  
+  256  def _price_lines(d: dict) -> dict[str, str]:
+  257      """Walmart priceInfo.priceDetails.priceLines -> CURRENT_PRICE, DISCOUNTED_PRICE, WAS_PRICE, UNIT_PRICE."""
+  258      out: dict[str, str] = {}
+  259      for pl in dig(d, "priceInfo", "priceDetails", "priceLines") or []:
+  260          if not isinstance(pl, dict):
+  261              continue
+  262          vals = {v.get("key"): v.get("value") for v in pl.get("values") or [] if isinstance(v, dict)}
+  263          lt = pl.get("lineType")
+  264          if lt in ("CURRENT_PRICE", "DISCOUNTED_PRICE") and vals.get("PRICE"):
+  265              out[lt] = str(vals["PRICE"])
+  266          elif lt == "COMPARISON" and vals.get("WAS_PRICE"):
+  267              out["WAS_PRICE"] = str(vals["WAS_PRICE"])
+  268          elif lt == "UNIT_PRICE" and vals.get("UNIT_PRICE"):
+  269              out["UNIT_PRICE"] = str(vals["UNIT_PRICE"])
+  270      return out
+  271  
+  272  
+  273  def _item_from(d: dict) -> ListingItem | None:
+  274      item_id = str(d.get("usItemId") or d.get("id") or "")
+  275      title = clean_text(d.get("name"))
+  276      if not item_id or not title:
+  277          return None
+  278      pi = d.get("priceInfo") or {}
+  279      lines = _price_lines(d)
+  280      current = (lines.get("DISCOUNTED_PRICE") or lines.get("CURRENT_PRICE")
+  281                 or _price_string(pi.get("linePrice") or pi.get("currentPrice") or pi.get("itemPrice") or d.get("price")))
+  282      was = lines.get("WAS_PRICE") or _price_string(pi.get("wasPrice"))
+  283      ppm = lines.get("UNIT_PRICE") or _price_string(pi.get("unitPrice"))
+  284      image = dig(d, "imageInfo", "thumbnailUrl") or d.get("image") or ""
+  285      if isinstance(image, dict):
+  286          image = image.get("url", "")
+  287      fulfil = _texts(d.get("fulfillmentBadgeGroups") or []) + _texts(d.get("fulfillmentBadges") or [])
+  288      if isinstance(d.get("fulfillmentBadge"), str):
+  289          fulfil.append(clean_text(d["fulfillmentBadge"]))
+  290      pickup_stores = set()
+  291      for fs in d.get("fulfillmentSummary") or []:
+  292          if not isinstance(fs, dict):
+  293              continue
+  294          kind = str(fs.get("fulfillment", "")).upper()
+  295          if kind:
+  296              fulfil.append(kind)
+  297          if kind in ("PICKUP", "IN_STORE", "INSTORE") and fs.get("storeId"):
+  298              pickup_stores.add(str(fs["storeId"]))
+  299      badge_texts = _texts((d.get("badges") or {}).get("groupsV2") or [])
+  300      fulfil += [t for t in badge_texts if any(k in t.lower() for k in ("pickup", "shipping", "delivery", "in store", "in-store"))]
+  301      return ListingItem(
+  302          item_id=item_id,
+  303          title=title,
+  304          url=product_url(urljoin(BASE, d.get("canonicalUrl") or d.get("productPageUrl") or f"/ip/{item_id}")),
+  305          image_url=str(image or ""),
+  306          brand=clean_text(d.get("brand")),
+  307          current_price=current,
+  308          was_price=was,
+  309          ppm=clean_text(ppm),
+  310          seller_name=clean_text(d.get("sellerName")),
+  311          seller_id=clean_text(d.get("sellerId")),
+  312          sponsored=bool(d.get("isSponsoredFlag") or d.get("sponsoredProduct") or d.get("isSponsored")),
+  313          fulfillment_texts=fulfil,
+  314          upc=clean_text(d.get("upc")),
+  315          raw=d,
+  316          pickup_store_ids=pickup_stores,
+  317          approx_weight=d.get("averageWeight") not in (None, "", 0) or str(d.get("salesUnit", "")).upper() == "WEIGHT",
+  318          fulfillment_type=clean_text(d.get("fulfillmentType")),
+  319          availability_value=clean_text((d.get("availabilityStatusV2") or {}).get("value") or d.get("availabilityStatus")),
+  320          store_ids_any={str(fs["storeId"]) for fs in d.get("fulfillmentSummary") or []
+  321                         if isinstance(fs, dict) and fs.get("storeId") and str(fs["storeId"]) != "0"},
+  322      )
+  323  
+  324  
+  325  def parse_listing(html: str, final_url: str = "") -> ListingPage:
+  326      data = next_data(html, final_url)
+  327      initial = dig(data, "props", "pageProps", "initialData") or {}
+  328      sr = initial.get("searchResult") or dig(initial, "contentLayout", "searchResult")
+  329      if not isinstance(sr, dict):
+  330          raise ShapeError("searchResult missing from listing page")
+  331      stacks = sr.get("itemStacks")
+  332      if not isinstance(stacks, list):
+  333          raise ShapeError("itemStacks missing from searchResult")
+  334      items = []
+  335      for stack in stacks:
+  336          secondary = _is_secondary_stack(stack)
+  337          for raw in stack.get("items") or []:
+  338              if isinstance(raw, dict) and raw.get("__typename", "Product") == "Product":
+  339                  it = _item_from(raw)
+  340                  if it:
+  341                      it.secondary_stack = secondary
+  342                      items.append(it)
+  343      pag = sr.get("paginationV2") or sr.get("pagination") or {}
+  344      max_page = int(pag.get("maxPage") or pag.get("totalPages") or 1)
+  345      total = int(sr.get("aggregatedCount") or sr.get("count") or len(items))
+  346      return ListingPage(items=items, max_page=max_page, total_count=total,
+  347                         store_ids=store_ids_in(data), subcategory_links=discover_links(data, html),
+  348                         children=department_children(data), location=page_location(data))
+  349  
+  350  
+  351  def _is_secondary_stack(stack: dict) -> bool:
+  352      """Walmart appends a secondary stack (sub_type puShipFul: not available at this store, ships instead)."""
+  353      meta = stack.get("meta") or {}
+  354      if str(meta.get("fulfillmentIntent", "")).lower() == "shipping":
+  355          return True
+  356      try:
+  357          interp = (json.loads(meta.get("beacon") or "{}").get("interpretations") or [{}])[0]
+  358      except (ValueError, TypeError, AttributeError):
+  359          return False
+  360      return interp.get("type") == "secondary_stack"
+  361  
+  362  
+  363  def department_children(data: Any) -> list[tuple[str, str]]:
+  364      """(name, category id) pairs from the listing's Departments navigation facet."""
+  365      out, seen = [], set()
+  366      for n in walk(data):
+  367          if isinstance(n, dict) and n.get("name") == "Departments" and isinstance(n.get("values"), list):
+  368              for v in n["values"]:
+  369                  if isinstance(v, dict) and v.get("id") and v.get("name") and v["id"] not in seen:
+  370                      seen.add(v["id"])
+  371                      out.append((clean_text(v["name"]), str(v["id"])))
+  372      return out
+  373  
+  374  
+  375  # ----------------------------------------------------------------------------- navigation
+  376  _BROWSE_HREF = re.compile(r'href="(/browse/[^"?#]+/(\d+(?:_\d+)+))[^"]*"[^>]*>(.*?)</a>', re.S)
+  377  
+  378  
+  379  def discover_links(data: Any, html: str = "") -> list[tuple[str, str]]:
+  380      """Collect (name, url) pairs for /browse/ category links on a category or listing page."""
+  381      seen, out = set(), []
+  382      for node in walk(data):
+  383          if not isinstance(node, dict):
+  384              continue
+  385          url = node.get("url")
+  386          if not isinstance(url, str) and isinstance(node.get("clickThrough"), dict):
+  387              url = node["clickThrough"].get("value")
+  388          name =node.get("name") or node.get("title") or node.get("text") or node.get("displayName")
+  389          if isinstance(url, str) and "/browse/" in url and isinstance(name, str):
+  390              path = url.split("?")[0]
+  391              if path not in seen:
+  392                  seen.add(path)
+  393                  out.append((clean_text(name), urljoin(BASE, path)))
+  394      for href, _id, label in _BROWSE_HREF.findall(html or ""):
+  395          if href not in seen:
+  396              seen.add(href)
+  397              out.append((clean_text(re.sub("<[^>]+>", " ", label)), urljoin(BASE, href)))
+  398      return out
+  399  
+  400  
+  401  def category_id_of(url: str) -> str:
+  402      return url.split("?")[0].rstrip("/").rsplit("/", 1)[-1]
+  403  
+  404  
+  405  def children_of(links: list[tuple[str, str]], parent_id: str) -> list[tuple[str, str]]:
+  406      """Direct and indirect child categories: Walmart ids are hierarchical ('976759_9176907')."""
+  407      out = []
+  408      for name, url in links:
+  409          cid = category_id_of(url)
+  410          if cid.startswith(parent_id + "_") and name:
+  411              out.append((name, url))
+  412      return out
+  413  
+  414  
+  415  # ----------------------------------------------------------------------------- product
+  416  @dataclass
+  417  class ProductDetail:
+  418      item_id: str
+  419      name: str
+  420      upc: str
+  421      brand: str
+  422      size: str
+  423      current_price: str
+  424      was_price: str
+  425      ppm: str
+  426      seller_name: str
+  427      seller_id: str
+  428      store_ids: set[str]
+  429      fulfillment_texts: list[str]
+  430      image_url: str
+  431      location: dict = field(default_factory=dict)   # product's selected pickup location (explicit)
+  432      fulfillment_type: str = ""
+  433      fulfillment_options: list = field(default_factory=list)   # [(fulfillment, storeId)] from fulfillmentSummary
+  434      price_value: float | None = None                            # priceInfo.currentPrice.price (number)
+  435      availability: str = ""
+  436  
+  437  
+  438  def parse_product(html: str, final_url: str = "") -> ProductDetail:
+  439      data = next_data(html, final_url)
+  440      product = dig(data, "props", "pageProps", "initialData", "data", "product")
+  441      if not isinstance(product, dict) or not product.get("usItemId"):
+  442          raise ShapeError("product object missing from product page")
+  443      pi = product.get("priceInfo") or {}
+  444      specs = dig(data, "props", "pageProps", "initialData", "data", "idml", "specifications") or []
+  445      size = ""
+  446      ranked = {"net content": 0, "net weight": 1, "size": 2, "capacity": 3, "count per pack": 4, "count": 5}
+  447      best = 99
+  448      for spec in specs if isinstance(specs, list) else []:
+  449          name = clean_text(spec.get("name")).lower() if isinstance(spec, dict) else ""
+  450          rank = 0 if "net content" in name else ranked.get(name, 99)
+  451          if rank < best and clean_text(spec.get("value")):
+  452              best, size = rank, clean_text(spec.get("value"))
+  453      images = dig(product, "imageInfo", "allImages") or []
+  454      image = (images[0].get("url") if images and isinstance(images[0], dict) else "") or dig(product, "imageInfo", "thumbnailUrl") or ""
+  455      fulfil = _texts(product.get("fulfillmentOptions") or []) + _texts(product.get("fulfillmentSummary") or [])
+  456      for opt in product.get("fulfillmentSummary") or []:
+  457          if isinstance(opt, dict) and opt.get("fulfillment"):
+  458              fulfil.append(str(opt["fulfillment"]))
+  459      return ProductDetail(
+  460          item_id=str(product.get("usItemId")),
+  461          name=clean_text(product.get("name")),
+  462          upc=clean_text(product.get("upc")),
+  463          brand=clean_text(product.get("brand")),
+  464          size=size,
+  465          current_price=_price_string(pi.get("currentPrice")),
+  466          was_price=_price_string(pi.get("wasPrice")),
+  467          ppm=clean_text(_price_string(pi.get("unitPrice"))),
+  468          seller_name=clean_text(product.get("sellerName")),
+  469          seller_id=clean_text(product.get("sellerId")),
+  470          store_ids=store_ids_in(data),
+  471          fulfillment_texts=fulfil,
+  472          image_url=str(image),
+  473          location={"storeIds": [str(x) for x in dig(product, "location", "storeIds") or []],
+  474                    "pickupStoreId": str(dig(product, "location", "pickupLocation", "storeId") or ""),
+  475                    "intent": clean_text(dig(product, "location", "intent")),
+  476                    "postalCode": clean_text(dig(product, "location", "postalCode"))},
+  477          fulfillment_type=clean_text(product.get("fulfillmentType")),
+  478          fulfillment_options=[(clean_text(o.get("fulfillment")), str(o.get("storeId") or ""))
+  479                               for o in product.get("fulfillmentSummary") or [] if isinstance(o, dict)],
+  480          price_value=(lambda v: float(v) if isinstance(v, (int, float)) else None)((pi.get("currentPrice") or {}).get("price")),
+  481          availability=clean_text(product.get("availabilityStatus")),
+  482      )
+  483  
+  484  
+  485  # ----------------------------------------------------------------------------- store
+  486  @dataclass
+  487  class StoreInfo:
+  488      store_id: str
+  489      name: str
+  490      address: str
+  491      zipcode: str
+  492  
+  493  
+  494  def parse_store(html: str, store_id: str, final_url: str = "") -> StoreInfo:
+  495      data = next_data(html, final_url)
+  496      best = None
+  497      for node in walk(data):
+  498          if isinstance(node, dict) and str(node.get("id") or node.get("storeId") or "") == str(store_id) and isinstance(node.get("address"), dict):
+  499              best = node
+  500              break
+  501      if not best:
+  502          raise ShapeError(f"store {store_id} details not found on store page")
+  503      a = best["address"]
+  504      street = clean_text(a.get("addressLineOne") or a.get("streetAddress") or a.get("address1"))
+  505      city, state = clean_text(a.get("city")), clean_text(a.get("state"))
+  506      postal = clean_text(a.get("postalCode") or a.get("zip"))[:5]
+  507      store_type = best.get("storeType") if isinstance(best.get("storeType"), dict) else {}
+  508      name = clean_text(best.get("displayName") or best.get("name") or store_type.get("name"))
+  509      address = ", ".join(x for x in (street, city, f"{state} {postal}".strip()) if x)
+  510      return StoreInfo(store_id=str(store_id), name=name or "Walmart", address=address, zipcode=postal)
+  511  
+  512  
+  513  def to_price(value: str) -> str:
+  514      return format_price(value)
+
+====================================================================================================
+FILE   tests/test_v114_corrections.py
+SHA256 b10aa8acae1c37ffd72eaaff9001d48489184e0393d8bdd986c7e2d34db86ed4
+STATUS added
+====================================================================================================
+    1  """1.1.14 correction from the client's static review of 1.1.13 (offline; synthetic fixtures, no provider request).
+    2  
+    3    page_location compared secondary location blocks on storeId / intent / postalCode only, so a secondary block
+    4    naming another pickupStore was not a conflict. Every block's pickupStore is now checked against the page's
+    5    pickup store (or its selected storeId when the first block names none).
+    6  """
+    7  from __future__ import annotations
+    8  
+    9  import pytest
+   10  
+   11  import conftest as c
+   12  from test_v113_corrections import LOC, MILK, _events, _fixtures, _run
+   13  from wmscraper.config import load_settings
+   14  from wmscraper.parse.walmart import next_data, page_location
+   15  from wmscraper.runner import Run
+   16  
+   17  
+   18  def _location(*blocks):
+   19      """initialData with the given location dicts at the explicit selected-location paths, in page_location order."""
+   20      initial: dict = {}
+   21      for path, loc in zip((("pageMetadata",), ("contentLayout", "pageMetadata"), ("searchResult", "pageMetadata")),
+   22                           blocks):
+   23          node = initial
+   24          for k in path:
+   25              node = node.setdefault(k, {})
+   26          node["location"] = loc
+   27      return page_location(next_data(c.page({"props": {"pageProps": {"initialData": initial}}})))
+   28  
+   29  
+   30  def _problems(site, location):
+   31      s = load_settings(site)
+   32      return Run(s, s.location("test-store")).context_problems(location)
+   33  
+   34  
+   35  BASE = {"storeId": c.STORE, "intent": "PICKUP", "postalCode": c.ZIP}
+   36  
+   37  
+   38  @pytest.mark.parametrize("primary,secondary", [
+   39      ({**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": "9999"}),   # the reviewer's case (100 vs 9999)
+   40      (BASE, {**BASE, "pickupStore": "9999"}),                                # first block names no pickupStore
+   41  ])
+   42  def test_contradicting_secondary_pickup_store_is_a_conflict(site, primary, secondary):
+   43      got = _location(primary, secondary)
+   44      assert [f["pickupStore"] for f in got["conflicts"]] == ["9999"]
+   45      probs = _problems(site, got)
+   46      assert any("conflicting selected location at initialData.contentLayout.pageMetadata.location" in p for p in probs)
+   47  
+   48  
+   49  def test_contradicting_third_block_pickup_store_is_a_conflict(site):
+   50      got = _location({**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": "9999"})
+   51      assert [f["path"] for f in got["conflicts"]] == ["initialData.searchResult.pageMetadata.location"]
+   52      assert _problems(site, got)
+   53  
+   54  
+   55  @pytest.mark.parametrize("blocks", [
+   56      ({**BASE, "pickupStore": c.STORE}, {**BASE, "pickupStore": c.STORE}),  # archived real shape: both agree
+   57      ({**BASE, "pickupStore": c.STORE}, BASE),                              # secondary names no pickupStore
+   58      (BASE, {**BASE, "pickupStore": c.STORE}),                              # only the secondary names it, correctly
+   59      (BASE, BASE),
+   60  ])
+   61  def test_agreeing_pickup_store_blocks_pass(site, blocks):
+   62      got = _location(*blocks)
+   63      assert got["conflicts"] == []
+   64      assert _problems(site, got) == []
+   65  
+   66  
+   67  def test_contradicting_secondary_pickup_store_fails_the_run(site):
+   68      """Full offline collection: the listing with the contradicting block fails validation and nothing is published."""
+   69      fx, m = _fixtures(site)
+   70      p = fx / m[MILK]
+   71      html = p.read_text(encoding="utf-8")
+   72      assert LOC in html
+   73      primary = LOC.replace('"postalCode": "72712"}', f'"postalCode": "72712", "pickupStore": "{c.STORE}"}}')
+   74      secondary = ('"contentLayout": {"pageMetadata": {"location": {"storeId": "1234", "intent": "PICKUP", '
+   75                   '"postalCode": "72712", "pickupStore": "9999"}}}')
+   76      p.write_text(html.replace(LOC, f"{secondary}, {primary}"), encoding="utf-8")
+   77      s, rep, st, _ = _run(site)
+   78      assert not rep["validation"]["ok"] and rep["published"] is None and st.get_json("test-store/latest/records.json") is None
+   79      assert any("store context" in e for e in rep["validation"]["errors"])
+   80      assert any("conflicting selected location" in pr and "9999" in pr
+   81                 for e in _events(s, rep, "store_mismatch") for pr in e["problems"])
+   82  
+   83  
+   84  def test_unavailable_identity_kept_with_agreeing_pickup_store_blocks(site):
+   85      """The stricter check does not drop eligible unavailable store items on a page whose blocks agree."""
+   86      fx, m = _fixtures(site)
+   87      p = fx / m[f"{c.BROWSE}976759_976787{c.Q}"]
+   88      html = c.listing([c.item(201, "Lay's Classic Chips, 8 oz", "$4.28", ppm="53.5 ¢/oz", availability="OUT_OF_STOCK"),
+   89                        c.item(203, "Doritos Nacho, 9.25 oz", "$4.98")])
+   90      both = LOC.replace('"postalCode": "72712"}', f'"postalCode": "72712", "pickupStore": "{c.STORE}"}}')
+   91      assert LOC in html
+   92      p.write_text(html.replace(LOC, f'"contentLayout": {{{both}}}, {both}'), encoding="utf-8")
+   93      (fx / m[f"{c.BROWSE}976759_976787?facet=fulfillment_method%3APickup&stores=1234"]).write_text(
+   94          c.listing([], total=1), encoding="utf-8")
+   95      _s, rep, _st, recs = _run(site)
+   96      assert rep["validation"]["ok"], rep["validation"]
+   97      lays = next(r for r in recs if r["product_title"].startswith("Lay's"))
+   98      assert lays["upc"] == "028400090858" and lays["regular_price"] == "4.28"

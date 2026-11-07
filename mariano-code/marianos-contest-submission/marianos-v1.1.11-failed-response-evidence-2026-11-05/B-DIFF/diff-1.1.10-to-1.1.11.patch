@@ -1,0 +1,572 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -18,6 +18,22 @@
+ disabled diagnostic location. Location configuration now carries the expected
+ fulfillment modality; realtime payloads derive `store_id` and pickup mode from
+ that location rather than global settings.
++
++## 1.1.11 (2026-11-05 CST) - failed responses preserved as evidence
++
++Client review of 1.1.10: a malformed HTTP-200 body on the verify-store / fetcher path counted one attempt but left no
++archive. Offline only; no Oxylabs request, Azure change or deployment (Test 1 budget stays 0/19); `deploy/` unchanged.
++1. `fetch.provider_result`: an HTTP-200 provider envelope that is not JSON or not the expected shape raises `malformed`
++   with the original response attached, instead of an unattributed exception. Provider 4xx/5xx errors also carry it.
++2. `Fetcher.get` hands every received-but-unusable response (the above, a page that does not parse, too small, a
++   non-refusal HTTP error) to `on_failure` with a failure receipt: URL, attempt, request sequence, budget name and
++   ledger line, request and failure times, error kind and message. Retry and stop behaviour is unchanged.
++3. `evidence.save_failed_response` (wired in `Runner` and `probe`): `evidence/failed/` keeps a sanitized copy bounded
++   to `evidence.failed_response_max_bytes` (1,000,000), the SHA-256 of the exact original and of the stored copy, the
++   sanitized request body and the receipt. Credential keys, cookies, Bearer/Basic values, URL passwords and the
++   configured credential values are removed; request headers are never stored.
++4. Tests: `tests/test_v1111_failed_response.py` (15 cases), including the reviewer's CLI case and non-JSON, empty,
++   truncated-JSON, wrong-type and non-numeric-status bodies.
+ 
+ ## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
+ 
+diff --git a/config/settings.yaml b/config/settings.yaml
+--- a/config/settings.yaml
++++ b/config/settings.yaml
+@@ -59,6 +59,8 @@
+ evidence:
+   raw_pages_per_category: 2    # full raw HTML kept for the first N pages per category (all pages keep a price-bearing
+                                # gzip excerpt + SHA-256 in the ledger)
++  failed_response_max_bytes: 1000000   # unusable responses (unparseable, malformed, too small, HTTP error) keep a
++                                       # sanitized copy of at most this many bytes + the SHA-256 of the full original
+ 
+ coupons:
+   enabled: true                # the "Coupons" CSV row: collect every displayed digital coupon (wording, expiry, id)
+diff --git a/docs/ARCHITECTURE.md b/docs/ARCHITECTURE.md
+--- a/docs/ARCHITECTURE.md
++++ b/docs/ARCHITECTURE.md
+@@ -101,5 +101,10 @@
+ ids and active modality read from it, products listed / priced, `sourceLocationId`s on its prices.
+ `evidence/pages/<sha256>.json.gz`: the price-bearing excerpt of every page; `evidence/raw/`: full HTML for the first pages
+ per category. `observations.json` links every output row to the SHA-256 of the response it was read from.
++`evidence/failed/` (v1.1.11): every response that arrived but could not be used (provider envelope not JSON or not the
++expected shape, page without application state, too small, HTTP error) keeps a sanitized copy bounded to
++`evidence.failed_response_max_bytes`, the SHA-256 of the exact original body, and a receipt (`<seq>-<attempt>-<sha>.json`,
++also appended to `receipts.jsonl` and the checkpoint `response_failed` event) with the URL, request body, attempt,
++budget ledger line, request / failure times and the error. Credentials, cookies and request headers are never stored.
+ `report.json → provenance`: code SHA-256, config file SHA-256s, requirements SHA-256, Python, argv – recorded at run start,
+ at every resume and at finish.
+diff --git a/src/mscraper/cli.py b/src/mscraper/cli.py
+--- a/src/mscraper/cli.py
++++ b/src/mscraper/cli.py
+@@ -206,6 +206,8 @@
+         out = _state_dir(settings) / loc.key / "probes" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+         f = build_fetcher(settings, loc)
+         f.on_refusal = lambda res: evidence.save_refusal(out, res)
++        f.on_failure = lambda res, receipt: evidence.save_failed_response(
++            out, res, receipt, int(settings.get("evidence.failed_response_max_bytes", 1_000_000)))
+         f.budget = args.max_requests          # retries count too: the probe can never exceed this many requests
+         f.retries = 1
+         f.total_budget = _total_budget(args, settings, f"probe {loc.key}")
+diff --git a/src/mscraper/evidence.py b/src/mscraper/evidence.py
+--- a/src/mscraper/evidence.py
++++ b/src/mscraper/evidence.py
+@@ -7,13 +7,17 @@
+ * a gzip JSON excerpt of the response (`evidence/pages/<sha256>.json.gz`): the store details, the search request
+   variables and every product object with its price block exactly as Mariano's served them – the price-bearing
+   source for every output row (`observations.response_sha256` links a row to its page);
+-* the complete raw HTML for the first pages of each category (`evidence/raw/<sha256>.html.gz`).
++* the complete raw HTML for the first pages of each category (`evidence/raw/<sha256>.html.gz`);
++* every response that arrived but could not be used (unparseable provider envelope, page that does not parse, too
++  small, HTTP error): a bounded, sanitized copy of the original body and a failure receipt linking its SHA-256 to the
++  request, the budget ledger line and the timestamps (`evidence/failed/`, see `save_failed_response`).
+ """
+ from __future__ import annotations
+ 
+ import gzip
+ import hashlib
+ import json
++import os
+ import platform
+ import re
+ import sys
+@@ -72,8 +76,23 @@
+     return sha, len(raw), rel
+ 
+ 
+-_SECRET_KEYS = re.compile(r"(authorization|password|passwd|secret|token|api[_-]?key|credential)", re.I)
++_SECRET_KEYS = re.compile(r"(authorization|password|passwd|secret|token|api[_-]?key|credential|cookie|session)", re.I)
+ _ID_KEYS = re.compile(r"(job|request|query|task|id)", re.I)
++_SECRET_ENV = ("OXYLABS_WEBAPI_KEY", "OXYLABS_USERNAME", "OXYLABS_PASSWORD", "AZURE_STORAGE_CONNECTION_STRING")
++
++
++def redact_text(text: str) -> str:
++    """Remove credentials from free text: key=value / key: value pairs, Bearer and Basic values, user:password@ in
++    URLs, and the literal values of the configured credential environment variables."""
++    text = re.sub(r"(?i)\b(bearer|basic)\s+[A-Za-z0-9._~+/=-]{8,}", r"\1 [REDACTED]", text)
++    text = re.sub(r"(?i)((?:proxy-)?authorization|password|passwd|secret|token|api[_-]?key|set-cookie|cookie)"
++                  r"(\"?\s*[:=]\s*\"?)[^\s\",;}]+", r"\1\2[REDACTED]", text)
++    text = re.sub(r"(?i)(https?://)[^/\s:@]+:[^/\s@]+@", r"\1[REDACTED]@", text)
++    for name in _SECRET_ENV:
++        value = os.getenv(name) or ""
++        if len(value) >= 4:
++            text = text.replace(value, "[REDACTED]")
++    return text
+ 
+ 
+ def sanitize_provider_response(raw: str) -> tuple[object, str]:
+@@ -81,7 +100,7 @@
+     try:
+         value = json.loads(raw or "{}")
+     except json.JSONDecodeError:
+-        return re.sub(r"(?i)(authorization|password|token|api[_-]?key)\s*[:=]\s*\S+", r"\1=[REDACTED]", raw), ""
++        return redact_text(raw), ""
+ 
+     def clean(item):
+         if isinstance(item, dict):
+@@ -129,3 +148,57 @@
+     }
+     (directory / f"{sha}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
+     return record
++
++
++def _redact_values(item):
++    """redact_text applied to every string inside a JSON-like value (keeps it valid JSON)."""
++    if isinstance(item, dict):
++        return {k: _redact_values(v) for k, v in item.items()}
++    if isinstance(item, list):
++        return [_redact_values(v) for v in item]
++    return redact_text(item) if isinstance(item, str) else item
++
++
++def save_failed_response(run_dir: Path, result, receipt: dict, max_bytes: int = 1_000_000) -> dict:
++    """Archive a response that arrived but could not be used, even when it is not JSON or has an unsupported shape.
++
++    `original_sha256` is the SHA-256 of the exact body received (the provider envelope when there is one, else the
++    page). The stored copy is that body sanitized (credential keys, cookies, Bearer/Basic values, URL passwords and the
++    configured credential values removed) and bounded to `max_bytes`, with its own `stored_sha256`. The receipt links
++    both hashes to the request (URL, request body, attempt, budget ledger line), the timestamps and the failure.
++    Request headers are never stored."""
++    original = (result.raw_response or result.html or "").encode("utf-8")
++    original_sha = sha256_bytes(original)
++    envelope, request_id = sanitize_provider_response(original.decode("utf-8")) if original else ("", "")
++    is_json = not isinstance(envelope, str)
++    stored = (json.dumps(_redact_values(envelope), ensure_ascii=False) if is_json else envelope).encode("utf-8")
++    truncated = len(stored) > max_bytes
++    if truncated:
++        stored = stored[:max_bytes].decode("utf-8", errors="ignore").encode("utf-8")
++    directory = run_dir / "evidence" / "failed"
++    directory.mkdir(parents=True, exist_ok=True)
++    body_file = f"{original_sha}.{'json' if is_json else 'txt'}.gz"
++    if not (directory / body_file).exists():
++        (directory / body_file).write_bytes(gzip.compress(stored))
++    request, _ = sanitize_provider_response(json.dumps(getattr(result, "request", None) or {}))
++    record = {
++        **_redact_values(receipt),
++        "request_body": _redact_values(request),
++        "provider_status": result.provider_status,
++        "target_status": result.status or None,
++        "request_id": request_id,
++        "original_sha256": original_sha,
++        "original_bytes": len(original),
++        "original_format": "json" if is_json else "text",
++        "stored_file": f"evidence/failed/{body_file}",
++        "stored_sha256": sha256_bytes(stored),
++        "stored_bytes": len(stored),
++        "truncated": truncated,
++        "sanitized": True,
++    }
++    name = f"{int(record.get('request_seq') or 0):04d}-{int(record.get('attempt') or 0)}-{original_sha[:16]}.json"
++    record["receipt_file"] = f"evidence/failed/{name}"
++    (directory / name).write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
++    with (directory / "receipts.jsonl").open("a", encoding="utf-8") as f:
++        f.write(json.dumps(record, ensure_ascii=False) + "\n")
++    return record
+diff --git a/src/mscraper/fetch.py b/src/mscraper/fetch.py
+--- a/src/mscraper/fetch.py
++++ b/src/mscraper/fetch.py
+@@ -12,7 +12,8 @@
+ import os
+ import random
+ import time
+-from dataclasses import dataclass
++from dataclasses import dataclass, field
++from datetime import datetime, timezone
+ from pathlib import Path
+ 
+ log = logging.getLogger("mscraper.fetch")
+@@ -26,6 +27,7 @@
+     elapsed: float
+     raw_response: str = ""
+     provider_status: int | None = None
++    request: dict = field(default_factory=dict)   # provider request body (never headers / credentials)
+ 
+ 
+ class FetchError(Exception):
+@@ -51,6 +53,25 @@
+     if status in (400, 404, 422):
+         return FetchError(f"provider rejected the request (HTTP {status}): {text[:200]}", "compat")
+     return FetchError(f"provider HTTP {status}: {text[:160]}", "http")
++
++
++def with_response(err: "FetchError", r, url: str, elapsed: float, body: dict) -> "FetchError":
++    """Attach the provider's original response to an error, so its body can be archived as failure evidence."""
++    err.result = FetchResult(url, 0, "", elapsed, r.text, r.status_code, body)
++    return err
++
++
++def provider_result(r, url: str, elapsed: float, body: dict, content_key: str, status_of) -> FetchResult:
++    """Read the provider's HTTP-200 envelope. A body that is not JSON or not the expected shape raises `malformed`
++    with the original response attached (exc.result), so it is archived as evidence instead of being discarded."""
++    try:
++        res = (r.json().get("results") or [{}])[0]
++        content = res.get(content_key) or ""
++        status = int(status_of(res) or 200)
++    except Exception as exc:
++        err = FetchError(f"provider response could not be parsed ({type(exc).__name__}: {str(exc)[:160]})", "malformed")
++        raise with_response(err, r, url, elapsed, body) from exc
++    return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text, r.status_code, body)
+ 
+ 
+ def require_live_lock(fetcher) -> None:
+@@ -76,6 +97,7 @@
+         self.budget = int(settings.get("fetch.max_requests_per_run", 0))
+         self.total_budget = None   # budget.TotalBudget shared by all commands of one bounded test (persists on disk)
+         self.on_refusal = None
++        self.on_failure = None     # on_failure(result, receipt): a response arrived but was unusable (archived)
+         self.concurrency = int(os.getenv("MSCRAPER_CONCURRENCY") or settings.get("fetch.concurrency", 4))
+         self.sem = asyncio.Semaphore(self.concurrency)
+         self._last = 0.0
+@@ -117,9 +139,15 @@
+                     lock.check_active()                 # a lost lease stops every further request
+                 except lock.LockLost as exc:
+                     raise FetchError(str(exc), "lock") from exc
++                request_n = None
+                 if self.total_budget is not None:   # counted before sending; raises once the test's total is used
+-                    self.total_budget.take(url, self.loc.store_id)
++                    request_n = self.total_budget.take(url, self.loc.store_id)
+                 self.stats["requests"] += 1
++                receipt = {"url": url, "render_js": render_js, "fetcher": self.name, "attempt": attempt + 1,
++                           "request_seq": self.stats["requests"], "budget_request_n": request_n,
++                           "budget": getattr(self.total_budget, "name", None),
++                           "requested_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
++                res = None
+                 try:
+                     res = await asyncio.wait_for(self._fetch_once(url, render_js), self.timeout + 90)
+                     self.stats["seconds"] += res.elapsed
+@@ -142,12 +170,15 @@
+                     return res
+                 except FetchError as exc:
+                     last = exc
++                    if exc.kind != "refused":       # refusals are archived by on_refusal
++                        self._preserve(exc.result or res, exc, receipt)
+                     if exc.terminal:
+                         raise
+-                    self.stats["blocked" if exc.kind == "blocked" else "http_errors"] += 1
++                    self.stats["blocked" if exc.kind in ("blocked", "malformed") else "http_errors"] += 1
+                 except asyncio.TimeoutError:
+                     last = FetchError("timeout", "timeout")
+                 except Exception as exc:  # parse errors raised by validate(), provider faults
++                    self._preserve(getattr(exc, "result", None) or res, exc, receipt)
+                     if isinstance(getattr(exc, "kind", None), str) and exc.kind in TERMINAL_KINDS:
+                         raise
+                     last = exc
+@@ -159,6 +190,18 @@
+                 await asyncio.sleep(delay)
+         raise FetchError(f"failed after {max_retries + 1} attempts: {last}", getattr(last, "kind", "error"))
+ 
++    def _preserve(self, res: FetchResult | None, exc: Exception, receipt: dict) -> None:
++        """Hand a received-but-unusable response (unparseable envelope, parse failure, too small, HTTP error) to
++        on_failure with its failure receipt. Archiving problems are logged and never hide the original error."""
++        if not self.on_failure or res is None:      # no response at all (timeout, connection error): nothing to keep
++            return
++        receipt = {**receipt, "failed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
++                   "error_kind": getattr(exc, "kind", "") or type(exc).__name__, "error": str(exc)[:500]}
++        try:
++            self.on_failure(res, receipt)
++        except Exception as arch:  # noqa: BLE001
++            log.error("failed-response archive not written", extra={"url": res.url, "error": str(arch)[:200]})
++
+ 
+ class OxylabsKrogerFetcher(Fetcher):
+     name = "oxylabs_kroger"
+@@ -185,13 +228,11 @@
+         elapsed = time.monotonic() - t0
+         if r.status_code >= 500:
+             self.stats["provider_faults"] += 1
+-            raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
++            raise with_response(FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http"), r, url, elapsed, body)
+         if r.status_code >= 400:
+-            raise provider_error(r.status_code, r.text)
+-        res = (r.json().get("results") or [{}])[0]
+-        meta = res.get("metadata") or {}
+-        status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
+-        return FetchResult(url, status, res.get("html") or "", elapsed, r.text, r.status_code)
++            raise with_response(provider_error(r.status_code, r.text), r, url, elapsed, body)
++        return provider_result(r, url, elapsed, body, "html", lambda res: (
++            ((res.get("metadata") or {}).get("statuses") or {}).get("http_request") or {}).get("code"))
+ 
+ 
+ class FixtureFetcher(Fetcher):
+@@ -268,13 +309,10 @@
+         elapsed = time.monotonic() - t0
+         if r.status_code >= 500:
+             self.stats["provider_faults"] += 1
+-            raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
++            raise with_response(FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http"), r, url, elapsed, body)
+         if r.status_code >= 400:
+-            raise provider_error(r.status_code, r.text)
+-        res = (r.json().get("results") or [{}])[0]
+-        content = res.get("content") or ""
+-        status = int(res.get("status_code") or 200)
+-        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text, r.status_code)
++            raise with_response(provider_error(r.status_code, r.text), r, url, elapsed, body)
++        return provider_result(r, url, elapsed, body, "content", lambda res: res.get("status_code"))
+ 
+ 
+ def realtime_payload(settings, location, url: str) -> dict:
+diff --git a/src/mscraper/runner.py b/src/mscraper/runner.py
+--- a/src/mscraper/runner.py
++++ b/src/mscraper/runner.py
+@@ -87,6 +87,7 @@
+         self.ck = Checkpoint(self.dir / "checkpoint.sqlite")
+         self.fetcher = fetcher or build_fetcher(settings, location)
+         self.fetcher.on_refusal = self._archive_refusal
++        self.fetcher.on_failure = self._archive_failure
+         self.census: dict[str, dict] = self.ck.get("offer_census", {})
+         self.page_size = int(settings.get("crawl.page_size", 24))
+         self.max_pages = int(settings.get("crawl.max_pages_per_query", 42))
+@@ -97,6 +98,15 @@
+ 
+     def _archive_refusal(self, res) -> None:
+         evidence.save_refusal(self.dir, res)
++
++    def _archive_failure(self, res, receipt: dict) -> None:
++        """A response arrived but was unusable: keep its bounded, sanitized body + hash, linked to its receipt."""
++        rec = evidence.save_failed_response(self.dir, res, receipt,
++                                            int(self.s.get("evidence.failed_response_max_bytes", 1_000_000)))
++        self.ck.event("response_failed", {k: rec[k] for k in (
++            "url", "attempt", "request_seq", "budget", "budget_request_n", "requested_at", "failed_at", "error_kind",
++            "error", "provider_status", "original_sha256", "original_bytes", "stored_sha256", "truncated",
++            "stored_file", "receipt_file")})
+ 
+     # ------------------------------------------------------------------ helpers
+     def _ctx(self, category: str, sub: str) -> dict:
+diff --git a/src/mscraper/version.py b/src/mscraper/version.py
+--- a/src/mscraper/version.py
++++ b/src/mscraper/version.py
+@@ -6,7 +6,7 @@
+ import sys
+ from pathlib import Path
+ 
+-__version__ = "1.1.10"
++__version__ = "1.1.11"
+ _SRC = Path(__file__).resolve().parent
+ _ROOT = _SRC.parents[1]
+ # release_sha256 covers everything that decides what a deployment does (client review 27 Oct: code_sha256 alone
+diff --git a/tests/test_v1111_failed_response.py b/tests/test_v1111_failed_response.py
+--- /dev/null
++++ b/tests/test_v1111_failed_response.py
+@@ -0,0 +1,208 @@
++"""v1.1.11 – client review of 1.1.10: a response that arrives but cannot be parsed is preserved as evidence.
++
++The client mocked a malformed HTTP-200 body on the real verify-store / fetcher path: 1.1.10 counted one attempt and
++archived nothing. Every received-but-unusable response now keeps a bounded, sanitized copy of its body plus the
++SHA-256 of the exact original, in a failure receipt linked to the request, the budget ledger line and the timestamps.
++Offline only: provider HTTP is mocked with httpx.MockTransport; no request leaves the machine.
++"""
++import asyncio
++import gzip
++import hashlib
++import json
++
++import httpx
++import pytest
++from conftest import ROOT, page
++
++from mscraper import cli
++from mscraper.config import load_settings
++from mscraper.fetch import FetchError, OxylabsKrogerFetcher, OxylabsRealtimeFetcher
++from mscraper.runner import Runner
++from mscraper.storage import LocalStorage
++
++CFG = str(ROOT / "config" / "settings.yaml")
++VERNON = "marianos-502-vernon-hills"
++SECRETS = {"OXYLABS_USERNAME": "user-qual-7781", "OXYLABS_PASSWORD": "pw-Secret-99231", "OXYLABS_WEBAPI_KEY": "key-ABCD-55120"}
++NOT_JSON = ("<html><body>Upstream gateway error. Authorization: Basic dXNlcjpwYXNzd29yZA== "
++            "token=tok-77aa retry later</body></html>")
++
++
++@pytest.fixture(autouse=True)
++def _offline(monkeypatch):
++    monkeypatch.setattr("mscraper.fetch.Fetcher._pace", lambda self: asyncio.sleep(0))
++    monkeypatch.setattr("mscraper.fetch.random.uniform", lambda a, b: 0)
++    for k, v in SECRETS.items():
++        monkeypatch.setenv(k, v)
++
++
++def _mock(monkeypatch, responses):
++    """httpx.AsyncClient answers each provider POST with the next (status, body); every request body is recorded."""
++    sent, queue = [], list(responses)
++
++    def handler(request):
++        sent.append(json.loads(request.content))
++        status, body = queue.pop(0)
++        return httpx.Response(status, content=body.encode("utf-8") if isinstance(body, str) else body)
++    real = httpx.AsyncClient
++    monkeypatch.setattr(httpx, "AsyncClient", lambda *a, **kw: real(*a, **{**kw, "transport": httpx.MockTransport(handler)}))
++    return sent
++
++
++def _receipts(run_dir):
++    d = run_dir / "evidence" / "failed"
++    return [json.loads(x) for x in (d / "receipts.jsonl").read_text(encoding="utf-8").splitlines()] if d.exists() else []
++
++
++def _stored(run_dir, rec):
++    return gzip.decompress((run_dir / rec["stored_file"]).read_bytes())
++
++
++def _no_secret(run_dir):
++    blob = b"".join(gzip.decompress(f.read_bytes()) if f.suffix == ".gz" else f.read_bytes()
++                    for f in (run_dir / "evidence" / "failed").iterdir())
++    for v in SECRETS.values():
++        assert v.encode() not in blob
++    assert b"dXNlcjpwYXNzd29yZA==" not in blob and b"tok-77aa" not in blob
++
++
++def _runner(tmp_path, provider=OxylabsRealtimeFetcher, max_bytes=None):
++    settings = load_settings(CFG)
++    settings.raw["fetch"]["min_page_bytes"] = 1000
++    if max_bytes:
++        settings.raw["evidence"]["failed_response_max_bytes"] = max_bytes
++    loc = settings.location(VERNON)
++    f = provider(settings, loc)
++    f.client = httpx.AsyncClient()
++    f.backoff = 0
++    return Runner(settings, loc, LocalStorage(tmp_path / "output"), tmp_path / "state", fetcher=f)
++
++
++def _verify(runner, retries=0):
++    runner.fetcher.retries = retries
++    with pytest.raises(FetchError) as exc:
++        asyncio.run(runner.verify_store())
++    return exc.value
++
++
++# ---------------------------------------------------------------- the reviewer's case, through the real CLI
++def test_cli_verify_store_malformed_http200_body_is_preserved_with_receipt(tmp_path, monkeypatch):
++    monkeypatch.setenv("MSCRAPER_STATE_DIR", str(tmp_path / "state"))
++    monkeypatch.setenv("MSCRAPER_FETCH_PROVIDER", "oxylabs_realtime")
++    sent = _mock(monkeypatch, [(200, NOT_JSON)])
++    with pytest.raises(FetchError) as exc:
++        cli.main(["--config", CFG, "--budget", "qual:1", "verify-store", "--location", VERNON, "--max-requests", "1"])
++    assert exc.value.kind == "malformed" and len(sent) == 1           # one attempt, exactly as before
++    assert sent[0]["store_id"] == "53100502" and sent[0]["fulfillment_type"] == "pickup"
++    runs = list((tmp_path / "state" / "_verify" / VERNON / "runs").iterdir())
++    assert len(runs) == 1
++    [rec] = _receipts(runs[0])
++    ledger = [json.loads(x) for x in (tmp_path / "state" / "_budgets" / "qual.jsonl").read_text("utf-8").splitlines()]
++    assert len(ledger) == 1 and rec["budget"] == "qual" and rec["budget_request_n"] == ledger[0]["n"] == 1
++    assert rec["url"] == ledger[0]["url"] and rec["attempt"] == 1 and rec["request_seq"] == 1
++    assert rec["requested_at"] and rec["failed_at"] >= rec["requested_at"]
++    assert rec["error_kind"] == "malformed" and "could not be parsed" in rec["error"]
++    assert rec["provider_status"] == 200 and rec["original_format"] == "text"
++    assert rec["original_sha256"] == hashlib.sha256(NOT_JSON.encode()).hexdigest()
++    assert rec["original_bytes"] == len(NOT_JSON.encode()) and not rec["truncated"]
++    assert rec["request_body"]["source"] == "kroger_search" and rec["request_body"]["store_id"] == "53100502"
++    body = _stored(runs[0], rec)
++    assert b"Upstream gateway error" in body and hashlib.sha256(body).hexdigest() == rec["stored_sha256"]
++    assert json.loads((runs[0] / rec["receipt_file"]).read_text("utf-8")) == rec
++    _no_secret(runs[0])
++
++
++# ---------------------------------------------------------------- malformed / non-JSON / unsupported shapes
++@pytest.mark.parametrize("body,fmt", [
++    (NOT_JSON, "text"),                                              # not JSON at all
++    ("", "text"),                                                    # empty HTTP-200 body
++    ('{"results": [{"content": "<html>', "text"),                    # truncated JSON
++    ("[1, 2, 3]", "json"),                                           # JSON, but a list
++    ('{"results": "not-a-list"}', "json"),                           # results of the wrong type
++    ('{"results": [{"content": "<html></html>", "status_code": "n/a"}]}', "json"),   # non-numeric target status
++], ids=["not-json", "empty", "truncated-json", "json-list", "results-wrong-type", "non-numeric-status"])
++def test_unsupported_provider_shapes_are_archived_not_discarded(tmp_path, monkeypatch, body, fmt):
++    _mock(monkeypatch, [(200, body)])
++    runner = _runner(tmp_path)
++    assert _verify(runner).kind == "malformed"
++    [rec] = _receipts(runner.dir)
++    assert rec["original_sha256"] == hashlib.sha256(body.encode()).hexdigest() and rec["original_format"] == fmt
++    assert (runner.dir / rec["stored_file"]).exists()
++    events = [json.loads(d) for k, d in runner.ck.db.execute("SELECT kind, detail FROM events") if k == "response_failed"]
++    assert [e["original_sha256"] for e in events] == [rec["original_sha256"]]
++    assert events[0]["receipt_file"] == rec["receipt_file"]
++
++
++def test_kroger_adapter_malformed_body_is_archived_without_the_bearer_key(tmp_path, monkeypatch):
++    _mock(monkeypatch, [(200, NOT_JSON + " " + SECRETS["OXYLABS_WEBAPI_KEY"])])
++    runner = _runner(tmp_path, provider=OxylabsKrogerFetcher)
++    assert _verify(runner).kind == "malformed"
++    [rec] = _receipts(runner.dir)
++    assert rec["fetcher"] == "oxylabs_kroger" and rec["request_body"]["store_id"] == "53100502"
++    _no_secret(runner.dir)
++
++
++def test_valid_envelope_with_unparseable_page_is_archived(tmp_path, monkeypatch):
++    """The envelope parses but the Mariano's page inside has no application state (PageError in validate)."""
++    envelope = json.dumps({"job_id": "job-42", "results": [{"content": "<html>" + "x" * 2000 + "</html>", "status_code": 200}]})
++    _mock(monkeypatch, [(200, envelope)])
++    runner = _runner(tmp_path)
++    assert _verify(runner).kind == "malformed"
++    [rec] = _receipts(runner.dir)
++    assert rec["error_kind"] == "malformed" and "application state" in rec["error"]
++    assert rec["target_status"] == 200 and rec["request_id"] == "job-42" and rec["original_format"] == "json"
++    assert rec["original_sha256"] == hashlib.sha256(envelope.encode()).hexdigest()
++
++
++def test_stored_copy_is_bounded_and_the_original_hash_is_of_the_full_body(tmp_path, monkeypatch):
++    big = "<html>" + "y" * 50_000 + "</html>"
++    _mock(monkeypatch, [(200, big)])
++    runner = _runner(tmp_path, max_bytes=4096)
++    _verify(runner)
++    [rec] = _receipts(runner.dir)
++    assert rec["truncated"] and rec["stored_bytes"] == 4096 == len(_stored(runner.dir, rec))
++    assert rec["original_bytes"] == len(big) and rec["original_sha256"] == hashlib.sha256(big.encode()).hexdigest()
++
++
++def test_credentials_and_sensitive_headers_never_reach_the_archive(tmp_path, monkeypatch):
++    envelope = json.dumps({"job": {"id": "job-9", "Authorization": "Basic dXNlcjpwYXNzd29yZA=="},
++                           "results": [{"content": "page token=tok-77aa " + SECRETS["OXYLABS_PASSWORD"],
++                                        "headers": {"Set-Cookie": "sess=abc123", "X-Api-Key": "k-1"},
++                                        "url": f"https://{SECRETS['OXYLABS_USERNAME']}:{SECRETS['OXYLABS_PASSWORD']}@x.io/",
++                                        "status_code": "bad"}]})
++    _mock(monkeypatch, [(200, envelope)])
++    runner = _runner(tmp_path)
++    _verify(runner)
++    [rec] = _receipts(runner.dir)
++    stored = json.loads(_stored(runner.dir, rec))                   # the stored copy stays valid JSON
++    headers = stored["results"][0]["headers"]
++    assert headers == {"Set-Cookie": "[REDACTED]", "X-Api-Key": "[REDACTED]"}
++    assert rec["request_id"] == "job-9"
++    _no_secret(runner.dir)
++    assert b"sess=abc123" not in _stored(runner.dir, rec)
++
++
++def test_each_retried_attempt_gets_its_own_receipt_and_ledger_line(tmp_path, monkeypatch):
++    _mock(monkeypatch, [(200, NOT_JSON), (200, "[]")])
++    runner = _runner(tmp_path)
++    _verify(runner, retries=1)
++    recs = _receipts(runner.dir)
++    assert [(r["attempt"], r["request_seq"]) for r in recs] == [(1, 1), (2, 2)]
++    assert len({r["original_sha256"] for r in recs}) == 2 and len({r["receipt_file"] for r in recs}) == 2
++
++
++@pytest.mark.parametrize("status,kind", [(400, "compat"), (503, "http")])
++def test_provider_error_bodies_are_archived(tmp_path, monkeypatch, status, kind):
++    _mock(monkeypatch, [(status, '{"message": "source not available for this account"}')])
++    runner = _runner(tmp_path)
++    assert _verify(runner).kind == kind
++    [rec] = _receipts(runner.dir)
++    assert rec["provider_status"] == status and rec["error_kind"] == kind
++
++
++def test_usable_response_writes_no_failure_receipt(tmp_path, monkeypatch):
++    envelope = json.dumps({"results": [{"content": page("search_milk_store544.html.gz"), "status_code": 200}]})
++    _mock(monkeypatch, [(200, envelope)])
++    runner = _runner(tmp_path)
++    runner.fetcher.retries = 0
++    res = asyncio.run(runner.verify_store())
++    assert res["evidence_response_sha256"] and _receipts(runner.dir) == []

@@ -1,0 +1,52 @@
+Mariano's 1.1.12: JSON-string provider bodies are now redacted (offline)
+
+Thank you for the focused review. Your finding was correct, and I reproduced it on 1.1.11 with a synthetic credential.
+The correction is delivered as Mariano's 1.1.12. This is a new version: 1.1.11 is unchanged and stays identifiable
+(ZIP 610910e1...). Nothing live was run. There was no Oxylabs request, no Azure change or redeployment, and
+deploy/ and config/ are unchanged (deploy_sha256 is identical to 1.1.11).
+
+The requested correction:
+  redact_text now runs on the string branch (evidence.py:111), so a body that is entirely a JSON string is redacted
+  before save_failed_response stores it. Your case now stores exactly "Bearer [REDACTED]". original_sha256 is still
+  the hash of the exact body received, and the receipt linkage is unchanged.
+
+Regression tests (tests/test_v1112_json_string_response.py, 15 cases):
+  - your case through cli.main verify-store: 1 attempt, 1 receipt, matching budget ledger line, matching original and
+    stored hashes, and the synthetic credential absent from every file in the state directory
+  - 6 credential forms inside a JSON string: Bearer, Basic, key=value, URL password, configured credential value,
+    double-encoded JSON
+  - a credential hidden behind \u escapes in the raw body
+  - the second adapter
+  - a large body, redacted before the 4,096-byte bound
+  Against unchanged 1.1.11 code: 14 failed, 1 passed (the control).
+Full suite: 122 passed (107 + 15), run from a clean extract of the 1.1.12 ZIP.
+
+One thing beyond your request, so that you can check it:
+  The cause was that the sanitizer did not redact strings. While reproducing your case I found three related gaps with
+  the same cause, and the same two-line change closes them:
+    1. request_id copied from an ID-like field (job_id, query) into the receipt
+    2. a credential used as a JSON object key
+    3. strings in the provider envelope stored by save_refusal
+  Each has its own test and its own row in the map. The 1.1.11 map said redaction applied to every string value. That
+  wording was not accurate, and the map now says so.
+
+Hashes:
+  1.1.12 ZIP sha256   30a7c37e311d24aeac95323c5b73cc85feab589b276c107fc4b5476e74390ab4
+  code_sha256         38a89e937ef9d8dc5caf555b651a6edb83bd901b7b6cf0253de348daf0d610e9
+  release_sha256      9521cbe9e5dc4b68726e8f9d6a7ea5134ceba742d8387d14d1251684f58ce9c3
+  deploy_sha256       356861f4f8623a6de4c43c270084ee0c569e337bdae1a18d9724d1afb52dd29a (same as 1.1.11)
+  Package entries: 68 (1.1.11: 67; added tests/test_v1112_json_string_response.py)
+
+Files (no ZIP needed to review):
+  00-CORRECTION-TO-TEST-MAP.md          requirement -> file:line -> test names
+  READABLE-CHANGED-FILES-1.1.12.txt     the 5 changed files, with path, sha256 and line numbers
+  B-DIFF/diff-1.1.11-to-1.1.12.patch    UTF-8, LF, built from the two delivered ZIPs
+  C-TESTS/                              full and focused output, and the new tests run against 1.1.11
+  A-CHANGED-FILES/                      the changed files at their paths, plus hashes of every packaged file
+  PREVIEW-TXT/                          .txt copies of the .md and .patch files, for preview in Freelancer
+
+Not established: every test mocks the provider and uses synthetic credentials. sanitized=true means the known patterns
+and configured credential values were removed; it cannot prove that a credential in an unknown format is absent.
+
+Noted on the payment terms, and that the account-support, cost and limited live-qualification decisions remain with
+you. The Mariano's Test 1 balance stays 0/19 and the execution hold is unchanged. Walmart is in a separate message.

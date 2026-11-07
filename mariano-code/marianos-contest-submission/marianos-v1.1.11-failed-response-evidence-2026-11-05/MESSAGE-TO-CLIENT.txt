@@ -1,0 +1,59 @@
+Mariano's 1.1.11: failed responses are preserved as evidence (offline)
+
+Thank you for exercising the verify-store error path. The correction is delivered as Mariano's 1.1.11. This is a new
+version: 1.1.10 is unchanged and stays identifiable (ZIP 438133ff...). Nothing live was run. There was no Oxylabs
+request, no Azure change or redeployment, and deploy/ is unchanged (deploy_sha256 is identical to 1.1.10). The
+Mariano's Test 1 balance is still 0/19. Walmart is in a separate message.
+
+What changed:
+  1. A provider HTTP-200 body that is not JSON, or is JSON of an unsupported shape, now raises "malformed" with the
+     original response attached. Before, it raised an unattributed exception (fetch.py:64). Provider 4xx/5xx bodies
+     are attached as well (fetch.py:58).
+  2. Every attempt where a response arrived but could not be used is preserved (fetch.py:193). This covers an
+     unparseable envelope, a page that fails parsing, a page that is too small, and a non-refusal HTTP error. Empty
+     bodies are recorded too. Retry and stop behaviour is unchanged.
+  3. evidence/failed/ keeps:
+       - original_sha256: the sha256 of the exact body received
+       - a sanitized copy, cut to evidence.failed_response_max_bytes (1,000,000), with its own stored_sha256 and a
+         "truncated" flag
+       - a failure receipt: URL, sanitized request body, attempt, request sequence, budget name and budget ledger line,
+         requested_at, failed_at, error kind and message, provider and target status, provider request id
+     The receipt is also in receipts.jsonl and in the checkpoint "response_failed" event (evidence.py:162,
+     runner.py:102). The probe command archives the same way.
+  4. Credentials stay out. Request headers are never stored. Credential, cookie and session keys are redacted at any
+     depth. Bearer and Basic values, URL passwords and the literal values of the configured credentials are removed
+     from text (evidence.py:79-96).
+
+Tests (tests/test_v1111_failed_response.py, 15 cases):
+  - your case through cli.main verify-store with a mocked malformed HTTP-200 body (1 request, 1 receipt, linked to
+    budget ledger line 1)
+  - 6 malformed/non-JSON shapes: not-json, empty, truncated-json, json-list, results-wrong-type, non-numeric-status
+  - a valid envelope with an unparseable page
+  - the second adapter (Bearer key)
+  - bounded copy with the full-body hash
+  - credentials and sensitive headers removed
+  - one receipt per retried attempt
+  - provider HTTP 400 and 503 bodies
+  - control: a usable response writes no receipt
+  Against unchanged 1.1.10 code: 14 failed, 1 passed (the control).
+Full suite: 107 passed (92 + 15), run from a clean extract of the 1.1.11 ZIP.
+
+Hashes:
+  1.1.11 ZIP sha256   610910e166f4dd446968c358f4e647909e1118b9748c0269a20dfaec68549035
+  code_sha256         fa99a020ac86690a3bac216c640d9204a9d2b1374ba0cbd2f865ed01cb9bc39e
+  release_sha256      bebe29189b135b9448d51609469915acf77195a58f1226ac2cf86ab5ebf7810f
+  deploy_sha256       356861f4f8623a6de4c43c270084ee0c569e337bdae1a18d9724d1afb52dd29a (same as 1.1.10)
+  Package entries: 67 (1.1.10: 66; added tests/test_v1111_failed_response.py)
+
+Files (no ZIP needed to review):
+  00-CORRECTION-TO-TEST-MAP.md          requirement -> file:line -> test names
+  READABLE-CHANGED-FILES-1.1.11.txt     the 9 changed files, with path, sha256 and line numbers
+  B-DIFF/diff-1.1.10-to-1.1.11.patch    UTF-8, LF, built from the two delivered ZIPs
+  C-TESTS/                              full and focused output, and the new tests run against 1.1.10
+  A-CHANGED-FILES/                      the changed files at their paths, plus hashes of every packaged file
+  PREVIEW-TXT/                          .txt copies of the .md and .patch files, for preview in Freelancer
+
+Not established: every test mocks the provider. Account support for kroger_search and the proposed route, and
+genuine Vernon Hills Pickup data, remain qualification questions. The November 4 window passed without approval.
+Nothing ran then, and nothing will run automatically. If you approve it, the one-request Vernon Hills qualification
+would run on 1.1.11 with the same request body (kroger_search, 53100502, pickup).

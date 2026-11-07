@@ -1,0 +1,42 @@
+Walmart 1.1.14: pickupStore check on every location block (offline)
+
+Thank you for the review and for confirming the closed 1.1.13 items. The page_location finding is corrected in
+Walmart 1.1.14. This is a new version: 1.1.13 is unchanged and stays identifiable. Nothing live was run. There was no
+Oxylabs request, no Azure deployment or redeployment and no budget change. The Walmart probe balance is still 3/10.
+Mariano's is in a separate message.
+
+Correction (parse/walmart.py:141-147, page_location):
+  Each secondary location block's pickupStore is now compared with the page's pickup store. That is the first block's
+  pickupStore, or its selected storeId when the first block names none. Your case (primary pickupStore 100, secondary
+  9999) is now a conflict. Run.context_problems reports it (runner.py:307, unchanged), the listing fails its store
+  context and nothing is published. Eligible unavailable store items are still kept with their identity.
+
+Regression tests (tests/test_v114_corrections.py, 9 cases):
+  - contradictory secondary block: your 100/9999 shape, and a first block with no pickupStore
+  - contradictory third block
+  - full offline collection with the contradictory block: validation fails, published is None, latest/ not written
+  - agreeing blocks still pass (4 shapes)
+  - unavailable identity kept on a page whose two blocks agree
+  Against unchanged 1.1.13 code: 4 failed (the contradiction cases), 5 passed (the controls).
+
+Tests: 145 passed (136 + 9), run from a clean extract of the 1.1.14 ZIP.
+Real-data check (offline, no request): 59 distinct archived store-100 pages. 39 of them are listings with two blocks,
+and all carry pickupStore 100. 0 conflicts under the new rule.
+
+Hashes:
+  1.1.14 source fingerprint  dc4c4783a85526bf033ba687d05b1f294cf9bd45303123d5af55fb4abf7b125c
+  1.1.14 ZIP sha256          0a67dce9d2836f43871efa3cc2c06edb4c8dc938191b2a1ab43ec76839844d76
+  1.1.13 (unchanged)         source f9e02ced..., ZIP 48382c21...
+  Package entries: 57 (1.1.13: 56; added tests/test_v114_corrections.py)
+
+Files (no ZIP needed to review):
+  00-CORRECTION-TO-TEST-MAP.md          finding -> file:line -> test names
+  READABLE-CHANGED-FILES-1.1.14.txt     the 4 changed files, with path, sha256 and line numbers
+  B-DIFF/diff-1.1.13-to-1.1.14.patch    UTF-8, LF, built from the two delivered ZIPs
+  C-TESTS/                              full and focused output, and the new tests run against 1.1.13
+  A-CHANGED-FILES/                      the changed files at their paths, plus hashes of every packaged file
+  PREVIEW-TXT/                          .txt copies of the .md and .patch files, for preview in Freelancer
+
+Not established by this change: live store-100 Pickup listings, account support for the search route, and
+delivery_zip, which remains a qualification question. walmart-500-demo.json remains an offline fixture.
+The November 4 window passed without approval. Nothing ran then, and nothing will run automatically.

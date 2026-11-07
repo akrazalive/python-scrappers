@@ -1,5 +1,15 @@
 # Changes
 
+## 1.1.14 (2026-11-05) - pickupStore checked on every selected-location block
+
+Client review of 1.1.13. Offline only: no Oxylabs request, no Azure deployment, no budget change (probe stays 3 of 10).
+`parse/walmart.page_location` compared secondary location blocks on `storeId`, intent and `postalCode` only, so a
+secondary block naming another `pickupStore` (primary 100, secondary 9999) produced no conflict and
+`Run.context_problems` returned no error. Every block's `pickupStore` is now compared with the page's pickup store
+(the first block's `pickupStore`, or its selected `storeId` when it names none); a disagreeing block is a conflict and
+fails the listing's store context. Eligible unavailable store items are still kept with their identity.
+Tests: `tests/test_v114_corrections.py` (9 cases). Full suite 145 passed.
+
 ## 1.1.13 (2026-11-04) - corrections from the client's static review of 1.1.12
 
 Offline only: no Oxylabs request, no Azure deployment, no budget change (probe budget stays 3 of 10).

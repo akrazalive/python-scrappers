@@ -101,5 +101,12 @@ every seed request's reported total against the distinct products read across th
 ids and active modality read from it, products listed / priced, `sourceLocationId`s on its prices.
 `evidence/pages/<sha256>.json.gz`: the price-bearing excerpt of every page; `evidence/raw/`: full HTML for the first pages
 per category. `observations.json` links every output row to the SHA-256 of the response it was read from.
+`evidence/failed/` (v1.1.11): every response that arrived but could not be used (provider envelope not JSON or not the
+expected shape, page without application state, too small, HTTP error) keeps a sanitized copy bounded to
+`evidence.failed_response_max_bytes`, the SHA-256 of the exact original body, and a receipt (`<seq>-<attempt>-<sha>.json`,
+also appended to `receipts.jsonl` and the checkpoint `response_failed` event) with the URL, request body, attempt,
+budget ledger line, request / failure times and the error. Credentials, cookies and request headers are never stored.
+Since v1.1.12 every string in a decoded provider body is redacted, including a body that is itself a JSON string, object
+keys, the `request_id` taken from the body and the `evidence/refusals/` provider envelope.
 `report.json → provenance`: code SHA-256, config file SHA-256s, requirements SHA-256, Python, argv – recorded at run start,
 at every resume and at finish.

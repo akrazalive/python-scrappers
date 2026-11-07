@@ -19,6 +19,34 @@ disabled diagnostic location. Location configuration now carries the expected
 fulfillment modality; realtime payloads derive `store_id` and pickup mode from
 that location rather than global settings.
 
+## 1.1.11 (2026-11-05 CST) - failed responses preserved as evidence
+
+Client review of 1.1.10: a malformed HTTP-200 body on the verify-store / fetcher path counted one attempt but left no
+archive. Offline only; no Oxylabs request, Azure change or deployment (Test 1 budget stays 0/19); `deploy/` unchanged.
+1. `fetch.provider_result`: an HTTP-200 provider envelope that is not JSON or not the expected shape raises `malformed`
+   with the original response attached, instead of an unattributed exception. Provider 4xx/5xx errors also carry it.
+2. `Fetcher.get` hands every received-but-unusable response (the above, a page that does not parse, too small, a
+   non-refusal HTTP error) to `on_failure` with a failure receipt: URL, attempt, request sequence, budget name and
+   ledger line, request and failure times, error kind and message. Retry and stop behaviour is unchanged.
+3. `evidence.save_failed_response` (wired in `Runner` and `probe`): `evidence/failed/` keeps a sanitized copy bounded
+   to `evidence.failed_response_max_bytes` (1,000,000), the SHA-256 of the exact original and of the stored copy, the
+   sanitized request body and the receipt. Credential keys, cookies, Bearer/Basic values, URL passwords and the
+   configured credential values are removed; request headers are never stored.
+4. Tests: `tests/test_v1111_failed_response.py` (15 cases), including the reviewer's CLI case and non-JSON, empty,
+   truncated-JSON, wrong-type and non-numeric-status bodies.
+
+## 1.1.12 (2026-11-06 CST) - JSON-string provider bodies redacted
+
+Client review of 1.1.11: a provider body that is itself a JSON string (for example a quoted string containing a Bearer
+value) was decoded and returned by `sanitize_provider_response` without redaction, so `save_failed_response` stored the
+credential in its text branch while the receipt said `sanitized=true`. Offline only; no Oxylabs request, Azure change or
+deployment (Test 1 budget stays 0/19); `deploy/` unchanged.
+1. `evidence.sanitize_provider_response`: `redact_text` now runs on every string in the decoded body, including the
+   whole body when it is a JSON string. `original_sha256`, `stored_sha256` and the receipt linkage are unchanged.
+2. The same change closes three related gaps found while reproducing the case: `request_id` copied from an ID-like
+   field, credentials used as object keys, and nested strings in the `save_refusal` provider envelope.
+3. Tests: `tests/test_v1112_json_string_response.py`, including the reviewer's case through the real CLI.
+
 ## 1.1.6 (2026-10-29) – Classic compatibility and target refusal evidence
 
 1. Retailer HTTP 401/403 responses inside provider-200 results are terminal `refused` errors and are archived under

@@ -138,9 +138,13 @@ def page_location(data: Any) -> dict:
     if not found:
         return {}
     out = dict(found[0])
-    # every selected-location block on the page must agree (store, intent, ZIP); otherwise the context is conflicting
+    # every selected-location block on the page must agree (store, intent, ZIP, pickup store); otherwise the context
+    # is conflicting. A pickupStore on any block must be the page's pickup store, or its selected storeId when the
+    # first block names none, so a secondary block cannot point Pickup at another store unnoticed.
     keys = ("storeId", "intent", "postalCode")
-    out["conflicts"] = [f for f in found[1:] if any(f[k] and out[k] and f[k] != out[k] for k in keys)]
+    pickup = out["pickupStore"] or out["storeId"]
+    out["conflicts"] = [f for f in found[1:] if any(f[k] and out[k] and f[k] != out[k] for k in keys)
+                        or (f["pickupStore"] and f["pickupStore"] != pickup)]
     return out
 
 

@@ -206,6 +206,8 @@ def main(argv=None) -> int:
         out = _state_dir(settings) / loc.key / "probes" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         f = build_fetcher(settings, loc)
         f.on_refusal = lambda res: evidence.save_refusal(out, res)
+        f.on_failure = lambda res, receipt: evidence.save_failed_response(
+            out, res, receipt, int(settings.get("evidence.failed_response_max_bytes", 1_000_000)))
         f.budget = args.max_requests          # retries count too: the probe can never exceed this many requests
         f.retries = 1
         f.total_budget = _total_budget(args, settings, f"probe {loc.key}")

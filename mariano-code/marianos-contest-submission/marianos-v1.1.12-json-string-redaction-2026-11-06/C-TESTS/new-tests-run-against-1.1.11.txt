@@ -1,0 +1,156 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: C:\Users\iZa Computers\AppData\Local\Temp\claude\896b1247ecc6d970\3791261b-f4cc-43f5-a24e-9b7aaa302b99\scratchpad\old1111\marianos-scraper
+plugins: anyio-4.15.1, platformdirs-4.13.5
+collecting ... collected 15 items
+
+tests/test_v1112_json_string_response.py::test_cli_verify_store_json_string_body_is_redacted_with_its_receipt_intact FAILED [  6%]
+tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[bearer] FAILED [ 13%]
+tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[basic] FAILED [ 20%]
+tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[key-value] FAILED [ 26%]
+tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[url-password] FAILED [ 33%]
+tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[configured-credential] FAILED [ 40%]
+tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[double-encoded] FAILED [ 46%]
+tests/test_v1112_json_string_response.py::test_json_string_body_with_unicode_escapes_is_redacted_after_decoding FAILED [ 53%]
+tests/test_v1112_json_string_response.py::test_second_adapter_redacts_a_json_string_body FAILED [ 60%]
+tests/test_v1112_json_string_response.py::test_large_json_string_body_is_redacted_before_it_is_bounded FAILED [ 66%]
+tests/test_v1112_json_string_response.py::test_request_id_taken_from_the_body_is_redacted[job_id] FAILED [ 73%]
+tests/test_v1112_json_string_response.py::test_request_id_taken_from_the_body_is_redacted[query] FAILED [ 80%]
+tests/test_v1112_json_string_response.py::test_credential_used_as_an_object_key_is_redacted FAILED [ 86%]
+tests/test_v1112_json_string_response.py::test_refusal_envelope_strings_are_redacted FAILED [ 93%]
+tests/test_v1112_json_string_response.py::test_harmless_json_string_and_metadata_are_kept_unchanged PASSED [100%]
+
+================================== FAILURES ===================================
+_ test_cli_verify_store_json_string_body_is_redacted_with_its_receipt_intact __
+tests\test_v1112_json_string_response.py:50: in test_cli_verify_store_json_string_body_is_redacted_with_its_receipt_intact
+    assert body == b"Bearer [REDACTED]" and rec["sanitized"] is True
+E   AssertionError: assert (b'Bearer DUMM..._SECRET_12345' == b'Bearer [REDACTED]'
+E     
+E     At index 7 diff: b'D' != b'['
+E     
+E     Full diff:
+E     - (b'Bearer [REDACTED]')
+E     + (b'Bearer DUMMY_REVIEW_SECRET_12345'))
+__________ test_json_string_body_loses_each_credential_form[bearer] ___________
+tests\test_v1112_json_string_response.py:72: in test_json_string_body_loses_each_credential_form
+    assert _stored(runner.dir, rec).decode() == kept
+E   AssertionError: assert 'Bearer DUMMY..._SECRET_12345' == 'Bearer [REDACTED]'
+E     
+E     - Bearer [REDACTED]
+E     + Bearer DUMMY_REVIEW_SECRET_12345
+___________ test_json_string_body_loses_each_credential_form[basic] ___________
+tests\test_v1112_json_string_response.py:72: in test_json_string_body_loses_each_credential_form
+    assert _stored(runner.dir, rec).decode() == kept
+E   AssertionError: assert 'Authorizatio...wYXNzd29yZA==' == 'Authorizatio...D] [REDACTED]'
+E     
+E     - Authorization: [REDACTED] [REDACTED]
+E     + Authorization: Basic dXNlcjpwYXNzd29yZA==
+_________ test_json_string_body_loses_each_credential_form[key-value] _________
+tests\test_v1112_json_string_response.py:72: in test_json_string_body_loses_each_credential_form
+    assert _stored(runner.dir, rec).decode() == kept
+E   AssertionError: assert 'gateway erro...ok-77aa retry' == 'gateway erro...DACTED] retry'
+E     
+E     - gateway error token=[REDACTED] retry
+E     + gateway error token=tok-77aa retry
+_______ test_json_string_body_loses_each_credential_form[url-password] ________
+tests\test_v1112_json_string_response.py:72: in test_json_string_body_loses_each_credential_form
+    assert _stored(runner.dir, rec).decode() == kept
+E   AssertionError: assert 'see https://...ter2pw@x.io/a' == 'see https://...ACTED]@x.io/a'
+E     
+E     - see https://[REDACTED]@x.io/a
+E     + see https://alice:hunter2pw@x.io/a
+___ test_json_string_body_loses_each_credential_form[configured-credential] ___
+tests\test_v1112_json_string_response.py:72: in test_json_string_body_loses_each_credential_form
+    assert _stored(runner.dir, rec).decode() == kept
+E   AssertionError: assert 'key was key-ABCD-55120 here' == 'key was [REDACTED] here'
+E     
+E     - key was [REDACTED] here
+E     + key was key-ABCD-55120 here
+______ test_json_string_body_loses_each_credential_form[double-encoded] _______
+tests\test_v1112_json_string_response.py:72: in test_json_string_body_loses_each_credential_form
+    assert _stored(runner.dir, rec).decode() == kept
+E   assert '{"token": "tok-77aa"}' == '{"token": "[REDACTED]"}'
+E     
+E     - {"token": "[REDACTED]"}
+E     + {"token": "tok-77aa"}
+____ test_json_string_body_with_unicode_escapes_is_redacted_after_decoding ____
+tests\test_v1112_json_string_response.py:84: in test_json_string_body_with_unicode_escapes_is_redacted_after_decoding
+    assert _stored(runner.dir, rec) == b"Bearer [REDACTED]"
+E   AssertionError: assert b'Bearer DUMM..._SECRET_12345' == b'Bearer [REDACTED]'
+E     
+E     At index 7 diff: b'D' != b'['
+E     
+E     Full diff:
+E     - (b'Bearer [REDACTED]')
+E     + (b'Bearer DUMMY_REVIEW_SECRET_12345')
+_______________ test_second_adapter_redacts_a_json_string_body ________________
+tests\test_v1112_json_string_response.py:93: in test_second_adapter_redacts_a_json_string_body
+    assert rec["fetcher"] == "oxylabs_kroger" and _stored(runner.dir, rec) == b"Bearer [REDACTED]"
+E   AssertionError: assert ('oxylabs_kroger' == 'oxylabs_kroger'
+E     
+E       oxylabs_kroger and b'Bearer DUMM..._SECRET_12345' == b'Bearer [REDACTED]'
+E     
+E     At index 7 diff: b'D' != b'['
+E     
+E     Full diff:
+E     - (b'Bearer [REDACTED]')
+E     + (b'Bearer DUMMY_REVIEW_SECRET_12345'))
+________ test_large_json_string_body_is_redacted_before_it_is_bounded _________
+tests\test_v1112_json_string_response.py:105: in test_large_json_string_body_is_redacted_before_it_is_bounded
+    _assert_absent(tmp_path, DUMMY)
+tests\test_v1112_json_string_response.py:32: in _assert_absent
+    assert value.encode() not in data, f"{value} found in {f}"
+E   AssertionError: DUMMY_REVIEW_SECRET_12345 found in C:\Users\iZa Computers\AppData\Local\Temp\pytest-of-iZa Computers\pytest-329\test_large_json_string_body_is0\state\marianos-502-vernon-hills\runs\20261106T035554Z-47f5e2\evidence\failed\5173e8199bf540254376f451fffb44e79f7b4e56af1cca255535a9a4049dd13a.txt.gz
+E   assert b'DUMMY_REVIEW_SECRET_12345' not in b'Bearer DUMMY_REVIEW_SECRET_12345 yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy...yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
+E    +  where b'DUMMY_REVIEW_SECRET_12345' = <built-in method encode of str object at 0x000001AC88A6DCA0>()
+E    +    where <built-in method encode of str object at 0x000001AC88A6DCA0> = 'DUMMY_REVIEW_SECRET_12345'.encode
+___________ test_request_id_taken_from_the_body_is_redacted[job_id] ___________
+tests\test_v1112_json_string_response.py:115: in test_request_id_taken_from_the_body_is_redacted
+    assert rec["request_id"] == "Bearer [REDACTED]"
+E   AssertionError: assert 'Bearer DUMMY..._SECRET_12345' == 'Bearer [REDACTED]'
+E     
+E     - Bearer [REDACTED]
+E     + Bearer DUMMY_REVIEW_SECRET_12345
+___________ test_request_id_taken_from_the_body_is_redacted[query] ____________
+tests\test_v1112_json_string_response.py:115: in test_request_id_taken_from_the_body_is_redacted
+    assert rec["request_id"] == "Bearer [REDACTED]"
+E   AssertionError: assert 'Bearer DUMMY..._SECRET_12345' == 'Bearer [REDACTED]'
+E     
+E     - Bearer [REDACTED]
+E     + Bearer DUMMY_REVIEW_SECRET_12345
+______________ test_credential_used_as_an_object_key_is_redacted ______________
+tests\test_v1112_json_string_response.py:124: in test_credential_used_as_an_object_key_is_redacted
+    assert json.loads(_stored(runner.dir, rec)) == {"Bearer [REDACTED]": "[REDACTED]", "results": "not-a-list"}
+E   AssertionError: assert {'Bearer DUMM... 'not-a-list'} == {'Bearer [RED... 'not-a-list'}
+E     
+E     Omitting 1 identical items, use -vv to show
+E     Left contains 1 more item:
+E     {'Bearer DUMMY_REVIEW_SECRET_12345': '[REDACTED]'}
+E     Right contains 1 more item:
+E     {'Bearer [REDACTED]': '[REDACTED]'}
+E     ...
+E     
+E     ...Full output truncated (6 lines hidden), use '-vv' to show
+_________________ test_refusal_envelope_strings_are_redacted __________________
+tests\test_v1112_json_string_response.py:136: in test_refusal_envelope_strings_are_redacted
+    assert record["provider_envelope"]["note"] == "Bearer [REDACTED]" and record["request_id"] == "job-7"
+E   AssertionError: assert ('Bearer DUMMY..._SECRET_12345' == 'Bearer [REDACTED]'
+E     
+E     - Bearer [REDACTED]
+E     + Bearer DUMMY_REVIEW_SECRET_12345)
+=========================== short test summary info ===========================
+FAILED tests/test_v1112_json_string_response.py::test_cli_verify_store_json_string_body_is_redacted_with_its_receipt_intact
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[bearer]
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[basic]
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[key-value]
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[url-password]
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[configured-credential]
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_loses_each_credential_form[double-encoded]
+FAILED tests/test_v1112_json_string_response.py::test_json_string_body_with_unicode_escapes_is_redacted_after_decoding
+FAILED tests/test_v1112_json_string_response.py::test_second_adapter_redacts_a_json_string_body
+FAILED tests/test_v1112_json_string_response.py::test_large_json_string_body_is_redacted_before_it_is_bounded
+FAILED tests/test_v1112_json_string_response.py::test_request_id_taken_from_the_body_is_redacted[job_id]
+FAILED tests/test_v1112_json_string_response.py::test_request_id_taken_from_the_body_is_redacted[query]
+FAILED tests/test_v1112_json_string_response.py::test_credential_used_as_an_object_key_is_redacted
+FAILED tests/test_v1112_json_string_response.py::test_refusal_envelope_strings_are_redacted
+======================== 14 failed, 1 passed in 2.07s =========================

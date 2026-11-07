@@ -87,6 +87,7 @@ class Runner:
         self.ck = Checkpoint(self.dir / "checkpoint.sqlite")
         self.fetcher = fetcher or build_fetcher(settings, location)
         self.fetcher.on_refusal = self._archive_refusal
+        self.fetcher.on_failure = self._archive_failure
         self.census: dict[str, dict] = self.ck.get("offer_census", {})
         self.page_size = int(settings.get("crawl.page_size", 24))
         self.max_pages = int(settings.get("crawl.max_pages_per_query", 42))
@@ -97,6 +98,15 @@ class Runner:
 
     def _archive_refusal(self, res) -> None:
         evidence.save_refusal(self.dir, res)
+
+    def _archive_failure(self, res, receipt: dict) -> None:
+        """A response arrived but was unusable: keep its bounded, sanitized body + hash, linked to its receipt."""
+        rec = evidence.save_failed_response(self.dir, res, receipt,
+                                            int(self.s.get("evidence.failed_response_max_bytes", 1_000_000)))
+        self.ck.event("response_failed", {k: rec[k] for k in (
+            "url", "attempt", "request_seq", "budget", "budget_request_n", "requested_at", "failed_at", "error_kind",
+            "error", "provider_status", "original_sha256", "original_bytes", "stored_sha256", "truncated",
+            "stored_file", "receipt_file")})
 
     # ------------------------------------------------------------------ helpers
     def _ctx(self, category: str, sub: str) -> dict:

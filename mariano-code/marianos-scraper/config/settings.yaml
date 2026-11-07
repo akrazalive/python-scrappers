@@ -59,6 +59,8 @@ crawl:
 evidence:
   raw_pages_per_category: 2    # full raw HTML kept for the first N pages per category (all pages keep a price-bearing
                                # gzip excerpt + SHA-256 in the ledger)
+  failed_response_max_bytes: 1000000   # unusable responses (unparseable, malformed, too small, HTTP error) keep a
+                                       # sanitized copy of at most this many bytes + the SHA-256 of the full original
 
 coupons:
   enabled: true                # the "Coupons" CSV row: collect every displayed digital coupon (wording, expiry, id)

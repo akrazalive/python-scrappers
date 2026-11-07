@@ -12,7 +12,8 @@ import logging
 import os
 import random
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 
 log = logging.getLogger("mscraper.fetch")
@@ -26,6 +27,7 @@ class FetchResult:
     elapsed: float
     raw_response: str = ""
     provider_status: int | None = None
+    request: dict = field(default_factory=dict)   # provider request body (never headers / credentials)
 
 
 class FetchError(Exception):
@@ -53,6 +55,25 @@ def provider_error(status: int, text: str) -> "FetchError":
     return FetchError(f"provider HTTP {status}: {text[:160]}", "http")
 
 
+def with_response(err: "FetchError", r, url: str, elapsed: float, body: dict) -> "FetchError":
+    """Attach the provider's original response to an error, so its body can be archived as failure evidence."""
+    err.result = FetchResult(url, 0, "", elapsed, r.text, r.status_code, body)
+    return err
+
+
+def provider_result(r, url: str, elapsed: float, body: dict, content_key: str, status_of) -> FetchResult:
+    """Read the provider's HTTP-200 envelope. A body that is not JSON or not the expected shape raises `malformed`
+    with the original response attached (exc.result), so it is archived as evidence instead of being discarded."""
+    try:
+        res = (r.json().get("results") or [{}])[0]
+        content = res.get(content_key) or ""
+        status = int(status_of(res) or 200)
+    except Exception as exc:
+        err = FetchError(f"provider response could not be parsed ({type(exc).__name__}: {str(exc)[:160]})", "malformed")
+        raise with_response(err, r, url, elapsed, body) from exc
+    return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text, r.status_code, body)
+
+
 def require_live_lock(fetcher) -> None:
     """Real provider adapters may only start inside lock.live_lock (one requester at a time)."""
     from . import lock
@@ -76,6 +97,7 @@ class Fetcher:
         self.budget = int(settings.get("fetch.max_requests_per_run", 0))
         self.total_budget = None   # budget.TotalBudget shared by all commands of one bounded test (persists on disk)
         self.on_refusal = None
+        self.on_failure = None     # on_failure(result, receipt): a response arrived but was unusable (archived)
         self.concurrency = int(os.getenv("MSCRAPER_CONCURRENCY") or settings.get("fetch.concurrency", 4))
         self.sem = asyncio.Semaphore(self.concurrency)
         self._last = 0.0
@@ -117,9 +139,15 @@ class Fetcher:
                     lock.check_active()                 # a lost lease stops every further request
                 except lock.LockLost as exc:
                     raise FetchError(str(exc), "lock") from exc
+                request_n = None
                 if self.total_budget is not None:   # counted before sending; raises once the test's total is used
-                    self.total_budget.take(url, self.loc.store_id)
+                    request_n = self.total_budget.take(url, self.loc.store_id)
                 self.stats["requests"] += 1
+                receipt = {"url": url, "render_js": render_js, "fetcher": self.name, "attempt": attempt + 1,
+                           "request_seq": self.stats["requests"], "budget_request_n": request_n,
+                           "budget": getattr(self.total_budget, "name", None),
+                           "requested_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+                res = None
                 try:
                     res = await asyncio.wait_for(self._fetch_once(url, render_js), self.timeout + 90)
                     self.stats["seconds"] += res.elapsed
@@ -142,12 +170,15 @@ class Fetcher:
                     return res
                 except FetchError as exc:
                     last = exc
+                    if exc.kind != "refused":       # refusals are archived by on_refusal
+                        self._preserve(exc.result or res, exc, receipt)
                     if exc.terminal:
                         raise
-                    self.stats["blocked" if exc.kind == "blocked" else "http_errors"] += 1
+                    self.stats["blocked" if exc.kind in ("blocked", "malformed") else "http_errors"] += 1
                 except asyncio.TimeoutError:
                     last = FetchError("timeout", "timeout")
                 except Exception as exc:  # parse errors raised by validate(), provider faults
+                    self._preserve(getattr(exc, "result", None) or res, exc, receipt)
                     if isinstance(getattr(exc, "kind", None), str) and exc.kind in TERMINAL_KINDS:
                         raise
                     last = exc
@@ -158,6 +189,18 @@ class Fetcher:
                 log.info("retry", extra={"url": url, "attempt": attempt + 1, "error": str(last)[:200], "sleep": round(delay, 1)})
                 await asyncio.sleep(delay)
         raise FetchError(f"failed after {max_retries + 1} attempts: {last}", getattr(last, "kind", "error"))
+
+    def _preserve(self, res: FetchResult | None, exc: Exception, receipt: dict) -> None:
+        """Hand a received-but-unusable response (unparseable envelope, parse failure, too small, HTTP error) to
+        on_failure with its failure receipt. Archiving problems are logged and never hide the original error."""
+        if not self.on_failure or res is None:      # no response at all (timeout, connection error): nothing to keep
+            return
+        receipt = {**receipt, "failed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                   "error_kind": getattr(exc, "kind", "") or type(exc).__name__, "error": str(exc)[:500]}
+        try:
+            self.on_failure(res, receipt)
+        except Exception as arch:  # noqa: BLE001
+            log.error("failed-response archive not written", extra={"url": res.url, "error": str(arch)[:200]})
 
 
 class OxylabsKrogerFetcher(Fetcher):
@@ -185,13 +228,11 @@ class OxylabsKrogerFetcher(Fetcher):
         elapsed = time.monotonic() - t0
         if r.status_code >= 500:
             self.stats["provider_faults"] += 1
-            raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
+            raise with_response(FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http"), r, url, elapsed, body)
         if r.status_code >= 400:
-            raise provider_error(r.status_code, r.text)
-        res = (r.json().get("results") or [{}])[0]
-        meta = res.get("metadata") or {}
-        status = int(((meta.get("statuses") or {}).get("http_request") or {}).get("code") or 200)
-        return FetchResult(url, status, res.get("html") or "", elapsed, r.text, r.status_code)
+            raise with_response(provider_error(r.status_code, r.text), r, url, elapsed, body)
+        return provider_result(r, url, elapsed, body, "html", lambda res: (
+            ((res.get("metadata") or {}).get("statuses") or {}).get("http_request") or {}).get("code"))
 
 
 class FixtureFetcher(Fetcher):
@@ -268,13 +309,10 @@ class OxylabsRealtimeFetcher(Fetcher):
         elapsed = time.monotonic() - t0
         if r.status_code >= 500:
             self.stats["provider_faults"] += 1
-            raise FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http")
+            raise with_response(FetchError(f"provider fault {r.status_code}: {r.text[:160]}", "http"), r, url, elapsed, body)
         if r.status_code >= 400:
-            raise provider_error(r.status_code, r.text)
-        res = (r.json().get("results") or [{}])[0]
-        content = res.get("content") or ""
-        status = int(res.get("status_code") or 200)
-        return FetchResult(url, status, content if isinstance(content, str) else "", elapsed, r.text, r.status_code)
+            raise with_response(provider_error(r.status_code, r.text), r, url, elapsed, body)
+        return provider_result(r, url, elapsed, body, "content", lambda res: res.get("status_code"))
 
 
 def realtime_payload(settings, location, url: str) -> dict:

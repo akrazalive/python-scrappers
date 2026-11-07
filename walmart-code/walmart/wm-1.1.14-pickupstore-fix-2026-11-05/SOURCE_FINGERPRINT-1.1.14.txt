@@ -1,0 +1,5 @@
+version 1.1.14
+source_sha256 dc4c4783a85526bf033ba687d05b1f294cf9bd45303123d5af55fb4abf7b125c
+zip_sha256 0a67dce9d2836f43871efa3cc2c06edb4c8dc938191b2a1ab43ec76839844d76
+package walmart-scraper-1.1.14-src.zip (55 files + MANIFEST.txt + SOURCE_FINGERPRINT.txt)
+previous 1.1.13 source_sha256 f9e02ced92e5b1056a35de20ee8a8616d23f3e59884162e1430989435897868b zip_sha256 48382c21f633fea818aed53329a440398fb774bb977fb72b704dd2a538188835

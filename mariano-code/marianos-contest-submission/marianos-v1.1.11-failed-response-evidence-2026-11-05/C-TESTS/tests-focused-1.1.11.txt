@@ -1,0 +1,24 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\iZa Computers\AppData\Local\Programs\Python\Python313\python.exe
+rootdir: C:\Users\iZa Computers\AppData\Local\Temp\claude\d--PROJECTS-python-scrappers\69aa6648-d1b0-42b6-ad40-7d376e4d599d\scratchpad\ms1111\marianos-scraper
+plugins: anyio-4.15.1, platformdirs-4.13.5
+collecting ... collected 16 items
+
+tests/test_v1111_failed_response.py::test_cli_verify_store_malformed_http200_body_is_preserved_with_receipt PASSED [  6%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[not-json] PASSED [ 12%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[empty] PASSED [ 18%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[truncated-json] PASSED [ 25%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[json-list] PASSED [ 31%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[results-wrong-type] PASSED [ 37%]
+tests/test_v1111_failed_response.py::test_unsupported_provider_shapes_are_archived_not_discarded[non-numeric-status] PASSED [ 43%]
+tests/test_v1111_failed_response.py::test_kroger_adapter_malformed_body_is_archived_without_the_bearer_key PASSED [ 50%]
+tests/test_v1111_failed_response.py::test_valid_envelope_with_unparseable_page_is_archived PASSED [ 56%]
+tests/test_v1111_failed_response.py::test_stored_copy_is_bounded_and_the_original_hash_is_of_the_full_body PASSED [ 62%]
+tests/test_v1111_failed_response.py::test_credentials_and_sensitive_headers_never_reach_the_archive PASSED [ 68%]
+tests/test_v1111_failed_response.py::test_each_retried_attempt_gets_its_own_receipt_and_ledger_line PASSED [ 75%]
+tests/test_v1111_failed_response.py::test_provider_error_bodies_are_archived[400-compat] PASSED [ 81%]
+tests/test_v1111_failed_response.py::test_provider_error_bodies_are_archived[503-http] PASSED [ 87%]
+tests/test_v1111_failed_response.py::test_usable_response_writes_no_failure_receipt PASSED [ 93%]
+tests/test_v116_findings.py::test_retailer_refusal_is_terminal_and_saved PASSED [100%]
+
+============================= 16 passed in 2.50s ==============================
