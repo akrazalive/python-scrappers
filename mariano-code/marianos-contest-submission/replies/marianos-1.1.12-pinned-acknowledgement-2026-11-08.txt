@@ -1,0 +1,13 @@
+Mariano's 1.1.12: pinned, waiting on your source/account decision
+
+Thank you for recording the 122-test result as my offline run and for confirming the 1.1.12 corrections remain credited. Understood that those offline results do not establish the live acceptance items.
+
+Mariano's stays pinned at 1.1.12. I will make no source changes, build no new version and run no further offline tests while your decision is pending.
+
+Unchanged:
+- Test 1 balance stays 0/19 and the execution hold stays in place. Nothing runs without your written approval.
+- Acceptance location stays Vernon Hills 53100502 / PICKUP. Crystal Lake 53100544 stays disabled and diagnostic-only.
+
+Once you have decided the source route and execution scope, I will send the proposed plan: exact CST start and end times, a request limit for each step, and which of the remaining items (qualified store/PICKUP collection, the genuine-product demonstration, required category/page coverage, recovery/retention and Azure operation) each step is meant to show. Every time in it will be marked as proposed until you approve it.
+
+Walmart is in a separate message.

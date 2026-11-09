@@ -1,0 +1,13 @@
+Walmart 1.1.14: pinned, waiting on your source/account decision
+
+Thank you for confirming the 1.1.14 corrections remain credited. Understood that the offline results do not establish the live acceptance items.
+
+Walmart stays pinned at 1.1.14. I will make no source changes, build no new version and run no further offline tests while your decision is pending.
+
+Unchanged:
+- The probe balance stays 3/10 and the execution hold stays in place. Nothing runs without your written approval.
+- The four volume/digital offer fields stay as empty strings, as agreed for the Walmart scope.
+
+Once you have decided the source route and execution scope, I will send the proposed plan: exact CST start and end times, a request limit for each step, and which of the remaining items (qualified store/PICKUP collection, the genuine-product demonstration, required category/page coverage, recovery/retention and Azure operation) each step is meant to show. Every time in it will be marked as proposed until you approve it.
+
+Mariano's is in a separate message.
